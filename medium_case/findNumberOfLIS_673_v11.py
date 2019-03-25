@@ -34,7 +34,7 @@ class Solution:
             n2j.append([])
             n2j[0].append(nums[j])
             #print('j: ', j)
-            for k in range(0,len(n2j)):
+            for k in range(0,len(n2j)): # TODO the value of k should change!
                 n2jk = num2[j][k]
                 for i in range(0,nums_len):
                     if nums[i]<nums[j] and nums[i] < nums[n2jk[0]]:
@@ -43,21 +43,32 @@ class Solution:
                         n2jk.append(i)
                     elif nums[i] == nums[j]:
                         # copy the last element
-                        n2j.append(n2j[-1])
+                        n2jk.pop()
+                        n2j.append(n2jk)
                         n2j[-1].append(j)
+                        print('n2j[-1]: ===========',n2j[-1])
+                        print('len(n2j): ===========',len(n2j))
+                print('n2jk:{0}, j:{1}, k:{2} ______:'.format(n2jk,j,k))
+            print('n2j ______:', n2j)
 
         print('num2 _________________:')
         pprint(num2)
 
         # TODO mesure the least len, add one more for cycle
-        target_len_list = [len(i) for i in num2]
+        target_len_list = []
+        for item in num2:
+            for i in item:
+                target_len_list.append(len(i))
+
         max_len = max(target_len_list)
+        print('max_len: ', max_len)
 
         target_list_long = []
-        for i in num2:
-            if len(i) != max_len:
-                continue
-            if i not in target_list_long:
+        for item in num2:
+            for i in item:
+                if len(i) != max_len:
+                    continue
+                #if i not in target_list_long:
                 target_list_long.append(i)
 
         print('target_list_long: ', target_list_long)
@@ -68,4 +79,5 @@ class Solution:
 if __name__ == '__main__':
     a = Solution()
     l = [1,1,1,2,2,2,3,3,3]
+    l1 = [1,2,3,4,5,6,7,8,9,10,1,1,1,1,1]
     a.findNumberOfLIS(l)
