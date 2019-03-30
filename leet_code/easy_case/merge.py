@@ -11,6 +11,5 @@ class Solution:
             nums1 = nums1.extend(nusm2)
                     
         for i in range(0,m+n):
-            for j in range(0,l2):
-                
+                    
                 
