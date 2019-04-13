@@ -15,6 +15,6 @@ class Solution:
         elif target > nums[-1]:
             return len(nums)
 
-        for i in range(0,len(nums)-1):
-            if nums[i] < target and target < nums[i+1]:
-                return i+1
+        for i in range(0, len(nums) - 1):
+            if nums[i] < target and target < nums[i + 1]:
+                return i + 1

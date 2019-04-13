@@ -1,8 +1,8 @@
-
 class Solution:
-    '''
+    """
     执行用时: 1624 ms, 在Number of Boomerangs的Python3提交中击败了79.56% 的用户
-    '''
+    """
+
     def numberOfBoomerangs(self, points):
         """
         降维
@@ -17,17 +17,17 @@ class Solution:
             dic = {}
             for j in range(n):
                 # 排除这个点本身
-                if j!=i:
-                    dis = self.distance(points[i],points[j])
+                if j != i:
+                    dis = self.distance(points[i], points[j])
                     if dis not in dic:
                         dic[dis] = 1
                     else:
-                        dic[dis]+=1
+                        dic[dis] += 1
             # print(dic)
             for value in dic.values():
-                if value>=2:
-                    sum1+=int(value*(value-1))
+                if value >= 2:
+                    sum1 += int(value * (value - 1))
         return sum1
 
-    def distance(self,point1,point2):
-        return (point1[0]-point2[0])**2+(point1[1]-point2[1])**2
+    def distance(self, point1, point2):
+        return (point1[0] - point2[0]) ** 2 + (point1[1] - point2[1]) ** 2

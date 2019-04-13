@@ -1,45 +1,43 @@
 class Solution:
     def __init__(self):
-        self.compare_dict = {
-            '(': ')',
-            '[': ']',
-            '{': '}'}
+        self.compare_dict = {"(": ")", "[": "]", "{": "}"}
         self.compare_dict2 = {
-            '(': ')',
-            '[': ']',
-            '{': '}',
-            ')': '(',
-            ']': '[',
-            '}': '{'}
+            "(": ")",
+            "[": "]",
+            "{": "}",
+            ")": "(",
+            "]": "[",
+            "}": "{",
+        }
 
     def isValidSub(self, s: str) -> str:
         complecate_brackets = ""
-        s += '0'
-        #print('s:', s)
+        s += "0"
+        # print('s:', s)
         i = 0
         l = len(s)
-        while i < l -1 :
-            #print('s[i],s[i+1]',s[i],s[i+1])
-            if self.compare_dict.get(s[i]) == s[i+1]:
+        while i < l - 1:
+            # print('s[i],s[i+1]',s[i],s[i+1])
+            if self.compare_dict.get(s[i]) == s[i + 1]:
                 i += 2
             else:
                 complecate_brackets += s[i]
                 i += 1
-            #print('i:', i)
-            #print('complecate_brackets:', complecate_brackets)
+            # print('i:', i)
+            # print('complecate_brackets:', complecate_brackets)
 
-        #print('complecate_brackets:', complecate_brackets)
+        # print('complecate_brackets:', complecate_brackets)
         if len(complecate_brackets) > 5:
             rev_s = complecate_brackets[::-1]
             rev_brackets = [self.compare_dict2.get(i) for i in rev_s]
-            print('rev_brackets', rev_brackets)
-            rev_s2 = ''.join(rev_brackets)
+            print("rev_brackets", rev_brackets)
+            rev_s2 = "".join(rev_brackets)
             if rev_s2 == complecate_brackets:
                 return True
 
-        if complecate_brackets == '':
+        if complecate_brackets == "":
             return True
-        if complecate_brackets+'0' == s: 
+        if complecate_brackets + "0" == s:
             return False
         else:
             return self.isValidSub(complecate_brackets)
@@ -48,14 +46,15 @@ class Solution:
         l = len(s)
         if not s:
             return True
-        elif l % 2 ==1:
+        elif l % 2 == 1:
             return False
-        
+
         s2 = self.isValidSub(s)
-        print('s2:', s2)
+        print("s2:", s2)
         return s2
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     a = Solution()
     s = "(()("
     s2 = "[({(())}[()])]"

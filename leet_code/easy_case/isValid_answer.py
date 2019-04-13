@@ -7,7 +7,7 @@ class Solution(object):
         if len(s) % 2 != 0:
             return False
 
-        lb = {'(':')','[':']','{':'}'}
+        lb = {"(": ")", "[": "]", "{": "}"}
         queue = []
         for x in s:
             if x in lb:
