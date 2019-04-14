@@ -16,8 +16,8 @@ filetype plugin on
 
 " 显示行号
 set number
-" 在第64列显示竖线
-set cc=64
+" 在第80列显示竖线
+set cc=80
 " 高亮显示当前行
 set cursorline
 
