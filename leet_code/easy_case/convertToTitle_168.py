@@ -1,10 +1,11 @@
 # leetcode 168
 
+
 class Solution:
     def convertToTitle(self, n: int) -> str:
-        ret = ''
-        while n > 0 :
-            n -= 1 # why ?
+        ret = ""
+        while n > 0:
+            n -= 1  # why ?
             print(f"n:{n}")
             ret = chr(n % 26 + ord("A")) + ret
             print(f"ret:{ret}")

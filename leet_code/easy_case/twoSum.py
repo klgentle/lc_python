@@ -3,20 +3,20 @@ class Solution:
         l = len(numbers)
         a = list(set(numbers))
         l2 = len(a)
-        #print(f"numbers:{numbers},target:{target}")
+        # print(f"numbers:{numbers},target:{target}")
         for i2 in range(0, l2):
             op = target - a[i2]
-            #print(f"op:{op}")
+            # print(f"op:{op}")
             i = numbers.index(a[i2])
-            #print(f"i:{i}")
+            # print(f"i:{i}")
             if op in numbers and op >= a[i2]:
                 if a[i2] == op:
-                    j = numbers.index(op)+1
+                    j = numbers.index(op) + 1
                 else:
                     j = numbers.index(op)
-                #print(f"j:{j}")
+                # print(f"j:{j}")
                 if i < j:
-                    #print(f"[i, j]: [{i},{j}]")
+                    # print(f"[i, j]: [{i},{j}]")
                     return [i + 1, j + 1]
 
 
