@@ -6,7 +6,7 @@ class Solution:
         elif digits[-1] == 9:
             digits[-1] = 10
             for i in range(-1, -l, -1):
-                #print(i)
+                # print(i)
                 if digits[i] == 10:
                     digits[i] = 0
                     digits[i - 1] += 1
