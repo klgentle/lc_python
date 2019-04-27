@@ -1,15 +1,8 @@
 Charset=UTF-8
-Columns=160
-Rows=45
-Font=Monaco
-FontHeight=11
 Term=xterm-256color
 CursorType=block
 CursorBlinks=yes
-Transparency=low
-BoldAsFont=yes
 AllowBlinking=no
-Scrollbar=none
 ScrollbackLines=10000
 ClickTargetMod=off
 ComposeKey=shift
