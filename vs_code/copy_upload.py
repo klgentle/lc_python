@@ -57,4 +57,4 @@ def copyRegister(date_str:str):
 
 
 if __name__ == '__main__':
-    copyRegister('20190417')
+    copyRegister('20190427')
