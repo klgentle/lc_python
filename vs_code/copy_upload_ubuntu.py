@@ -3,6 +3,7 @@ import openpyxl
 import pprint
 import csv
 from sys import argv
+from openpyxl import Workbook
 import codecs
 
 
@@ -77,7 +78,6 @@ class CopyRegister(object):
 
     def copyfiles(self):
         # copy code files
-        print(f"\n\nstart to write rows ----------------- ")
         for row in self.data_list:
             name, file_type, path = row[2:5]
             path = path.replace('\\','/')
@@ -104,13 +104,43 @@ class CopyRegister(object):
             except FileNotFoundError:
                 print(f"error! No such file: {new_file}")
 
+    def saveRegisterExcel(self):
+        print(f"\n\nstart to write rows ----------------- ")
+
+        wb = Workbook()
+        sheet = wb.active
+        sheet.title = self.date_str + "发布登记" 
+
+        file_path_name = self.target_path + "/登记表" + self.date_str + ".xlsx"
+        print(f"file_path_name:{file_path_name}")
+        head_list = [
+                "所属模块",
+                "类型（接口\报表）",
+                "程序名称",
+                "程序类型（pro\java\\rpt\sql\shell)",
+                "SVN存储目录 ",
+                "开发负责人",
+                "BA负责人",
+                "发布日期",
+                "mantis id",
+                "remarks"
+            ]
+        sheet.append(head_list)
+        ## print(f'self.date_list:{self.data_list}')
+
+        # record rows
+        for row in self.data_list:
+             sheet.append(row)
+
+        wb.save(filename=file_path_name)
 
 if __name__ == "__main__":
     if len(argv) == 2 and len(argv[1]) == 8:
         a = CopyRegister(argv[1])
         #a.date_str = argv[1]
         a.readRegister()
-        a.saveRegister()
+        #a.saveRegister()
+        a.saveRegisterExcel()
         a.copyfiles()
     else:
         print("usage python[3] copy_upload_ubuntu.py '20190501'")
