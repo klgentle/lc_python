@@ -14,7 +14,7 @@ def copyRegister(date_str:str):
     target_path = os.path.join(code_bate_path, date_str+'bate')
     os.makedirs(target_path, exist_ok=True)
 
-    csvFile = open(target_path + '\\登记表'+date_str+'.csv', 'w', newline='')
+    csvFile = open(target_path + '\\登记表'+date_str+'.csv', 'w', newline='', encoding='utf-8-sig')
     csvWriter = csv.writer(csvFile, delimiter=',', lineterminator='\n')
     csvWriter.writerow(['所属模块','类型（接口\报表）','程序名称','程序类型（pro\java\\rpt\sql\shell)','SVN存储目录 ','开发负责人','BA负责人','发布日期','mantis id','remarks'])
 

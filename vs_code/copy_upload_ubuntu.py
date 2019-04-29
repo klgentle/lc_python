@@ -3,6 +3,7 @@ import openpyxl
 import pprint
 import csv
 from sys import argv
+import codecs
 
 
 class CopyRegister(object):
@@ -50,10 +51,9 @@ class CopyRegister(object):
 
     def saveRegister(self):
 
-        csvFile = open(self.target_path + "/登记表" + self.date_str + ".csv", "w", newline="")
-        csvWriter = csv.writer(csvFile, delimiter=",", lineterminator="\n")
-        csvWriter.writerow(
-            [
+        csvFile = open(self.target_path + "/登记表" + self.date_str + ".csv", "w", encoding='utf-8-sig')
+        csvWriter = csv.writer(csvFile, delimiter=",", lineterminator="\n", dialect='excel')
+        head_list = [
                 "所属模块",
                 "类型（接口\报表）",
                 "程序名称",
@@ -63,10 +63,12 @@ class CopyRegister(object):
                 "BA负责人",
                 "发布日期",
                 "mantis id",
-                "remarks",
+                "remarks"
             ]
-        )
+        #head_list = [str(i).encode('gbk','ignore') for i in head_list]
+        csvWriter.writerow(head_list)
         # print(f'self.date_list:{self.data_list}')
+
         # record rows
         for row in self.data_list:
             csvWriter.writerow(row)
