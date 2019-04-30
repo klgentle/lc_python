@@ -9,6 +9,7 @@ from sys import argv
 from openpyxl import Workbook
 from backupToZip import backupToZip
 
+SVN_DIR = "/mnt/e/svn/1300_编码/"
 
 class CopyRegister(object):
     """ copy 'svn/1300_编码' upload register and upload file 
@@ -21,12 +22,13 @@ class CopyRegister(object):
         self.code_home = "/mnt/e/svn"
         self.dir_name = os.path.join(self.code_home, "1300_编码/发布登记表")
         svnup_dir = os.path.join(self.code_home, "1300_编码")
-        os.system(f"svn up {svnup_dir}")
+        os.system(f"svn up '{svnup_dir}'")
         code_beta_path = "/mnt/e/yx_walk/report_develop/sky"
         self.target_path = os.path.join(code_beta_path, self.date_str + "beta")
         os.makedirs(self.target_path, exist_ok=True)
         self.data_list = []
         print(f"self.date_str:{self.date_str}")
+
 
     def readRegister(self):
         """ copy register """
@@ -120,25 +122,31 @@ class CopyRegister(object):
     def saveRegisterExcel(self):
         print(f"\n\nstart to write rows ----------------- ")
 
-        wb = Workbook()
-        sheet = wb.active
-        sheet.title = self.date_str + "发布登记"
-
+        file1 = os.path.join(SVN_DIR, "发布登记表", "支付", "ODS程序版本发布登记表(支付)-template.xlsx")
         file_path_name = self.target_path + "/登记表" + self.date_str + ".xlsx"
         print(f"file_path_name:{file_path_name}")
-        head_list = [
-            "所属模块",
-            "类型（接口\报表）",
-            "程序名称",
-            "程序类型（pro\java\\rpt\sql\shell)",
-            "SVN存储目录 ",
-            "开发负责人",
-            "BA负责人",
-            "发布日期",
-            "mantis id",
-            "remarks",
-        ]
-        sheet.append(head_list)
+        if not os.path.exists(file_path_name):
+            shutil.copy(file1, file_path_name)
+
+
+        #wb = Workbook()
+        wb = openpyxl.load_workbook(file_path_name)
+        sheet = wb.active
+        #sheet.title = self.date_str + "发布登记"
+
+        #head_list = [
+        #    "所属模块",
+        #    "类型（接口\报表）",
+        #    "程序名称",
+        #    "程序类型（pro\java\\rpt\sql\shell)",
+        #    "SVN存储目录 ",
+        #    "开发负责人",
+        #    "BA负责人",
+        #    "发布日期",
+        #    "mantis id",
+        #    "remarks",
+        #]
+        #sheet.append(head_list)
         ## print(f'self.date_list:{self.data_list}')
 
         # record rows
