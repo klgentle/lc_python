@@ -5,6 +5,7 @@ import csv
 from sys import argv
 from openpyxl import Workbook
 import codecs
+from backupToZip import backupToZip
 
 
 class CopyRegister(object):
@@ -15,8 +16,8 @@ class CopyRegister(object):
 
         self.code_home = "/mnt/e/svn"
         self.dir_name = os.path.join(self.code_home, "1300_编码/发布登记表")
-        code_bate_path = "/mnt/e/yx_walk/report_develop/sky"
-        self.target_path = os.path.join(code_bate_path, self.date_str + "bate")
+        code_beta_path = "/mnt/e/yx_walk/report_develop/sky"
+        self.target_path = os.path.join(code_beta_path, self.date_str + "beta")
         os.makedirs(self.target_path, exist_ok=True)
         self.data_list = []
         print(f"self.date_str:{self.date_str}")
@@ -140,6 +141,9 @@ class CopyRegister(object):
 
         wb.save(filename=file_path_name)
 
+    def createZipfile(self):
+        return backupToZip(self.target_path)
+
 
 if __name__ == "__main__":
     if len(argv) == 2 and len(argv[1]) == 8:
@@ -149,5 +153,6 @@ if __name__ == "__main__":
         # a.saveRegister()
         a.saveRegisterExcel()
         a.copyfiles()
+        a.createZipfile()
     else:
         print("usage python[3] copy_upload_ubuntu.py '20190501'")
