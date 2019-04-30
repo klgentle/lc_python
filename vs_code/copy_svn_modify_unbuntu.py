@@ -1,21 +1,27 @@
 import shutil, os
 import openpyxl
 import pprint
+import codecs
 import csv
+import os
+import time
 from sys import argv
 from openpyxl import Workbook
-import codecs
 from backupToZip import backupToZip
 
 
 class CopyRegister(object):
-    """ copy upload register and upload file """
+    """ copy 'svn/1300_编码' upload register and upload file 
+       "usage python[3] copy_upload_ubuntu.py '20190501'"
+    """
 
     def __init__(self, date_str: str):
         self.date_str = date_str
 
         self.code_home = "/mnt/e/svn"
         self.dir_name = os.path.join(self.code_home, "1300_编码/发布登记表")
+        svnup_dir = os.path.join(self.code_home, "1300_编码")
+        os.system(f"svn up {svnup_dir}")
         code_beta_path = "/mnt/e/yx_walk/report_develop/sky"
         self.target_path = os.path.join(code_beta_path, self.date_str + "beta")
         os.makedirs(self.target_path, exist_ok=True)
@@ -146,13 +152,14 @@ class CopyRegister(object):
 
 
 if __name__ == "__main__":
-    if len(argv) == 2 and len(argv[1]) == 8:
-        a = CopyRegister(argv[1])
-        # a.date_str = argv[1]
-        a.readRegister()
-        # a.saveRegister()
-        a.saveRegisterExcel()
-        a.copyfiles()
-        a.createZipfile()
-    else:
-        print("usage python[3] copy_upload_ubuntu.py '20190501'")
+    date_str = time.strftime("%Y%m%d", time.localtime())
+    if len(argv) > 1 and len(argv[1]) == 8:
+        date_str = argv[1]
+
+    a = CopyRegister(date_str)
+    a.readRegister()
+    a.saveRegisterExcel()
+    a.copyfiles()
+    a.createZipfile()
+
+    # print("usage python[3] copy_upload_ubuntu.py '20190501'")

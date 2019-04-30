@@ -8,7 +8,8 @@ import zipfile, os
 def backupToZip(folder: str):
 
     # change path
-    os.chdir(os.path.dirname(folder))
+    dirname = os.path.dirname(folder)
+    os.chdir(dirname)
     # Backup the entire contents of "folder" into a ZIP file.
     folder = os.path.abspath(folder)
 
@@ -30,7 +31,7 @@ def backupToZip(folder: str):
     for foldername, subfolders, filenames in os.walk(folder):
         print(f"Adding files in {foldername} ________________")
         # backupZip.write(foldername)
-        short_foldername = foldername[len(folder) :]
+        short_foldername = foldername[len(dirname) :]
         backupZip.write(foldername, short_foldername)  # 重命名(去掉文件名前面的绝对路径）
 
         # Add all the files in this folder to the ZIP file.
