@@ -9,8 +9,9 @@ import codecs
 
 class CopyRegister(object):
     """ copy upload register and upload file """
-    def __init__(self,date_str:str):
-        self.date_str = date_str 
+
+    def __init__(self, date_str: str):
+        self.date_str = date_str
 
         self.code_home = "/mnt/e/svn"
         self.dir_name = os.path.join(self.code_home, "1300_编码/发布登记表")
@@ -25,11 +26,11 @@ class CopyRegister(object):
 
         for folderName, subfolders, filenames in os.walk(self.dir_name):
             for filename in filenames:
-                #print('FILE INSIDE ' + folderName + ': '+ filename)
+                # print('FILE INSIDE ' + folderName + ': '+ filename)
                 if filename.find(self.date_str) == -1:
                     continue
 
-                #print(f"filename: {filename} --------------------------")
+                # print(f"filename: {filename} --------------------------")
                 whole_filename = os.path.join(folderName, filename)
 
                 # copy excel file content
@@ -42,31 +43,36 @@ class CopyRegister(object):
                     # file_type = sheet["D" + str(row)].value
                     # path = sheet["E" + str(row)].value
                     data_row = [
-                        sheet[chr(i + ord("A")) + str(row)].value
-                        for i in range(0, 10)
+                        sheet[chr(i + ord("A")) + str(row)].value for i in range(0, 10)
                     ]
-                    #print(f"data_row:{data_row}")
+                    # print(f"data_row:{data_row}")
                     self.data_list.append(data_row)
 
-        #print(f"data_list:{self.data_list}")
+        # print(f"data_list:{self.data_list}")
 
     def saveRegister(self):
 
-        csvFile = open(self.target_path + "/登记表" + self.date_str + ".csv", "w", encoding='utf-8-sig')
-        csvWriter = csv.writer(csvFile, delimiter=",", lineterminator="\n", dialect='excel')
+        csvFile = open(
+            self.target_path + "/登记表" + self.date_str + ".csv",
+            "w",
+            encoding="utf-8-sig",
+        )
+        csvWriter = csv.writer(
+            csvFile, delimiter=",", lineterminator="\n", dialect="excel"
+        )
         head_list = [
-                "所属模块",
-                "类型（接口\报表）",
-                "程序名称",
-                "程序类型（pro\java\\rpt\sql\shell)",
-                "SVN存储目录 ",
-                "开发负责人",
-                "BA负责人",
-                "发布日期",
-                "mantis id",
-                "remarks"
-            ]
-        #head_list = [str(i).encode('gbk','ignore') for i in head_list]
+            "所属模块",
+            "类型（接口\报表）",
+            "程序名称",
+            "程序类型（pro\java\\rpt\sql\shell)",
+            "SVN存储目录 ",
+            "开发负责人",
+            "BA负责人",
+            "发布日期",
+            "mantis id",
+            "remarks",
+        ]
+        # head_list = [str(i).encode('gbk','ignore') for i in head_list]
         csvWriter.writerow(head_list)
         # print(f'self.date_list:{self.data_list}')
 
@@ -80,14 +86,14 @@ class CopyRegister(object):
         # copy code files
         for row in self.data_list:
             name, file_type, path = row[2:5]
-            path = path.replace('\\','/')
+            path = path.replace("\\", "/")
             ind = path.find("1300_编码")
             if ind == -1:
                 continue
-            if file_type.upper() == 'BO':
-                file_type = 'rpt'
-            elif file_type.upper() == 'PRO':
-                file_type = 'sql'
+            if file_type.upper() == "BO":
+                file_type = "rpt"
+            elif file_type.upper() == "PRO":
+                file_type = "sql"
 
             new_file = os.path.join(
                 self.code_home, path[ind:], name + "." + file_type.lower()
@@ -109,37 +115,38 @@ class CopyRegister(object):
 
         wb = Workbook()
         sheet = wb.active
-        sheet.title = self.date_str + "发布登记" 
+        sheet.title = self.date_str + "发布登记"
 
         file_path_name = self.target_path + "/登记表" + self.date_str + ".xlsx"
         print(f"file_path_name:{file_path_name}")
         head_list = [
-                "所属模块",
-                "类型（接口\报表）",
-                "程序名称",
-                "程序类型（pro\java\\rpt\sql\shell)",
-                "SVN存储目录 ",
-                "开发负责人",
-                "BA负责人",
-                "发布日期",
-                "mantis id",
-                "remarks"
-            ]
+            "所属模块",
+            "类型（接口\报表）",
+            "程序名称",
+            "程序类型（pro\java\\rpt\sql\shell)",
+            "SVN存储目录 ",
+            "开发负责人",
+            "BA负责人",
+            "发布日期",
+            "mantis id",
+            "remarks",
+        ]
         sheet.append(head_list)
         ## print(f'self.date_list:{self.data_list}')
 
         # record rows
         for row in self.data_list:
-             sheet.append(row)
+            sheet.append(row)
 
         wb.save(filename=file_path_name)
+
 
 if __name__ == "__main__":
     if len(argv) == 2 and len(argv[1]) == 8:
         a = CopyRegister(argv[1])
-        #a.date_str = argv[1]
+        # a.date_str = argv[1]
         a.readRegister()
-        #a.saveRegister()
+        # a.saveRegister()
         a.saveRegisterExcel()
         a.copyfiles()
     else:
