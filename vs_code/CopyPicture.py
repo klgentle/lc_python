@@ -6,7 +6,10 @@ import time
 
 
 def CopyPicture():
-    path = "C:\\Users\\pactera\\AppData\\Local\\Packages\\Microsoft.Windows.ContentDeliveryManager_cw5n1h2txyewy\\LocalState\\Assets"
+    username = "klgentle"
+    target_path = "D:\\picture\\win10_save\\tmp"
+
+    path = f"C:\\Users\\{username}\\AppData\\Local\\Packages\\Microsoft.Windows.ContentDeliveryManager_cw5n1h2txyewy\\LocalState\\Assets"
     # os.path.dirname(path)
     date_str = time.strftime("%Y%m%d", time.localtime())
 
@@ -18,8 +21,7 @@ def CopyPicture():
         if os.path.getsize(path_file) > 169 * 1024:
             # 复制并重新命名文件
             shutil.copy(
-                path_file,
-                "D:\\win_screen\\tmp\\" + date_str + "_" + str(filename)[:6] + ".jpg",
+                path_file, target_path + date_str + "_" + str(filename)[:6] + ".jpg"
             )
 
 
