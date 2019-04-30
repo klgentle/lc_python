@@ -3,7 +3,6 @@ import openpyxl
 import pprint
 import csv
 
-
 # copy upload register and upload file
 
 
