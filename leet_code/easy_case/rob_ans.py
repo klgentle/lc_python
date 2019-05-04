@@ -4,7 +4,7 @@ import pysnooper
 
 class Solution(object):
     # debug here
-    #@pysnooper.snoop('/home/kl/log/leet_code/1.log')
+    # @pysnooper.snoop('/home/kl/log/leet_code/1.log')
     @pysnooper.snoop()
     def rob(self, nums: list) -> int:
         """
