@@ -14,6 +14,7 @@ from backupToZip import backupToZip
 
 SVN_DIR = "/mnt/e/svn/1300_编码/"
 
+
 class CopyRegister(object):
     """ copy 'svn/1300_编码' upload register and upload file 
        "usage python[3] copy_upload_ubuntu.py '20190501'"
@@ -29,14 +30,12 @@ class CopyRegister(object):
         code_beta_path = "/mnt/e/yx_walk/report_develop/sky"
 
         self.target_path = os.path.join(code_beta_path, self.date_str + "beta")
-        if not os.path.exists(self.target_path):
-            os.makedirs(self.target_path, exist_ok=True)
-        #else:
-        #    sh.rm('-r', f'{self.target_path}')
+        if os.path.exists(self.target_path):
+            sh.rm("-rf", f"{self.target_path}")
+        os.makedirs(self.target_path, exist_ok=True)
 
         self.data_list = []
-        #print(f"self.date_str:{self.date_str}")
-
+        # print(f"self.date_str:{self.date_str}")
 
     def readRegister(self):
         """ copy register """
@@ -128,18 +127,18 @@ class CopyRegister(object):
                 print(f"error! No such file: {new_file} _______________")
 
     def saveRegisterExcel(self):
-        #print(f"start to write rows! ")
+        # print(f"start to write rows! ")
 
         file1 = os.path.join(SVN_DIR, "发布登记表", "支付", "ODS程序版本发布登记表(支付)-template.xlsx")
         file_path_name = self.target_path + "/登记表" + self.date_str + ".xlsx"
-        #print(f"file_path_name:{file_path_name}")
-        #print(f"file1:{file1}")
+        # print(f"file_path_name:{file_path_name}")
+        # print(f"file1:{file1}")
         shutil.copy(file1, file_path_name)
 
-        #wb = Workbook()
+        # wb = Workbook()
         wb = openpyxl.load_workbook(file_path_name)
         sheet = wb.active
-        #sheet.title = self.date_str + "发布登记"
+        # sheet.title = self.date_str + "发布登记"
 
         # record rows
         for row in self.data_list:
