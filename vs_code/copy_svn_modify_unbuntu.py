@@ -5,9 +5,12 @@ import codecs
 import csv
 import os
 import time
+import sh
+
 from sys import argv
 from openpyxl import Workbook
 from backupToZip import backupToZip
+
 
 SVN_DIR = "/mnt/e/svn/1300_编码/"
 
@@ -24,10 +27,15 @@ class CopyRegister(object):
         svnup_dir = os.path.join(self.code_home, "1300_编码")
         os.system(f"svn up '{svnup_dir}'")
         code_beta_path = "/mnt/e/yx_walk/report_develop/sky"
+
         self.target_path = os.path.join(code_beta_path, self.date_str + "beta")
-        os.makedirs(self.target_path, exist_ok=True)
+        if not os.path.exists(self.target_path):
+            os.makedirs(self.target_path, exist_ok=True)
+        #else:
+        #    sh.rm('-r', f'{self.target_path}')
+
         self.data_list = []
-        print(f"self.date_str:{self.date_str}")
+        #print(f"self.date_str:{self.date_str}")
 
 
     def readRegister(self):
@@ -117,37 +125,21 @@ class CopyRegister(object):
             try:
                 shutil.copy(new_file, self.target_path2)
             except FileNotFoundError:
-                print(f"error! No such file: {new_file}")
+                print(f"error! No such file: {new_file} _______________")
 
     def saveRegisterExcel(self):
-        print(f"\n\nstart to write rows ----------------- ")
+        #print(f"start to write rows! ")
 
         file1 = os.path.join(SVN_DIR, "发布登记表", "支付", "ODS程序版本发布登记表(支付)-template.xlsx")
         file_path_name = self.target_path + "/登记表" + self.date_str + ".xlsx"
-        print(f"file_path_name:{file_path_name}")
-        if not os.path.exists(file_path_name):
-            shutil.copy(file1, file_path_name)
-
+        #print(f"file_path_name:{file_path_name}")
+        #print(f"file1:{file1}")
+        shutil.copy(file1, file_path_name)
 
         #wb = Workbook()
         wb = openpyxl.load_workbook(file_path_name)
         sheet = wb.active
         #sheet.title = self.date_str + "发布登记"
-
-        #head_list = [
-        #    "所属模块",
-        #    "类型（接口\报表）",
-        #    "程序名称",
-        #    "程序类型（pro\java\\rpt\sql\shell)",
-        #    "SVN存储目录 ",
-        #    "开发负责人",
-        #    "BA负责人",
-        #    "发布日期",
-        #    "mantis id",
-        #    "remarks",
-        #]
-        #sheet.append(head_list)
-        ## print(f'self.date_list:{self.data_list}')
 
         # record rows
         for row in self.data_list:

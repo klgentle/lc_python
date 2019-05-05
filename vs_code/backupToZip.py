@@ -26,10 +26,10 @@ def backupToZip(folder: str):
 
     # walk the entire folder tree and compress the files in each folder
     base_folder = os.path.basename(folder)
-    print(f"base_folder:{base_folder}")
+    #print(f"base_folder:{base_folder}")
 
     for foldername, subfolders, filenames in os.walk(folder):
-        print(f"Adding files in {foldername} ________________")
+        #print(f"Adding files in {foldername}")
         # backupZip.write(foldername)
         short_foldername = foldername[len(dirname) :]
         backupZip.write(foldername, short_foldername)  # 重命名(去掉文件名前面的绝对路径）
