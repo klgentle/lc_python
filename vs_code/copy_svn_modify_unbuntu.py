@@ -66,38 +66,6 @@ class CopyRegister(object):
 
         # print(f"data_list:{self.data_list}")
 
-    def saveRegister(self):
-
-        csvFile = open(
-            self.target_path + "/登记表" + self.date_str + ".csv",
-            "w",
-            encoding="utf-8-sig",
-        )
-        csvWriter = csv.writer(
-            csvFile, delimiter=",", lineterminator="\n", dialect="excel"
-        )
-        head_list = [
-            "所属模块",
-            "类型（接口\报表）",
-            "程序名称",
-            "程序类型（pro\java\\rpt\sql\shell)",
-            "SVN存储目录 ",
-            "开发负责人",
-            "BA负责人",
-            "发布日期",
-            "mantis id",
-            "remarks",
-        ]
-        # head_list = [str(i).encode('gbk','ignore') for i in head_list]
-        csvWriter.writerow(head_list)
-        # print(f'self.date_list:{self.data_list}')
-
-        # record rows
-        for row in self.data_list:
-            csvWriter.writerow(row)
-
-        csvFile.close()
-
     def copyfiles(self):
         # copy code files
         for row in self.data_list:
@@ -114,7 +82,6 @@ class CopyRegister(object):
             new_file = os.path.join(
                 self.code_home, path[ind:], name + "." + file_type.lower()
             )
-            # print(f"new_file:{new_file}")
 
             targetName = path[ind:].split("/")[1].split("_")[1]
             # print(f"targetName:{targetName}")
