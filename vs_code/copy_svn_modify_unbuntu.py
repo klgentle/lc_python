@@ -10,6 +10,7 @@ import sh
 from sys import argv
 from openpyxl import Workbook
 from backupToZip import backupToZip
+from datetime import datetime
 
 
 SVN_DIR = "/mnt/e/svn/1300_编码/"
@@ -56,12 +57,13 @@ class CopyRegister(object):
                     name = sheet["C" + str(row)].value
                     if not name:
                         continue
-                    # file_type = sheet["D" + str(row)].value
-                    # path = sheet["E" + str(row)].value
                     data_row = [
                         sheet[chr(i + ord("A")) + str(row)].value for i in range(0, 10)
                     ]
-                    # print(f"data_row:{data_row}")
+                    if isinstance(data_row[7],datetime):
+                        data_row[7] = data_row[7].strftime("%Y%m%d")
+
+                    #print(f"data_row:{data_row}")
                     self.data_list.append(data_row)
 
         # print(f"data_list:{self.data_list}")
