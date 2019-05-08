@@ -3,22 +3,21 @@
 # whose filename increments
 
 import zipfile, os
+import sh
 
 
 def backupToZip(folder: str):
 
+    # TODO encrypt 
     # change path
     dirname = os.path.dirname(folder)
     os.chdir(dirname)
     # Backup the entire contents of "folder" into a ZIP file.
     folder = os.path.abspath(folder)
 
-    number = 1
-    while True:
-        zipFilename = os.path.basename(folder) + "_" + str(number) + ".zip"
-        if not os.path.exists(zipFilename):
-            break
-        number = number + 1
+    zipFilename = os.path.basename(folder) + ".zip"
+    if os.path.exists(zipFilename):
+        sh.rm(zipFilename) 
 
     # create the ZIP file
     print(f"Creating {zipFilename}..")
@@ -49,5 +48,5 @@ def backupToZip(folder: str):
 
 
 if __name__ == "__main__":
-    folder = "/mnt/e/yx_walk/report_develop/sky/uat05"
+    folder = "/mnt/e/yx_walk/report_develop/sky/20190505beta"
     backupToZip(folder)
