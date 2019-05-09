@@ -51,7 +51,10 @@ class Solution:
                 # print(f"file_list:{file_list}")
                 file_name = file_list[0]
                 modu = file_name.upper().split("RPT_")
-                module = modu[1][:3]
+                module = ""
+                if len(modu) > 1:
+                    module = modu[1][:3]
+
                 print(f"module:{module}")
                 file_type = file_list[-1].replace("\n", "")
                 row = (
