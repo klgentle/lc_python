@@ -128,6 +128,7 @@ if __name__ == "__main__":
     a.readRegister()
     a.saveRegisterExcel()
     a.copyfiles()
-    a.createZipfile()
+    # not create zip file, need to add rpt files
+    #a.createZipfile()
 
     # print("usage python[3] copy_upload_ubuntu.py '20190501'")
