@@ -17,20 +17,17 @@ class SplitPicture(object):
                 if not filename.endswith('png'):
                     continue
 
+                #if filename != '2019-05-13 163915.png':
+                #    continue
                 print(f"filename:{filename}")
-
                 file_whole_name = os.path.join(self.path,folderName,filename)
-                img = Image.open(file_whole_name)
-                box1 = (0,0,665,750)
-                image1 = img.crop(box1)
-                image1.save(file_whole_name)
-                
-                
+
                 img = cv2.imread(file_whole_name)
-                #print(f"img:{img.shape}") #(1334, 750, 3)
-                
-                x, y = img.shape[0:2]
-                img_test1 = cv2.resize(img, (int(y / 2), int(x / 2)))
+                cropped = img[0:660,:]
+                x, y = cropped.shape[0:2]
+                #img_test1 = cv2.resize(cropped, (int(y / 2), int(x / 2)+1))
+                img_test1 = cv2.resize(cropped, (int(y / 2.2), int(x / 2.2)))
+                cv2.imwrite(file_whole_name,img_test1)
 
 
 

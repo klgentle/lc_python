@@ -29,7 +29,7 @@ def CopyPicture():
         # 拼接路径与文件名
         path_file = os.path.join(path, filename)
         
-        short_name = str(filename)[:6]
+        short_name = str(filename)[:12] # 6 is too short
         #if short_name in hist_list:
         #    continue
         
