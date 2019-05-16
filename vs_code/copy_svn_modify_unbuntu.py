@@ -78,16 +78,19 @@ class CopyRegister(object):
                 continue
             if file_type.upper() == "BO":
                 file_type = "rpt"
-            elif file_type.upper() == "PRO":
+            elif file_type.upper() in ("PRO", "FNC"):
                 file_type = "sql"
 
             new_file = os.path.join(
                 self.code_home, path[ind:], name + "." + file_type.lower()
             )
 
-            targetName = path[ind:].split("/")[1].split("_")[1]
-            # print(f"targetName:{targetName}")
+            #print(f"path:{path}")
+            # get folder name of code 
+            targetName = path[ind:].split("/")[1]
 
+            if targetName != "1350_存储过程":
+                targetName = file_type
             self.target_path2 = os.path.join(self.target_path, targetName)
             os.makedirs(self.target_path2, exist_ok=True)
             try:
@@ -115,8 +118,8 @@ class CopyRegister(object):
 
         wb.save(filename=file_path_name)
 
-    def createZipfile(self):
-        return backupToZip(self.target_path)
+    #def createZipfile(self):
+    #    return backupToZip(self.target_path)
 
 
 if __name__ == "__main__":

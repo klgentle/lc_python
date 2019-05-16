@@ -26,6 +26,7 @@ class Solution:
         self.file2 = os.path.join(
             self.regi_dir, f"ODS程序版本发布登记表{module_type_name}-{self.date_str}.xlsx"
         )
+        print(f"self.file2:{self.file2}")
         if not os.path.exists(self.file2):
             shutil.copy(file1, self.file2)
 
@@ -36,10 +37,10 @@ class Solution:
         svn_log = open(SVN_LOG)
         for line in svn_log.readlines():
             if line.startswith("Sending") or line.startswith("Adding"):
-                if line.find("(bin)") > -1:
+                if line.find("ODS程序版本发布登记表") > -1:
                     continue
 
-                path_file = line.split("        ")[1]
+                path_file = line[line.find('1300_编码'):]
                 path_list = path_file.split("/")
                 # 跳过建表语句
                 if path_list[-2] == "1380_建表语句":
@@ -82,7 +83,7 @@ class Solution:
                     # row is blank and row+1 is blank too
                     if not sheet["C" + str(row + 1)].value:
                         break
-            print(f"num:{num}")
+            #print(f"num:{num}")
             sheet.delete_rows(row, sheet.max_row - num)
 
         for i in self.comit_list:
@@ -96,7 +97,6 @@ if __name__ == "__main__":
     date_str = time.strftime("%Y%m%d", time.localtime())
     remark = ""
     module_type = "支付"
-    # print(f"argv:{argv} ---------- ")
     if len(argv) == 2 and len(argv[1]) == 8:
         date_str = argv[1]
     elif len(argv) == 3:
@@ -107,6 +107,7 @@ if __name__ == "__main__":
         print("usage: python3 commit_register.py '20190501' remark")
         sys.exit(1)
 
+    #print(f"date_str:{date_str} ---------- ")
     a = Solution(date_str, remark, module_type)
     a.logRead()
     a.logRegister()
