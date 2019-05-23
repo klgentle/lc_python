@@ -27,7 +27,7 @@ class CopyRegister(object):
         self.code_home = "/mnt/e/svn"
         self.dir_name = os.path.join(self.code_home, "1300_编码/发布登记表")
         svnup_dir = os.path.join(self.code_home, "1300_编码")
-        os.system(f"svn up '{svnup_dir}'")
+        #os.system(f"svn up '{svnup_dir}'")
         code_beta_path = "/mnt/e/yx_walk/report_develop/sky"
 
         self.target_path = os.path.join(code_beta_path, self.date_str + "beta")
@@ -80,9 +80,12 @@ class CopyRegister(object):
                 file_type = "rpt"
             elif file_type.upper() in ("PRO", "FNC"):
                 file_type = "sql"
+            name_and_type = name + '.' + file_type.lower() 
+            if name.find('.') > -1:
+                name_and_type = name
 
             new_file = os.path.join(
-                self.code_home, path[ind:], name + "." + file_type.lower()
+                self.code_home, path[ind:], name_and_type
             )
 
             #print(f"path:{path}")
@@ -133,5 +136,6 @@ if __name__ == "__main__":
     a.copyfiles()
     # not create zip file, need to add rpt files
     #a.createZipfile()
+    print("Done!")
 
     # print("usage python[3] copy_upload_ubuntu.py '20190501'")
