@@ -5,7 +5,7 @@ import codecs
 import csv
 import os
 import time
-import sh
+#import sh
 
 from sys import argv
 from openpyxl import Workbook
@@ -22,15 +22,18 @@ class CopyRegister(object):
     def __init__(self, date_str: str):
         self.date_str = date_str
 
-        code_beta_path = "/mnt/e/yx_walk/report_develop/sky"
-        self.code_home = "/mnt/e/svn"
+        code_beta_path = "/e/yx_walk/report_develop/sky"
+        self.code_home = "/e/svn"
         self.dir_name = os.path.join(self.code_home, "1300_编码/发布登记表")
-        self.svnup_dir = os.path.join(self.code_home, "1300_编码")
-        #os.system(f"svn up '{self.svnup_dir}'")
+        svnup_dir = os.path.join(self.code_home, "1300_编码")
+
+        os.system(f"svn up '{svnup_dir}'")
 
         self.target_path = os.path.join(code_beta_path, self.date_str + "beta")
         if os.path.exists(self.target_path):
             sh.rm("-rf", f"{self.target_path}")
+            #os.system("#rd /s /q f：\wo ")
+
         os.makedirs(self.target_path, exist_ok=True)
 
         self.data_list = []
@@ -78,8 +81,7 @@ class CopyRegister(object):
                 file_type = "rpt"
             elif file_type.upper() in ("PRO", "FNC"):
                 file_type = "sql"
-            # strip() delete blank
-            name_and_type = name + '.' + file_type.lower().strip() 
+            name_and_type = name + '.' + file_type.lower() 
             if name.find('.') > -1:
                 name_and_type = name
 
@@ -103,7 +105,7 @@ class CopyRegister(object):
     def saveRegisterExcel(self):
         # print(f"start to write rows! ")
 
-        file1 = os.path.join(self.svnup_dir, "发布登记表", "支付", "ODS程序版本发布登记表(支付)-template.xlsx")
+        file1 = os.path.join(svnup_dir, "发布登记表", "支付", "ODS程序版本发布登记表(支付)-template.xlsx")
         file_path_name = self.target_path + "/登记表" + self.date_str + ".xlsx"
         # print(f"file_path_name:{file_path_name}")
         # print(f"file1:{file1}")

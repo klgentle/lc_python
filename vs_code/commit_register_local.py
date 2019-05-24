@@ -37,16 +37,17 @@ class Solution:
 
     def logRead(self):
         svn_log = open(SVN_LOG)
-        for line in svn_log.readlines():
-            if line.startswith("M") or line.startswith("?"):
+        for line in svn_log.readlines().strip():
+            if line.startswith("Modified") or line.startswith("Adding"):
                 if line.find("ODS程序版本发布登记表") > -1:
                     continue
 
                 path_file = line[line.find('1300_编码'):]
-                path_list = path_file.split("/")
+                #path_list = path_file.split("/")
+                path_list = path_file.split("\\")
                 # 跳过建表语句
-                if path_list[-2] == "1380_建表语句":
-                    continue
+                #if path_list[-2] == "1380_建表语句":
+                #    continue
 
                 # print(f"path_list:{path_list}")
                 path = "1000_编辑区\\" + "\\".join(path_list[:-1])
