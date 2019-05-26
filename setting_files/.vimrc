@@ -9,7 +9,7 @@ set fileformat=unix
 " 语法高亮
 syntax on
 " 深色背景
-color evening
+""color evening
 " 检测文件类型
 filetype on
 " 根据文件类型加载对应的插件
@@ -26,9 +26,9 @@ set cursorline
 set tabstop=4
 set softtabstop=4
 set shiftwidth=4
-set autoindent
+""set autoindent
 set smartindent
-set cindent
+""set cindent
 " tab转换为空格
 set expandtab
 
@@ -38,6 +38,5 @@ inoremap jj <Esc>
 inoremap ( ()<ESC>i
 inoremap [ []<ESC>i
 inoremap { {}<ESC>i
-inoremap < <><ESC>i
 inoremap ' ''<ESC>i
 inoremap " ""<ESC>i
