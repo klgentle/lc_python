@@ -1,8 +1,8 @@
 import openpyxl
 import shutil, os
 import time
-from pprint import pprint
 from sys import argv
+import pysnooper
 
 SVN_DIR = "/mnt/e/svn/1300_编码/"
 SVN_LOG = "/mnt/e/svn/commit.log"
@@ -35,9 +35,12 @@ class Solution:
         # write commit.log
         #os.system("svn st {SVN_DIR} | grep -v '~' > {SVN_LOG}")
 
+    #@pysnooper.snoop()
     def logRead(self):
-        svn_log = open(SVN_LOG)
-        for line in svn_log.readlines().strip():
+        svn_log = open(SVN_LOG,encoding='utf-8-sig') # deal with \ufeff
+        for line in svn_log.readlines():
+            line = line.strip()
+            #print(f"line:{line}")
             if line.startswith("Modified") or line.startswith("Adding"):
                 if line.find("ODS程序版本发布登记表") > -1:
                     continue
