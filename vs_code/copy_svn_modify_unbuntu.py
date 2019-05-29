@@ -12,6 +12,7 @@ from openpyxl import Workbook
 from backupToZip import backupToZip
 from datetime import datetime
 
+from list_file import list_file
 
 
 class CopyRegister(object):
@@ -122,6 +123,18 @@ class CopyRegister(object):
 
     #def createZipfile(self):
     #    return backupToZip(self.target_path)
+
+    def listSqlFile(self):
+        path = os.path.join(self.target_path,'1350_存储过程')
+        file_name = os.path.join(self.target_path,'pro.sql')
+        # list procedure
+        list_file(path, file_name)
+
+        path = os.path.join(self.target_path,'SQL')
+        file_name = os.path.join(self.target_path,'list.sql')
+        # list other sql 
+        list_file(path, file_name)
+        
 
 
 if __name__ == "__main__":
