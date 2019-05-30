@@ -27,7 +27,8 @@ class CopyRegister(object):
         self.code_home = "/mnt/e/svn"
         self.dir_name = os.path.join(self.code_home, "1300_编码/发布登记表")
         self.svnup_dir = os.path.join(self.code_home, "1300_编码")
-        #os.system(f"svn up '{self.svnup_dir}'")
+        # BE CAREFUL HERE
+        os.system(f"svn up '{self.svnup_dir}'")
 
         self.target_path = os.path.join(code_beta_path, self.date_str + "beta")
         if os.path.exists(self.target_path):
