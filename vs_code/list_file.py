@@ -11,6 +11,7 @@ def list_file(path: str, file_name: str):
         to_file.write(s)
 
     to_file.close()
+    #print("list file done!")
 
 
 if __name__ == "__main__":

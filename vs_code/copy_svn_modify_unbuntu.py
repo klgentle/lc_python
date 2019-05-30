@@ -147,6 +147,7 @@ if __name__ == "__main__":
     a.readRegister()
     a.saveRegisterExcel()
     a.copyfiles()
+    a.listSqlFile()
     # not create zip file, need to add rpt files
     #a.createZipfile()
     print("Done!")
