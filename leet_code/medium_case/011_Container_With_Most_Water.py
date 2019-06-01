@@ -20,8 +20,3 @@ class Solution:
 
         print(res)
         return res
-
-
-if __name__ == "__main__":
-    a = Solution()
-    a.maxArea([1, 2, 1])
