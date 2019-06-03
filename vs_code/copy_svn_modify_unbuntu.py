@@ -126,15 +126,17 @@ class CopyRegister(object):
     #    return backupToZip(self.target_path)
 
     def listSqlFile(self):
-        path = os.path.join(self.target_path,'1350_存储过程')
+        path2 = "1350_存储过程"
+        path = os.path.join(self.target_path,path2)
         file_name = os.path.join(self.target_path,'pro.sql')
         # list procedure
-        list_file(path, file_name)
+        list_file(path, file_name, path2)
 
-        path = os.path.join(self.target_path,'SQL')
+        path2 = "SQL"
+        path = os.path.join(self.target_path,path2)
         file_name = os.path.join(self.target_path,'list.sql')
         # list other sql 
-        list_file(path, file_name)
+        list_file(path, file_name, path2)
         
 
 

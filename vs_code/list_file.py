@@ -2,14 +2,15 @@ import os
 import time
 
 
-def list_file(path: str, file_name: str):
+def list_file(path: str, file_name: str, path2: str):
     to_file = open(file_name, "w")
     date_str = time.strftime("%Y%m%d", time.localtime())
-    to_path = f"D:\jdong\\beta\\{date_str}_beta"
+    to_path = f"D:\jdong\\beta\\{date_str}beta\\{path2}"
     for f in os.listdir(path):
         s = f"@@{to_path}\{f};\n"
         to_file.write(s)
 
+    to_file.write("commit;\n")
     to_file.close()
     #print("list file done!")
 
