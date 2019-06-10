@@ -36,6 +36,7 @@ class CopyRegister(object):
         os.makedirs(self.target_path, exist_ok=True)
 
         self.data_list = []
+        self.procedure_name_list = []
         # print(f"self.date_str:{self.date_str}")
 
     def readRegister(self):
@@ -132,6 +133,10 @@ class CopyRegister(object):
         for f in os.listdir(path):
             s = f"@@{to_path}\{f};\n"
             to_file.write(s)
+            if path2 == "1350_存储过程":
+                # procedure name add to list
+                pro_name = f.split(".")[0]
+                self.procedure_name_list.append(pro_name.upper())
 
         to_file.write("commit;\n")
         to_file.close()
@@ -149,6 +154,18 @@ class CopyRegister(object):
         # list other sql 
         self.list_file(path, file_name, path2)
         
+    def createConfigCheckSql(self):
+        file_name = os.path.join(self.target_path,'config_check.sql')
+        to_file = open(file_name, "w")
+        #print(f"self.procedure_name_list:{self.procedure_name_list}")
+        sql = f"""SELECT OBJECT_NAME FROM ALL_OBJECTS WHERE OWNER = 'RPTUSER' AND OBJECT_TYPE = 'PROCEDURE'
+AND OBJECT_NAME IN ({", ".join(["'" + name + "'" for name in self.procedure_name_list])})
+AND SUBSTR(OBJECT_NAME,-4) != '_MID'
+MINUS
+select OBJECT_NAME from ods_job_config where object_type = 'SP';
+        """
+        to_file.write(f"{sql}\n")
+        to_file.close()
 
 
 if __name__ == "__main__":
@@ -161,6 +178,7 @@ if __name__ == "__main__":
     a.saveRegisterExcel()
     a.copyfiles()
     a.listSqlFile()
+    a.createConfigCheckSql()
     # not create zip file, need to add rpt files
     #a.createZipfile()
     print("Done!")
