@@ -146,13 +146,15 @@ class CopyRegister(object):
         path = os.path.join(self.target_path,path2)
         file_name = os.path.join(self.target_path,'pro.sql')
         # list procedure
-        self.list_file(path, file_name, path2)
+        if os.path.exists(path):
+            self.list_file(path, file_name, path2)
 
         path2 = "SQL"
         path = os.path.join(self.target_path,path2)
         file_name = os.path.join(self.target_path,'list.sql')
         # list other sql 
-        self.list_file(path, file_name, path2)
+        if os.path.exists(path):
+            self.list_file(path, file_name, path2)
         
     def createConfigCheckSql(self):
         file_name = os.path.join(self.target_path,'config_check.sql')
