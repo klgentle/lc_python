@@ -16,7 +16,7 @@ class Solution:
 
     def __init__(self, date_str, mantis, module_type):
         # svn up
-        #os.system(f"svn up '{SVN_DIR}'")
+        os.system(f"svn up '{SVN_DIR}'")
         # copy template change excel name
         self.regi_dir = os.path.join(SVN_DIR, "发布登记表", module_type)
 
