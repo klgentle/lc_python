@@ -24,11 +24,13 @@ class CopyRegister(object):
         self.date_str = date_str
 
         code_beta_path = "/mnt/e/yx_walk/report_develop/sky"
-        self.code_home = "/mnt/e/svn"
+        #self.code_home = "/mnt/e/svn"
+        self.code_home = "/mnt/e/svn2"
         self.dir_name = os.path.join(self.code_home, "1300_编码/发布登记表")
         self.svnup_dir = os.path.join(self.code_home, "1300_编码")
         # BE CAREFUL HERE
-        ###############os.system(f"svn up '{self.svnup_dir}'")
+        ###############
+        os.system(f"svn up '{self.svnup_dir}'")
 
         self.target_path = os.path.join(code_beta_path, self.date_str + "beta")
         if os.path.exists(self.target_path):
@@ -37,6 +39,7 @@ class CopyRegister(object):
 
         self.data_list = []
         self.procedure_name_list = []
+        self.bo_name_list = []
         # print(f"self.date_str:{self.date_str}")
 
     def readRegister(self):
@@ -81,6 +84,10 @@ class CopyRegister(object):
                 file_type = "rpt"
             elif file_type.upper() in ("PRO", "FNC"):
                 file_type = "sql"
+
+            if file_type.upper() in ("BO","RPT"):
+                self.bo_name_list.append(name)
+
             # strip() delete blank
             name_and_type = name + '.' + file_type.lower().strip() 
             if name.find('.') > -1:
@@ -94,8 +101,11 @@ class CopyRegister(object):
             # get folder name of code 
             targetName = path[ind:].split("/")[1]
 
-            if targetName != "1350_存储过程":
+            if targetName in ("1350_存储过程","05Procedures"):
+                targetName = "pro" 
+            else:
                 targetName = file_type
+
             self.target_path2 = os.path.join(self.target_path, targetName)
             os.makedirs(self.target_path2, exist_ok=True)
             try:
@@ -133,7 +143,7 @@ class CopyRegister(object):
         for f in os.listdir(path):
             s = f"@@{to_path}\{f};\n"
             to_file.write(s)
-            if path2 == "1350_存储过程":
+            if path2 in ("1350_存储过程","05Procedures"):
                 # procedure name add to list
                 pro_name = f.split(".")[0]
                 self.procedure_name_list.append(pro_name.upper())
@@ -142,19 +152,17 @@ class CopyRegister(object):
         to_file.close()
 
     def listSqlFile(self):
-        path2 = "1350_存储过程"
-        path = os.path.join(self.target_path,path2)
-        file_name = os.path.join(self.target_path,'pro.sql')
-        # list procedure
-        if os.path.exists(path):
-            self.list_file(path, file_name, path2)
-
-        path2 = "SQL"
-        path = os.path.join(self.target_path,path2)
-        file_name = os.path.join(self.target_path,'list.sql')
-        # list other sql 
-        if os.path.exists(path):
-            self.list_file(path, file_name, path2)
+        dc = {
+            "pro":"pro.sql",
+            "sql":"list.sql"
+        }
+        for k, v in dc.items():
+            path2 = k 
+            path = os.path.join(self.target_path,path2)
+            file_name = os.path.join(self.target_path, v)
+            # list file 
+            if os.path.exists(path):
+                self.list_file(path, file_name, path2)
         
     def createConfigCheckSql(self):
         file_name = os.path.join(self.target_path,'config_check.sql')
@@ -169,6 +177,17 @@ select OBJECT_NAME from ods_job_config where object_type = 'SP';
         to_file.write(f"{sql}\n")
         to_file.close()
 
+    def boNameList(self,file_name='bo_list.txt'):
+        self.bo_name_list.sort()
+        print("\n请核对今日BO上线清单：\n"+'\n'.join(self.bo_name_list)+"\n")
+
+        file_name = os.path.join(self.target_path,file_name)
+        to_file = open(file_name, "w")
+        to_file.write("请核对今日BO上线清单：\n")
+        for b in self.bo_name_list:
+            to_file.write(b+'\n')
+
+        to_file.close()
 
 if __name__ == "__main__":
     date_str = time.strftime("%Y%m%d", time.localtime())
@@ -181,6 +200,7 @@ if __name__ == "__main__":
     a.copyfiles()
     a.listSqlFile()
     a.createConfigCheckSql()
+    a.boNameList()
     # not create zip file, need to add rpt files
     #a.createZipfile()
     print("Done!")

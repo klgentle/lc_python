@@ -4,8 +4,10 @@ import time
 from sys import argv
 import pysnooper
 
-SVN_DIR = "/mnt/e/svn/1300_编码/"
-SVN_LOG = "/mnt/e/svn/commit.log"
+#SVN_DIR = "/mnt/e/svn/1300_编码/"
+#SVN_LOG = "/mnt/e/svn/commit.log"
+SVN_DIR = "/mnt/e/svn2/1300_编码/"
+SVN_LOG = "/mnt/e/svn2/commit.log"
 
 
 class Solution:
