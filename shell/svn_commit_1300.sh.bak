@@ -1,17 +1,17 @@
 echo "svn up ---------------------"
 svndir="/home/kl/svn2"
-svn up 1300_编码
+svn up $svndir/1300_编码
 
-find ./1300_编码/ -name '*.~sql' |xargs rm -rf
+#find $svndir/1300_编码/ -name '*.~sql' |xargs rm -rf
 
-if [ -n "$(svn st 1300_编码| grep '?')" ]; then
+if [ -n "$(svn st $svndir/1300_编码| grep '?')" ]; then
 echo "svn add code ---------------------"
-svn add $(svn st 1300_编码 | grep '?' | awk '{print $2}')
+svn add $(svn st $svndir/1300_编码 | grep '?' | awk '{print $2}')
 fi
 
-if [ -n "$(svn st 1300_编码 | grep -v test.txt)" ]; then
+if [ -n "$(svn st $svndir/1300_编码 | grep -v test.txt)" ]; then
 echo "svn commmit code ---------------------"
-svn commit 1300_编码 -m "dongjian $(date +%Y%m%d)" > commit.log
+svn commit $svndir/1300_编码 -m "dongjian $(date +%Y%m%d)" > commit.log
 fi
 
 date_str=$(date +%Y%m%d)
@@ -26,13 +26,13 @@ module_type=$3
 python3 /mnt/c/Users/pactera/lc_python/vs_code/commit_register.py "${date_str}" "${mantis}" "${module_type}"
 #python3 /mnt/c/Users/pactera/lc_python/vs_code/commit_register.py $1 $2 $3 
 
-if [ -n "$(svn st 1300_编码| grep '?')" ]; then
+if [ -n "$(svn st $svndir/1300_编码| grep '?')" ]; then
 echo "svn add excel---------------------"
-svn add $(svn st 1300_编码 | grep '?' | awk '{print $2}')
+svn add $(svn st $svndir/1300_编码 | grep '?' | awk '{print $2}')
 fi
 
-if [ -n "$(svn st 1300_编码 | grep -v test.txt)" ]; then
+if [ -n "$(svn st $svndir/1300_编码 | grep -v test.txt)" ]; then
 echo "svn commmit excel ---------------------"
-svn commit 1300_编码 -m "dongjian $(date +%Y%m%d) register"
+svn commit $svndir/1300_编码 -m "dongjian $(date +%Y%m%d) register"
 fi
 
