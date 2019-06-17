@@ -1,6 +1,4 @@
 from pysnooper import snoop
-
-
 class Solution:
     """
     s = '226'
@@ -11,45 +9,19 @@ class Solution:
 
     @snoop()
     def numDecodings(self, s: str) -> int:
-        if not s or int(s) < 1:
-            return 0
-        elif int(s) < 10:
-            return 1
+        if not s or s.startswith('0'): return 0
+        dp = [0] * len(s)
+        dp[0] = 1
+        for i in range(1, len(s)):
+            if s[i] != '0':
+                dp[i] += dp[i - 1]
+            if s[i - 1] != '0' and int(s[i - 1:i + 1]) <= 26:
+                tmp = dp[i - 2] if i - 2 >= 0 else 1
+                dp[i] += tmp
+        return dp[-1]
 
-        dic = {}
-        for i in range(0, 26):
-            dic[str(i)] = chr(ord("A") + i)
-        # init and init the first 2
-        set = [[]] * len(s)
-        print(f"set:{set}")
-        set[0] = s[0]
-        set[1].append([set[0], s[1]])
-        if s[0:2] in dic.keys():
-            set[1].append([s[0:2]])
-
-        for i in range(2, len(s)):
-            # 上一个结果加一个 or 上上一个加2个： set[i] = set[i-1] + s[i] or set[i-2] + s[i-1:i+1]
-            for d in set[i - 1]:
-                # 处理单个数字
-                # error will change set[i-1] #d.append(s[i])   # d is a list
-                new = d + [s[i]]
-                if new not in set[i]:
-                    set[i].append()
-
-                # 处理两位数的字符
-                last = d[-1] + s[i]
-                if last in dic.keys():
-                    new = d[0:-1] + [new]
-                    if new not in set[i]:
-                        set[i].append(new)
-
-            print(f"i:{i}")
-
-        print(set)
-        return len(set[-1])
-
-
+# todo return multiply of len of all subset
 if __name__ == "__main__":
     a = Solution()
-    s = "1001"
+    s = "4757562545844617494555774581341211511296816786586787755257741178599337186486723247528324612117156948"
     a.numDecodings(s)
