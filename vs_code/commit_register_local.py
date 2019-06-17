@@ -4,10 +4,8 @@ import time
 from sys import argv
 import pysnooper
 
-#SVN_DIR = "/mnt/e/svn/1300_编码/"
-#SVN_LOG = "/mnt/e/svn/commit.log"
-SVN_DIR = "/mnt/e/svn2/1300_编码/"
-SVN_LOG = "/mnt/e/svn2/commit.log"
+SVN_DIR = "/mnt/e/svn/1300_编码/"
+SVN_LOG = "/mnt/e/svn/commit.log"
 
 
 class Solution:
@@ -15,8 +13,7 @@ class Solution:
     """
 
     def __init__(self, date_str, mantis, module_type):
-        # svn up
-        os.system(f"svn up '{SVN_DIR}'")
+        # svn up ########os.system(f"svn up '{SVN_DIR}'")
         # copy template change excel name
         self.regi_dir = os.path.join(SVN_DIR, "发布登记表", module_type)
 

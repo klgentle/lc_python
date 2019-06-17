@@ -24,13 +24,11 @@ class CopyRegister(object):
         self.date_str = date_str
 
         code_beta_path = "/mnt/e/yx_walk/report_develop/sky"
-        #self.code_home = "/mnt/e/svn"
-        self.code_home = "/mnt/e/svn2"
+        self.code_home = "/mnt/e/svn"
         self.dir_name = os.path.join(self.code_home, "1300_编码/发布登记表")
         self.svnup_dir = os.path.join(self.code_home, "1300_编码")
         # BE CAREFUL HERE
-        ###############
-        os.system(f"svn up '{self.svnup_dir}'")
+        ############### os.system(f"svn up '{self.svnup_dir}'")
 
         self.target_path = os.path.join(code_beta_path, self.date_str + "beta")
         if os.path.exists(self.target_path):
