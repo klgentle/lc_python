@@ -74,6 +74,7 @@ class CopyRegister(object):
         # copy code files
         for row in self.data_list:
             name, file_type, path = row[2:5]
+            #print(f"name:{name}")
             path = path.replace("\\", "/")
             ind = path.find("1300_编码")
             if ind == -1:
@@ -95,14 +96,14 @@ class CopyRegister(object):
                 self.code_home, path[ind:], name_and_type
             )
 
-            #print(f"path:{path}")
+            #print(f"new_file:{new_file}")
             # get folder name of code 
             targetName = path[ind:].split("/")[1]
 
             if targetName in ("1350_存储过程","05Procedures"):
                 targetName = "pro" 
             else:
-                targetName = file_type
+                targetName = file_type.lower()
 
             self.target_path2 = os.path.join(self.target_path, targetName)
             os.makedirs(self.target_path2, exist_ok=True)
@@ -141,7 +142,7 @@ class CopyRegister(object):
         for f in os.listdir(path):
             s = f"@@{to_path}\{f};\n"
             to_file.write(s)
-            if path2 in ("1350_存储过程","05Procedures"):
+            if path2 in ("pro"):
                 # procedure name add to list
                 pro_name = f.split(".")[0]
                 self.procedure_name_list.append(pro_name.upper())
@@ -165,6 +166,7 @@ class CopyRegister(object):
     def createConfigCheckSql(self):
         file_name = os.path.join(self.target_path,'config_check.sql')
         to_file = open(file_name, "w")
+        # print test
         #print(f"self.procedure_name_list:{self.procedure_name_list}")
         sql = f"""SELECT OBJECT_NAME FROM ALL_OBJECTS WHERE OWNER = 'RPTUSER' AND OBJECT_TYPE = 'PROCEDURE'
 AND OBJECT_NAME IN ({", ".join(["'" + name + "'" for name in self.procedure_name_list])})
