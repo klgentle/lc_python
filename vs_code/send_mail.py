@@ -1,10 +1,11 @@
 import smtplib
-import config
 from pysnooper import snoop
 
 
-@snoop()
+#@snoop()
 def send_mail():
+    from_email = "jian.dong2@pactera.com"
+
     smtpObj = smtplib.SMTP('smtp.office365.com',587)
     ret = smtpObj.ehlo()
     if ret[0] != 250: 
@@ -14,7 +15,8 @@ def send_mail():
     if ret[0] != 220: 
         print("smtp tsl encode failed!")
         return -1
-    ret = smtpObj.login('jian.dong2@pactera.com', config.pactera_mail_passwd) 
+    password = input(f"Please input your passwd of {from_email}: ")
+    ret = smtpObj.login(from_email, password) 
     if ret[0] != 235: 
         print("Smtp login failed!")
         return -1
@@ -25,7 +27,7 @@ def send_mail():
         print("Smtp send mail failed!")
         return -1
     smtpObj.quit()
-    print("mail send")
+    print("mail send success!")
     return 0
 
 
