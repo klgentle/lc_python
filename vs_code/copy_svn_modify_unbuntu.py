@@ -86,20 +86,27 @@ class CopyRegister(object):
             name, file_type, path = row[2:5]
             path = path.replace("\\", "/")
             ind = path.find("1300_编码")
+
             if ind == -1:
-                print(f"skip row: {name}, {file_type}, {path}")
+                print(f"path error, skip row: {name}, {file_type}, {path}")
                 continue
             if file_type.upper() == "BO":
                 file_type = "rpt"
             elif file_type.upper() in ("PRO", "FNC"):
                 file_type = "sql"
+            # fixing file_type
+            elif file_type.upper() != "RPT" and path.find("1370_水晶报表") > -1: 
+                file_type = "rpt"
 
-            if file_type.upper() in ("BO","RPT"):
+            if file_type.upper() in ("RPT","BO"):
                 self.bo_name_list.append(name)
+                # name format: rpt to upper
+                name = name.upper()
 
             # strip() delete blank
             name_and_type = name + '.' + file_type.lower().strip() 
             name_lower_type = name.lower() + '.' + file_type.lower().strip() 
+
             #if name.find('.') > -1: # too smart
             #    name_and_type = name
 
@@ -122,6 +129,7 @@ class CopyRegister(object):
             self.target_path2 = os.path.join(self.target_path, targetName)
             os.makedirs(self.target_path2, exist_ok=True)
             try:
+                # todo copy ignore upper or lower
                 shutil.copy(new_file, self.target_path2)
             except FileNotFoundError:
                 if os.path.exists(new_file2):

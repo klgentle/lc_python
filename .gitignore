@@ -1,0 +1,48 @@
+# Eclipse
+.classpath
+.project
+.settings/
+# Intellij
+.idea/
+*.iml
+*.iws
+*.ipr
+/out/
+# Mac
+.DS_Store
+# Maven
+log/
+target/
+build/
+# Package Files #
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+# Log file
+*.log
+# Java
+*.class
+*-api/target/
+*-api-impl/target/
+*-data/target/
+*-common/target/
+*-service/target/
+*-rpc/target/
+exitStatus*
+# svn
+.svn/
+# Other
+*.versionsBackup
+tmp
+temp
+
+
+/.idea/
+/bin/
+
+# python
+.__pycache__
+*.pyc
