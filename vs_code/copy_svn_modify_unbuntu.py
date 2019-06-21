@@ -23,12 +23,19 @@ class CopyRegister(object):
     def __init__(self, date_str: str):
         self.date_str = date_str
 
-        code_beta_path = "/mnt/e/yx_walk/report_develop/sky"
-        self.code_home = "/mnt/e/svn"
+        home_path = "/home/klgentle"
+        if not os.path.exists(home_path):
+            home_path = "/mnt/e"
+
+        code_beta_path = os.path.join(home_path, "yx_walk/beta")
+        self.code_home = os.path.join(home_path, "svn")
         self.dir_name = os.path.join(self.code_home, "1300_编码/发布登记表")
         self.svnup_dir = os.path.join(self.code_home, "1300_编码")
-        # BE CAREFUL HERE
-        ############### os.system(f"svn up '{self.svnup_dir}'")
+
+        if home_path == "/home/klgentle":
+            # BE CAREFUL HERE ############### 
+            # linux test
+            os.system(f"svn up '{self.svnup_dir}'")
 
         self.target_path = os.path.join(code_beta_path, self.date_str + "beta")
         if os.path.exists(self.target_path):
@@ -92,11 +99,15 @@ class CopyRegister(object):
 
             # strip() delete blank
             name_and_type = name + '.' + file_type.lower().strip() 
-            if name.find('.') > -1:
-                name_and_type = name
+            name_lower_type = name.lower() + '.' + file_type.lower().strip() 
+            #if name.find('.') > -1: # too smart
+            #    name_and_type = name
 
             new_file = os.path.join(
                 self.code_home, path[ind:], name_and_type
+            )
+            new_file2 = os.path.join(
+                self.code_home, path[ind:], name_lower_type
             )
 
             #print(f"new_file:{new_file}")
@@ -113,7 +124,10 @@ class CopyRegister(object):
             try:
                 shutil.copy(new_file, self.target_path2)
             except FileNotFoundError:
-                print(f"error! No such file: {new_file} _______________")
+                if os.path.exists(new_file2):
+                    shutil.copy(new_file2, self.target_path2)
+                else:
+                    print(f"error! No such file: {new_file} _______________")
 
     def saveRegisterExcel(self):
         "save excel records to one excel"
