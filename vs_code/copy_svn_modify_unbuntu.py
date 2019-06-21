@@ -32,6 +32,7 @@ class CopyRegister(object):
 
         self.target_path = os.path.join(code_beta_path, self.date_str + "beta")
         if os.path.exists(self.target_path):
+            print(f"rm -rf {self.target_path}")
             sh.rm("-rf", f"{self.target_path}")
         os.makedirs(self.target_path, exist_ok=True)
 
@@ -46,6 +47,7 @@ class CopyRegister(object):
         for folderName, subfolders, filenames in os.walk(self.dir_name):
             for filename in filenames:
                 # print('FILE INSIDE ' + folderName + ': '+ filename)
+                # find right date register excel
                 if filename.find(self.date_str) == -1:
                     continue
 
@@ -57,6 +59,7 @@ class CopyRegister(object):
                 sheet = wb.active
                 for row in range(2, sheet.max_row + 1):
                     name = sheet["C" + str(row)].value
+                    # skip no name row record 
                     if not name:
                         continue
                     data_row = [
@@ -77,6 +80,7 @@ class CopyRegister(object):
             path = path.replace("\\", "/")
             ind = path.find("1300_编码")
             if ind == -1:
+                print(f"skip row: {name}, {file_type}, {path}")
                 continue
             if file_type.upper() == "BO":
                 file_type = "rpt"
@@ -95,14 +99,14 @@ class CopyRegister(object):
                 self.code_home, path[ind:], name_and_type
             )
 
-            #print(f"path:{path}")
+            #print(f"new_file:{new_file}")
             # get folder name of code 
             targetName = path[ind:].split("/")[1]
 
             if targetName in ("1350_存储过程","05Procedures"):
                 targetName = "pro" 
             else:
-                targetName = file_type
+                targetName = file_type.lower()
 
             self.target_path2 = os.path.join(self.target_path, targetName)
             os.makedirs(self.target_path2, exist_ok=True)
@@ -112,12 +116,9 @@ class CopyRegister(object):
                 print(f"error! No such file: {new_file} _______________")
 
     def saveRegisterExcel(self):
-        # print(f"start to write rows! ")
-
+        "save excel records to one excel"
         file1 = os.path.join(self.svnup_dir, "发布登记表", "支付", "ODS程序版本发布登记表(支付)-template.xlsx")
         file_path_name = self.target_path + "/登记表" + self.date_str + ".xlsx"
-        # print(f"file_path_name:{file_path_name}")
-        # print(f"file1:{file1}")
         shutil.copy(file1, file_path_name)
 
         # wb = Workbook()
@@ -131,8 +132,8 @@ class CopyRegister(object):
 
         wb.save(filename=file_path_name)
 
-    #def createZipfile(self):
-    #    return backupToZip(self.target_path)
+    def createZipfile(self):
+        return backupToZip(self.target_path)
 
     def list_file(self, path: str, file_name: str, path2: str):
         to_file = open(file_name, "w")
@@ -141,7 +142,7 @@ class CopyRegister(object):
         for f in os.listdir(path):
             s = f"@@{to_path}\{f};\n"
             to_file.write(s)
-            if path2 in ("1350_存储过程","05Procedures"):
+            if path2 in ("pro"):
                 # procedure name add to list
                 pro_name = f.split(".")[0]
                 self.procedure_name_list.append(pro_name.upper())
@@ -165,6 +166,7 @@ class CopyRegister(object):
     def createConfigCheckSql(self):
         file_name = os.path.join(self.target_path,'config_check.sql')
         to_file = open(file_name, "w")
+        # print test
         #print(f"self.procedure_name_list:{self.procedure_name_list}")
         sql = f"""SELECT OBJECT_NAME FROM ALL_OBJECTS WHERE OWNER = 'RPTUSER' AND OBJECT_TYPE = 'PROCEDURE'
 AND OBJECT_NAME IN ({", ".join(["'" + name + "'" for name in self.procedure_name_list])})
@@ -200,7 +202,7 @@ if __name__ == "__main__":
     a.createConfigCheckSql()
     a.boNameList()
     # not create zip file, need to add rpt files
-    #a.createZipfile()
+    a.createZipfile()
     print("Done!")
 
     # print("usage python[3] copy_upload_ubuntu.py '20190501'")
