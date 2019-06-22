@@ -7,7 +7,6 @@ from email.mime.multipart import MIMEMultipart
 from pysnooper import snoop
 import traceback
 import time
-from encode.decrypt import get_passwd
  
 sender = 'jian.dong2@pactera.com'  # 发件人邮箱
 #password = ''  # 发件人邮箱密码
@@ -50,8 +49,8 @@ def mail(date_str=None):
         #server = smtplib.SMTP_SSL("smtp.office365.com", 847)  # 发件人邮箱中的SMTP服务器，一般端口是25
         server = smtplib.SMTP("smtp.office365.com", 587)  # 发件人邮箱中的SMTP服务器，一般端口是25
         server.starttls()
-        #password = input(f"{sender}'s password: ")
-        server.login(sender, get_passwd())  # 括号中对应的是发件人邮箱账号、邮箱密码
+        password = input(f"{sender}'s password: ")
+        server.login(sender, password)  # 括号中对应的是发件人邮箱账号、邮箱密码
         # multi people shoud be list
         server.sendmail(sender, addressed_eamil2, message.as_string())  # 括号中对应的是发件人邮箱账号、收件人邮箱账号、发送邮件
         server.quit()  # 关闭连接
