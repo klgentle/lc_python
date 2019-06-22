@@ -7,7 +7,8 @@ from email.mime.multipart import MIMEMultipart
 from pysnooper import snoop
 import traceback
 import time
- 
+from getpass import getpass
+import os
 sender = 'jian.dong2@pactera.com'  # 发件人邮箱
 #password = ''  # 发件人邮箱密码
 addressed_eamil = 'klgentle@sina.com'  # 收件人邮箱
@@ -27,7 +28,7 @@ def mail(date_str=None):
         message['From'] = formataddr(['jdong', sender])  # 括号里的对应发件人邮箱昵称、发件人邮箱账号
         # send to multi people, 1.message to should join by comma, 2.sending to should be list
         message['To'] = formataddr(['Dear', ','.join(addressed_eamil2)])  # 括号里的对应收件人邮箱昵称、收件人邮箱账号
-        message['Subject'] = "测试发送邮件"  # 邮件的主题，也可以说是标题
+        message['Subject'] = f"测试发送邮件{date_str}"  # 邮件的主题，也可以说是标题
  
         # 邮件正文内容
         message.attach(MIMEText('Python3邮件发送测试。。。', 'plain', 'utf-8'))
@@ -40,7 +41,7 @@ def mail(date_str=None):
         #message.attach(att1)
  
         # 构造附件2
-        att2 = MIMEText(open('/mnt/e/yx_walk/report_develop/sky/20190620beta.zip', 'rb').read(), 'base64', 'utf-8')
+        att2 = MIMEText(open(f'/mnt/e/yx_walk/report_develop/sky/{date_str}beta.zip', 'rb').read(), 'base64', 'utf-8')
         att2["Content-Type"] = 'application/octet-stream'
         #附件名称非中文时的写法
         att2["Content-Disposition"] = 'attachment; filename="20190620beta.zip")'
@@ -49,7 +50,9 @@ def mail(date_str=None):
         #server = smtplib.SMTP_SSL("smtp.office365.com", 847)  # 发件人邮箱中的SMTP服务器，一般端口是25
         server = smtplib.SMTP("smtp.office365.com", 587)  # 发件人邮箱中的SMTP服务器，一般端口是25
         server.starttls()
-        password = input(f"{sender}'s password: ")
+        # to get passwd
+        #password = getpass(f"{sender}'s password: ")
+        password = os.popen('awk \'FS="=" {if ($0~/^pactera_passwd/) print $2}\' $HOME/passwd.txt').read()
         server.login(sender, password)  # 括号中对应的是发件人邮箱账号、邮箱密码
         # multi people shoud be list
         server.sendmail(sender, addressed_eamil2, message.as_string())  # 括号中对应的是发件人邮箱账号、收件人邮箱账号、发送邮件
