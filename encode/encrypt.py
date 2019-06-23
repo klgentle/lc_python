@@ -22,7 +22,6 @@ encrypted_text = des.encrypt(padded_text.encode('utf-8'))  # 加密
 
 print(encrypted_text)
 
-with open("pactera_passwd_encrpt.txt","w") as f:
+with open("pactera_passwd_encrpt.txt","wb") as f:
     #f.write(str(encrypted_text))
-    # bytes 转str通过decode()
-    f.write(encrypted_text.decode('utf-8'))
+    f.write(encrypted_text)
