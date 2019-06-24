@@ -90,6 +90,7 @@ class CopyRegister(object):
             ind = path.find("1300_编码")
 
             if ind == -1:
+                error_file_type.add('lost')
                 print(f"path error, skip row: {name}, {file_type}, {path}")
                 continue
             if file_type.upper() == "BO":
