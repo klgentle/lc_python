@@ -11,6 +11,7 @@ from sys import argv
 from openpyxl import Workbook
 from backupToZip import backupToZip
 from datetime import datetime
+from send_mail_with_attach import mail
 
 #from list_file import list_file
 
@@ -27,7 +28,7 @@ class CopyRegister(object):
         if not os.path.exists(home_path):
             home_path = "/mnt/e"
 
-        code_beta_path = os.path.join(home_path, "yx_walk/beta")
+        self.code_beta_path = os.path.join(home_path, "yx_walk/beta")
         self.code_home = os.path.join(home_path, "svn")
         self.dir_name = os.path.join(self.code_home, "1300_编码/发布登记表")
         self.svnup_dir = os.path.join(self.code_home, "1300_编码")
@@ -37,7 +38,7 @@ class CopyRegister(object):
             # linux test
             os.system(f"svn up '{self.svnup_dir}'")
 
-        self.target_path = os.path.join(code_beta_path, self.date_str + "beta")
+        self.target_path = os.path.join(self.code_beta_path, self.date_str + "beta")
         if os.path.exists(self.target_path):
             print(f"rm -rf {self.target_path}")
             sh.rm("-rf", f"{self.target_path}")
@@ -211,6 +212,11 @@ select OBJECT_NAME from ods_job_config where object_type = 'SP';
 
         to_file.close()
 
+    #def send_mail(self,file_path=""):
+    #    if not file_path:
+    #        file_path = os.path.join(self.code_beta_path, self.date_str + "beta.zip")
+    #    mail(self.date_str,file_path)
+
 if __name__ == "__main__":
     date_str = time.strftime("%Y%m%d", time.localtime())
     if len(argv) > 1 and len(argv[1]) == 8:
@@ -225,6 +231,7 @@ if __name__ == "__main__":
     a.boNameList()
     # not create zip file, need to add rpt files
     a.createZipfile()
+    #a.send_mail()
     print("Done!")
 
     # print("usage python[3] copy_upload_ubuntu.py '20190501'")
