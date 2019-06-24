@@ -32,6 +32,7 @@ def mail(date_str=None, file_path=""):
         date_str = time.strftime("%Y%m%d", time.localtime())
     if not file_path:
         file_path = f'{home_path}/yx_walk/beta/{date_str}beta.zip'
+    #print(file_path)
     try:
         # 创建一个带附件的实例
         message = MIMEMultipart()
@@ -54,7 +55,7 @@ def mail(date_str=None, file_path=""):
         att2 = MIMEText(open(file_path, 'rb').read(), 'base64', 'utf-8')
         att2["Content-Type"] = 'application/octet-stream'
         #附件名称非中文时的写法
-        att2["Content-Disposition"] = 'attachment; filename="20190620beta.zip")'
+        att2["Content-Disposition"] = f'attachment; filename="{date_str}beta.zip")'
         message.attach(att2)
  
         #server = smtplib.SMTP_SSL("smtp.office365.com", 847)  # 发件人邮箱中的SMTP服务器，一般端口是25
