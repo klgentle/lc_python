@@ -82,6 +82,7 @@ class CopyRegister(object):
         # print(f"data_list:{self.data_list}")
 
     def copyfiles(self):
+        error_file_type = set()
         # copy code files
         for row in self.data_list:
             name, file_type, path = row[2:5]
@@ -136,7 +137,10 @@ class CopyRegister(object):
                 if os.path.exists(new_file2):
                     shutil.copy(new_file2, self.target_path2)
                 else:
+                    error_file_type.add(file_type.lower())
                     print(f"error! No such file: {new_file} _______________")
+
+        return error_file_type
 
     def saveRegisterExcel(self):
         "save excel records to one excel"
@@ -212,10 +216,10 @@ select OBJECT_NAME from ods_job_config where object_type = 'SP';
 
         to_file.close()
 
-    #def send_mail(self,file_path=""):
-    #    if not file_path:
-    #        file_path = os.path.join(self.code_beta_path, self.date_str + "beta.zip")
-    #    mail(self.date_str,file_path)
+    def send_mail(self,file_path=""):
+        if not file_path:
+            file_path = os.path.join(self.code_beta_path, self.date_str + "beta.zip")
+        mail(self.date_str,file_path)
 
 if __name__ == "__main__":
     date_str = time.strftime("%Y%m%d", time.localtime())
@@ -225,13 +229,15 @@ if __name__ == "__main__":
     a = CopyRegister(date_str)
     a.readRegister()
     a.saveRegisterExcel()
-    a.copyfiles()
+    error_file_type = a.copyfiles()
     a.listSqlFile()
     a.createConfigCheckSql()
     a.boNameList()
     # not create zip file, need to add rpt files
     a.createZipfile()
-    #a.send_mail()
+    # if only rpt not find, send email
+    if error_file_type == {'rpt'}:
+        a.send_mail()
     print("Done!")
 
     # print("usage python[3] copy_upload_ubuntu.py '20190501'")

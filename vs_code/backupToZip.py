@@ -44,7 +44,7 @@ def backupToZip(folder: str):
             backupZip.write(os.path.join(foldername, filename), short_filename)
 
     backupZip.close()
-    print("Done.")
+    print("Create zip done.")
 
 
 if __name__ == "__main__":
