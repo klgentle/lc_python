@@ -126,6 +126,7 @@ class CopyRegister(object):
 
             if targetName in ("1350_存储过程","05Procedures"):
                 targetName = "pro" 
+                self.procedure_name_list.append(name.upper())
             else:
                 targetName = file_type.lower()
 
@@ -169,9 +170,6 @@ class CopyRegister(object):
         for f in os.listdir(path):
             s = f"@@{to_path}\{f};\n"
             to_file.write(s)
-            if path2 in ("pro"):
-                pro_name = f.split(".")[0]
-                self.procedure_name_list.append(pro_name.upper())
 
         to_file.write("commit;\n")
         to_file.close()
@@ -187,11 +185,6 @@ class CopyRegister(object):
             name_without_type = file_name.split(".")[0]
             s = f"prompt\n@@{file_name}\nprompt\nprompt {name_without_type}\nprompt ==============================\nprompt\n"
             to_file.write(s)
-
-            if path2 in ("pro"):
-                # procedure name add to list
-                pro_name = file_name.split(".")[0]
-                self.procedure_name_list.append(pro_name.upper())
 
         to_file.write("\nspool off\ncommit;\n")
         to_file.close()
