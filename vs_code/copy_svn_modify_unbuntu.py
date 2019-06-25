@@ -164,17 +164,35 @@ class CopyRegister(object):
 
     def list_file(self, path: str, file_name: str, path2: str):
         to_file = open(file_name, "w")
-        #date_str = time.strftime("%Y%m%d", time.localtime())
         to_path = f"D:\jdong\\beta\\{self.date_str}beta\\{path2}"
         for f in os.listdir(path):
             s = f"@@{to_path}\{f};\n"
             to_file.write(s)
             if path2 in ("pro"):
-                # procedure name add to list
                 pro_name = f.split(".")[0]
                 self.procedure_name_list.append(pro_name.upper())
 
         to_file.write("commit;\n")
+        to_file.close()
+
+    def list_file2(self, path: str, file_name: str, path2: str):
+        to_file = open(file_name, "w")
+
+        to_file.write(f"set define off\nspool {self.date_str}_{path2}.log\n\n")
+        for file_name in os.listdir(path):
+            # 跳过目标文件
+            if file_name in ("pro.sql","list.sql"):
+                continue
+            name_without_type = file_name.split(".")[0]
+            s = f"prompt\n@@{file_name}\nprompt\nprompt {name_without_type}\nprompt ==============================\nprompt\n"
+            to_file.write(s)
+
+            if path2 in ("pro"):
+                # procedure name add to list
+                pro_name = file_name.split(".")[0]
+                self.procedure_name_list.append(pro_name.upper())
+
+        to_file.write("\nspool off\ncommit;\n")
         to_file.close()
 
     def listSqlFile(self):
@@ -185,10 +203,11 @@ class CopyRegister(object):
         for k, v in dc.items():
             path2 = k 
             path = os.path.join(self.target_path,path2)
-            file_name = os.path.join(self.target_path, v)
+            #file_name = os.path.join(self.target_path, v)
+            file_name = os.path.join(path, v)
             # list file 
             if os.path.exists(path):
-                self.list_file(path, file_name, path2)
+                self.list_file2(path, file_name, path2)
         
     def createConfigCheckSql(self):
         file_name = os.path.join(self.target_path,'config_check.sql')
