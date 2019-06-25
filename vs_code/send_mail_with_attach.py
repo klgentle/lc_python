@@ -26,6 +26,7 @@ def mail(date_str=None, file_path=""):
     原文：https://blog.csdn.net/a54288447/article/details/81113934 
     """
     home_path = "/home/klgentle"
+    time_str = time.strftime("%H:%M:%S", time.localtime())
     if not os.path.exists(home_path):
         home_path = "/mnt/e"
     if not date_str:
@@ -39,7 +40,7 @@ def mail(date_str=None, file_path=""):
         message['From'] = formataddr(['jdong', sender])  # 括号里的对应发件人邮箱昵称、发件人邮箱账号
         # send to multi people, 1.message to should join by comma, 2.sending to should be list
         message['To'] = formataddr(['Dear', ','.join(addressed_eamil2)])  # 括号里的对应收件人邮箱昵称、收件人邮箱账号
-        message['Subject'] = f"UAT {date_str}beta update"  # 邮件的主题，也可以说是标题
+        message['Subject'] = f"UAT {date_str}beta update {time_str}"  # 邮件的主题，也可以说是标题
  
         # 邮件正文内容
         message.attach(MIMEText(f'SIT, UAT program update {date_str}.', 'plain', 'utf-8'))
