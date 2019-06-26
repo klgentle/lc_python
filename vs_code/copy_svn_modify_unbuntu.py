@@ -110,8 +110,8 @@ class CopyRegister(object):
             name_and_type = name + '.' + file_type.lower().strip() 
             name_lower_type = name.lower() + '.' + file_type.lower().strip() 
 
-            #if name.find('.') > -1: # too smart
-            #    name_and_type = name
+            if name.find('.') > -1: # too smart
+                name_and_type = name
 
             new_file = os.path.join(
                 self.code_home, path[ind:], name_and_type
