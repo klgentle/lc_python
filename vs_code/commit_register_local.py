@@ -43,10 +43,15 @@ class Solution:
             if line.startswith("Modified") or line.startswith("Adding"):
                 if line.find("ODS程序版本发布登记表") > -1:
                     continue
+                # delete  application/octet-stream
+                if line.find("application/octet-stream") > -1:
+                    line = line.replace("application/octet-stream",'').strip()
 
                 path_file = line[line.find('1300_编码'):]
-                #path_list = path_file.split("/")
-                path_list = path_file.split("\\")
+                spliter = '\\'
+                if path_file.find('/') > -1:
+                    spliter = '/'
+                path_list = path_file.split(spliter)
                 # 跳过建表语句
                 #if path_list[-2] == "1380_建表语句":
                 #    continue
