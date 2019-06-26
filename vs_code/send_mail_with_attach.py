@@ -64,7 +64,7 @@ def mail(date_str=None, file_path=""):
         server.starttls()
         # to get passwd
         #password = getpass(f"{sender}'s password: ")
-        password = os.popen('awk \'FS="=" {if ($0~/^pactera_passwd/) print $2}\' $HOME/passwd.txt').read()
+        password = os.popen('awk \'FS="=" {if ($0~/^pactera_passwd/) print $2}\' $HOME/.passwd.txt').read()
         server.login(sender, password)  # 括号中对应的是发件人邮箱账号、邮箱密码
         # multi people shoud be list
         server.sendmail(sender, addressed_eamil2, message.as_string())  # 括号中对应的是发件人邮箱账号、收件人邮箱账号、发送邮件
