@@ -249,7 +249,7 @@ if __name__ == "__main__":
     # not create zip file, need to add rpt files
     a.createZipfile()
     # if only rpt not find, send email
-    if error_file_type == {'rpt'}:
+    if not error_file_type or error_file_type == {'rpt'}:
         a.send_mail()
     print("Done!")
 
