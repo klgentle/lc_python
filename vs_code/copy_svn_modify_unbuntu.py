@@ -24,7 +24,7 @@ class CopyRegister(object):
     def __init__(self, date_str: str):
         self.date_str = date_str
 
-        home_path = "/home/klgentle"
+        home_path = "/home/kl"
         if not os.path.exists(home_path):
             home_path = "/mnt/e"
 
@@ -33,10 +33,12 @@ class CopyRegister(object):
         self.dir_name = os.path.join(self.code_home, "1300_编码/发布登记表")
         self.svnup_dir = os.path.join(self.code_home, "1300_编码")
 
-        if home_path == "/home/klgentle":
-            # BE CAREFUL HERE ############### 
-            # linux test
-            os.system(f"svn up '{self.svnup_dir}'")
+        with os.popen("uname -a") as p :
+            uname = p.read()
+            if uname.find("Microsoft") == -1:
+                # BE CAREFUL HERE ############### 
+                # linux test
+                os.system(f"svn up '{self.svnup_dir}'")
 
         self.target_path = os.path.join(self.code_beta_path, self.date_str + "beta")
         if os.path.exists(self.target_path):
@@ -46,6 +48,7 @@ class CopyRegister(object):
 
         self.data_list = []
         self.procedure_name_list = []
+	
         self.bo_name_list = []
         # print(f"self.date_str:{self.date_str}")
 
@@ -122,7 +125,8 @@ class CopyRegister(object):
 
             #print(f"new_file:{new_file}")
             # get folder name of code 
-            targetName = path[ind:].split("/")[1]
+            # get the file type name to depart pro and sql
+            targetName = path[ind:].split("/")[-1]
 
             if targetName in ("1350_存储过程","05Procedures"):
                 targetName = "pro" 

@@ -24,7 +24,7 @@ def mail(date_str=None, file_path=""):
     作者：梦忆安凉 
     原文：https://blog.csdn.net/a54288447/article/details/81113934 
     """
-    home_path = "/home/klgentle"
+    home_path = "/home/kl"
     time_str = time.strftime("%H:%M:%S", time.localtime())
     if not os.path.exists(home_path):
         home_path = "/mnt/e"
@@ -63,7 +63,10 @@ def mail(date_str=None, file_path=""):
         server.starttls()
         # to get passwd
         #password = getpass(f"{sender}'s password: ")
-        password = os.popen('awk \'FS="=" {if ($0~/^pactera_passwd/) print $2}\' $HOME/.passwd.txt').read()
+        cmd = 'awk \'FS="=" {if ($0~/^pactera_passwd/) print $2}\' $HOME/.passwd.txt'
+        password = ''
+        with os.popen(cmd) as p:
+            password = p.read()
         server.login(sender, password)  # 括号中对应的是发件人邮箱账号、邮箱密码
         # multi people shoud be list
         server.sendmail(sender, addressed_eamil2, message.as_string())  # 括号中对应的是发件人邮箱账号、收件人邮箱账号、发送邮件
