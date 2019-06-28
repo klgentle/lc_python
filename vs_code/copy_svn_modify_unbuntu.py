@@ -254,7 +254,7 @@ if __name__ == "__main__":
     a.createZipfile()
     # if only rpt not find, send email
     if not error_file_type or error_file_type == {'rpt'}:
-        pass#a.send_mail()
+        a.send_mail()
     print("Done!")
 
     # print("usage python[3] copy_upload_ubuntu.py '20190501'")
