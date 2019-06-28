@@ -16,7 +16,7 @@ from sys import argv
 sender = 'jian.dong2@pactera.com'  # 发件人邮箱
 #password = ''  # 发件人邮箱密码
 addressed_eamil = 'klgentle@sina.com'  # 收件人邮箱
-addressed_eamil2 = ['BenChanHY@chbank.com','jiarui.qiu@pactera.com','klgentle@sina.com']  # 收件人邮箱
+addressed_eamil2 = ['BenChanHY@chbank.com','jiarui.qiu@pactera.com']  # 收件人邮箱
  
 #@snoop()
 def mail(date_str=None, file_path=""):
