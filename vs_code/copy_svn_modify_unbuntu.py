@@ -125,7 +125,8 @@ class CopyRegister(object):
 
             #print(f"new_file:{new_file}")
             # get folder name of code 
-            targetName = path[ind:].split("/")[1]
+            # get the file type name to depart pro and sql
+            targetName = path[ind:].split("/")[-1]
 
             if targetName in ("1350_存储过程","05Procedures"):
                 targetName = "pro" 
@@ -253,7 +254,7 @@ if __name__ == "__main__":
     a.createZipfile()
     # if only rpt not find, send email
     if not error_file_type or error_file_type == {'rpt'}:
-        a.send_mail()
+        pass#a.send_mail()
     print("Done!")
 
     # print("usage python[3] copy_upload_ubuntu.py '20190501'")
