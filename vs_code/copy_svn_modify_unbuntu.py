@@ -12,6 +12,7 @@ from openpyxl import Workbook
 from backupToZip import backupToZip
 from datetime import datetime
 from send_mail_with_attach import mail
+from config_default import configs
 
 #from list_file import list_file
 
@@ -24,7 +25,7 @@ class CopyRegister(object):
     def __init__(self, date_str: str):
         self.date_str = date_str
 
-        home_path = "/home/kl"
+        home_path = configs.get('path').get('svn_home_path')
         if not os.path.exists(home_path):
             home_path = "/mnt/e"
 
@@ -252,9 +253,15 @@ if __name__ == "__main__":
     a.boNameList()
     # not create zip file, need to add rpt files
     a.createZipfile()
-    # if only rpt not find, send email
-    if not error_file_type or error_file_type == {'rpt'}:
-        a.send_mail()
+
+    time_str = time.strftime("%H:%M", time.localtime())
+    if time_str > '16:05':
+        # if only rpt not find, send email
+        if not error_file_type or error_file_type == {'rpt'}:
+            a.send_mail()
+    else:
+        print("Time is early than 16:05, not send email.")
+
     print("Done!")
 
     # print("usage python[3] copy_upload_ubuntu.py '20190501'")
