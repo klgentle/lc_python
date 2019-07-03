@@ -110,6 +110,18 @@ class CopyRegister(object):
                 # name format: rpt to upper
                 name = name.upper()
 
+            # get folder name of code 
+            # get the file type name to depart pro and sql
+            targetName = path[ind:].split("/")[-1]
+
+            if targetName in ("1350_存储过程","05Procedures"):
+                targetName = "pro" 
+                self.procedure_name_list.append(name.upper())
+                # file_type in this fold must be sql or pro
+                file_type = "sql"
+            else:
+                targetName = file_type.lower()
+
             # strip() delete blank
             name_and_type = name + '.' + file_type.lower().strip() 
             name_lower_type = name.lower() + '.' + file_type.lower().strip() 
@@ -125,15 +137,6 @@ class CopyRegister(object):
             )
 
             #print(f"new_file:{new_file}")
-            # get folder name of code 
-            # get the file type name to depart pro and sql
-            targetName = path[ind:].split("/")[-1]
-
-            if targetName in ("1350_存储过程","05Procedures"):
-                targetName = "pro" 
-                self.procedure_name_list.append(name.upper())
-            else:
-                targetName = file_type.lower()
 
             self.target_path2 = os.path.join(self.target_path, targetName)
             os.makedirs(self.target_path2, exist_ok=True)
