@@ -1,8 +1,11 @@
 import openpyxl
 import shutil, os
 import time
+import sys
 from sys import argv
 import pysnooper
+import datetime
+from date_add import date_add
 
 SVN_DIR = "/mnt/e/svn/1300_编码/"
 SVN_LOG = "/mnt/e/svn/commit.log"
@@ -101,11 +104,22 @@ class Solution:
 
 
 if __name__ == "__main__":
+    today = time.strftime("%Y%m%d", time.localtime())
     date_str = time.strftime("%Y%m%d", time.localtime())
+    time_str = time.strftime("%H:%M", time.localtime())
+    if time_str > '16:10':
+        # today add one day
+        date_str = date_add(1) 
     mantis = ""
     module_type = "支付"
+
+
     if len(argv) == 2 and len(argv[1]) == 8:
         date_str = argv[1]
+    elif len(argv) == 2 and argv[1].find('d+')>-1:
+        # get days from d+days
+        days = int(argv[1][2:])
+        date_str = date_add(days)
     elif len(argv) == 3:
         date_str, mantis = argv[1], argv[2]
     elif len(argv) == 4:
@@ -116,8 +130,13 @@ if __name__ == "__main__":
         print("usage: python3 commit_register.py '20190501' mantis_id, module_type")
         sys.exit(1)
 
-    #print(f"date_str:{date_str} ---------- ")
+    if date_str < today:
+        print(f"date_str:{date_str} is wrong!")
+        sys.exit(1)
+
     print(f"argv:{argv} ---------- ")
+    print(f"date_str:{date_str} ---------- ")
+
     a = Solution(date_str, mantis, module_type)
     a.logRead()
     a.logRegister()
