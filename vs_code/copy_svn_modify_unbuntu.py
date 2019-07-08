@@ -6,6 +6,7 @@ import csv
 import os
 import time
 import sh
+import sys
 
 from sys import argv
 from openpyxl import Workbook
@@ -84,6 +85,7 @@ class CopyRegister(object):
                     self.data_list.append(data_row)
 
         # print(f"data_list:{self.data_list}")
+        print(f"data_list count:{len(self.data_list)}")
 
     def copyfiles(self):
         error_file_type = set()
@@ -245,6 +247,12 @@ select OBJECT_NAME from ods_job_config where object_type = 'SP';
 if __name__ == "__main__":
     date_str = time.strftime("%Y%m%d", time.localtime())
     if len(argv) > 1 and len(argv[1]) == 8:
+        if int(date_str) - int(argv[1]) > 10:
+            print(f"argv[1] {argv[1]} is to small")
+            sys.exit(1)
+        if int(date_str) < int(argv[1]):
+            print(f"argv[1] {argv[1]} is large than today")
+            sys.exit(1)
         date_str = argv[1]
 
     a = CopyRegister(date_str)
