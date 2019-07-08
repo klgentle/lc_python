@@ -104,6 +104,7 @@ class Solution:
 
 
 if __name__ == "__main__":
+    today = time.strftime("%Y%m%d", time.localtime())
     date_str = time.strftime("%Y%m%d", time.localtime())
     time_str = time.strftime("%H:%M", time.localtime())
     if time_str > '16:10':
@@ -114,9 +115,6 @@ if __name__ == "__main__":
 
 
     if len(argv) == 2 and len(argv[1]) == 8:
-        if argv[1] < date_str:
-            print(f"date {argv[1]} is wrong!")
-            sys.exit(1)
         date_str = argv[1]
     elif len(argv) == 2 and argv[1].find('d+')>-1:
         # get days from d+days
@@ -130,6 +128,10 @@ if __name__ == "__main__":
             module_type = "支付"
     elif len(argv) > 4:
         print("usage: python3 commit_register.py '20190501' mantis_id, module_type")
+        sys.exit(1)
+
+    if date_str < today:
+        print(f"date_str:{date_str} is wrong!")
         sys.exit(1)
 
     print(f"argv:{argv} ---------- ")
