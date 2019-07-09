@@ -43,7 +43,7 @@ class Solution:
         for line in svn_log.readlines():
             line = line.strip()
             #print(f"line:{line}")
-            if line.startswith("Modified") or line.startswith("Adding"):
+            if line.startswith("Modified") or line.startswith("Modify") or line.startswith("Adding"):
                 if line.find("ODS程序版本发布登记表") > -1:
                     continue
                 # delete  application/octet-stream
