@@ -116,10 +116,6 @@ if __name__ == "__main__":
 
     if len(argv) == 2 and len(argv[1]) == 8:
         date_str = argv[1]
-    elif len(argv) == 2 and argv[1].find('d+')>-1:
-        # get days from d+days
-        days = int(argv[1][2:])
-        date_str = date_add(days)
     elif len(argv) == 3:
         date_str, mantis = argv[1], argv[2]
     elif len(argv) == 4:
@@ -129,6 +125,11 @@ if __name__ == "__main__":
     elif len(argv) > 4:
         print("usage: python3 commit_register.py '20190501' mantis_id, module_type")
         sys.exit(1)
+
+    if argv[1].find('d+')>-1:
+        # get days from d+days
+        days = int(argv[1][2:])
+        date_str = date_add(days)
 
     if date_str < today:
         print(f"date_str:{date_str} is wrong!")
