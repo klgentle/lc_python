@@ -95,6 +95,8 @@ class CopyRegister(object):
         # copy code files
         for row in self.data_list:
             name, file_type, path = row[2:5]
+            if not file_type:
+                file_type = 'sql'
             path = path.replace("\\", "/")
             ind = path.find("1300_编码")
 
