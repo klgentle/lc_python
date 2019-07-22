@@ -63,6 +63,9 @@ class CopyRegister(object):
                 # find right date register excel
                 if filename.find(self.date_str) == -1:
                     continue
+                # test!!!!
+                #if filename.find("支付") == -1:
+                #    continue
 
                 # print(f"filename: {filename} --------------------------")
                 whole_filename = os.path.join(folderName, filename)
