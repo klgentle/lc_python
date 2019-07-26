@@ -78,8 +78,9 @@ class CopyRegister(object):
                     # skip no name row record 
                     if not name:
                         continue
+                    # 20 is hard code, if column is max than 20, should change the value
                     data_row = [
-                        sheet[chr(i + ord("A")) + str(row)].value for i in range(0, 10)
+                        sheet[chr(i + ord("A")) + str(row)].value for i in range(0, 20)
                     ]
                     if isinstance(data_row[7],datetime):
                         data_row[7] = data_row[7].strftime("%Y%m%d")
@@ -161,7 +162,7 @@ class CopyRegister(object):
 
     def saveRegisterExcel(self):
         "save excel records to one excel"
-        file1 = os.path.join(self.svnup_dir, "发布登记表", "支付", "ODS程序版本发布登记表(支付)-template.xlsx")
+        file1 = os.path.join(self.svnup_dir, "发布登记表", "Payment", "ODS程序版本发布登记表(Payment)-template.xlsx")
         file_path_name = self.target_path + "/登记表" + self.date_str + ".xlsx"
         shutil.copy(file1, file_path_name)
 
