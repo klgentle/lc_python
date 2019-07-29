@@ -47,12 +47,12 @@ def mail():
         server = smtplib.SMTP_SSL("smtp.sina.com", 465)  # 发件人邮箱中的SMTP服务器，一般端口是25
         server.starttls()
         # to get passwd
-        # password = getpass(f"{sender}'s password: ")
+        #password = getpass(f"{sender}'s password: ")
         cmd = "awk 'FS=\"=\" {if ($0~/^sina_passwd/) print $2}' $HOME/.passwd.txt"
         password = ""
         with os.popen(cmd) as p:
             password = p.read().strip()
-        # print(f"test [{password}]")
+        #print(f"test [{password}]")
         server.login(sender, password)  # 括号中对应的是发件人邮箱账号、邮箱密码
         # multi people shoud be list
         server.sendmail(
