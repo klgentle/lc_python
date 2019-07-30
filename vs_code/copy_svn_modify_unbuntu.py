@@ -14,6 +14,7 @@ from backupToZip import backupToZip
 from datetime import datetime
 from send_mail_with_attach import mail
 from config_default import configs
+from create_date import getBetweenDay
 
 #from list_file import list_file
 
@@ -24,7 +25,15 @@ class CopyRegister(object):
     """
 
     def __init__(self, date_str: str):
-        self.date_str = date_str
+        self.date_str_list = [0]
+        # date_str: 20190725,20190730
+        if date_str.find(',') > -1:
+            self.date_str = date_str.split(',')[-1]
+            self.date_str_list = getBetweenDay(date_str.split(',')[0],self.date_str)
+        else:
+            self.date_str = date_str
+            self.date_str_list[0] = self.date_str 
+        print(f"self.date_str_list:{self.date_str_list}")
 
         home_path = configs.get('path').get('svn_home_path')
         if not os.path.exists(home_path):
@@ -61,7 +70,8 @@ class CopyRegister(object):
             for filename in filenames:
                 # print('FILE INSIDE ' + folderName + ': '+ filename)
                 # find right date register excel
-                if filename.find(self.date_str) == -1:
+                # filename[-13:-5] is datadate of register
+                if filename[-13:-5] not in self.date_str_list:
                     continue
                 # test!!!!
                 #if filename.find("支付") == -1:
@@ -259,6 +269,8 @@ if __name__ == "__main__":
         if int(date_str) < int(argv[1]):
             print(f"argv[1] {argv[1]} is large than today")
             sys.exit(1)
+        date_str = argv[1]
+    elif len(argv) > 1:
         date_str = argv[1]
 
     a = CopyRegister(date_str)
