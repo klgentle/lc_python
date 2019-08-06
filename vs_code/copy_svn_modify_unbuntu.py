@@ -139,6 +139,7 @@ class CopyRegister(object):
                 file_type = "sql"
             else:
                 targetName = file_type.lower()
+            # TODO odsuser path and MO path
 
             # strip() delete blank
             name_and_type = name + '.' + file_type.lower().strip() 

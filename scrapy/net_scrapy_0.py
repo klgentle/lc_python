@@ -1,6 +1,7 @@
 import requests
 import os
 import re
+from urllib.parse import quote_plus, unquote_plus
  
 def get_page(url,page_num):
     pageList =[]
