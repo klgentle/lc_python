@@ -2,6 +2,7 @@
 # coding:utf8
 
 import pysnooper
+import pdb
 
 
 class Solution:
@@ -56,4 +57,7 @@ if __name__ == "__main__":
     lst1 = [1, 2, 3, 1]
     lst2 = [2, 1, 1, 2]
     # a.rob(lst1)
-    a.rob(lst2)
+    try:
+       _ = a.rob(lst2)
+    except (Exception, e):
+        pdb.set_trace()

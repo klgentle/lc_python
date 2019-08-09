@@ -36,6 +36,7 @@ class CopyRegister(object):
         print(f"self.date_str_list:{self.date_str_list}")
 
         home_path = configs.get('path').get('svn_home_path')
+        print(f"home_path:{home_path}")
         if not os.path.exists(home_path):
             home_path = "/mnt/e"
 
@@ -189,6 +190,7 @@ class CopyRegister(object):
         wb.save(filename=file_path_name)
 
     def createZipfile(self):
+        print(f"file path:{self.target_path}")
         return backupToZip(self.target_path)
 
     def list_file(self, path: str, file_name: str, path2: str):
