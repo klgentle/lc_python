@@ -5,7 +5,7 @@ import codecs
 import csv
 import os
 import time
-import sh
+#import sh
 import sys
 
 from sys import argv
@@ -55,7 +55,8 @@ class CopyRegister(object):
         self.target_path = os.path.join(self.code_beta_path, self.date_str + "beta")
         if os.path.exists(self.target_path):
             print(f"rm -rf {self.target_path}")
-            sh.rm("-rf", f"{self.target_path}")
+            #sh.rm("-rf", f"{self.target_path}")
+            shutil.rmtree(f"{self.target_path}")
         os.makedirs(self.target_path, exist_ok=True)
 
         self.data_list = []
@@ -174,7 +175,7 @@ class CopyRegister(object):
 
     def saveRegisterExcel(self):
         "save excel records to one excel"
-        file1 = os.path.join(self.svnup_dir, "发布登记表", "Payment", "ODS程序版本发布登记表(Payment)-template.xlsx")
+        file1 = os.path.join(self.svnup_dir, "发布登记表", "dj", "ODS程序版本发布登记表(dj)-template.xlsx")
         file_path_name = self.target_path + "/登记表" + self.date_str + ".xlsx"
         shutil.copy(file1, file_path_name)
 
@@ -287,12 +288,12 @@ if __name__ == "__main__":
     a.createZipfile()
 
     time_str = time.strftime("%H:%M", time.localtime())
-    if time_str > '16:05':
-        # if only rpt not find, send email
-        if not error_file_type or error_file_type == {'rpt'}:
-            a.send_mail()
-    else:
-        print("Time is early than 16:05, not send email.")
+    #if time_str > '16:05':
+    #else:
+    #    print("Time is early than 16:05, not send email.")
+    # if only rpt not find, send email
+    if not error_file_type or error_file_type == {'rpt'}:
+        a.send_mail()
 
     print("Done!")
 

@@ -3,6 +3,7 @@
 # whose filename increments
 
 import zipfile, os
+import shutil
 import sh
 
 
@@ -17,6 +18,7 @@ def backupToZip(folder: str):
 
     zipFilename = os.path.basename(folder) + ".zip"
     if os.path.exists(zipFilename):
+        #shutil.rmtree(zipFilename) 
         sh.rm(zipFilename) 
 
     # create the ZIP file
