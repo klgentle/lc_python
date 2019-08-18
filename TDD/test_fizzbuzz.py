@@ -3,7 +3,6 @@ from FizzBuzz import FizzBuzz
 
 
 class MyTestCase(unittest.TestCase):
-
     def test_number_divide_by_3_fizz(self):
         self.assertEqual(FizzBuzz(3).fizz_buzz(), "Fizz")
 
@@ -16,5 +15,6 @@ class MyTestCase(unittest.TestCase):
     def test_number_divide_by_2_number(self):
         self.assertEqual(FizzBuzz(2).fizz_buzz(), "2")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()
