@@ -6,16 +6,15 @@ while keepgoing == "Y":
     variable = input("Enter variable:")
     comparison = input("Enter comparison >,<,= : ")
     value = input("Enter value of cutoff:")
-    # todo TypeError: Invalid comparison between dtype=int64 and str
+    # value format
     if value.isdigit():
         value = int(value)
-    # reverse comparison and delete rows
     if comparison == ">":
-        loan = loan[loan[variable] <= value]
+        loan = loan[loan[variable] > value]
     elif comparison == "<":
-        loan = loan[loan[variable] >= value]
+        loan = loan[loan[variable] < value]
     elif comparison == "=":
-        loan = loan[loan[variable] != value]
+        loan = loan[loan[variable] = value]
 
     keepgoing = input("Do you want to slice by another variable (Y for yes?):")
 
