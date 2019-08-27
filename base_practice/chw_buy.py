@@ -4,6 +4,7 @@ au_deliver = 66.81
 print(f"CHW营养品总价及运费(第一次):￥ {all_goods_and_deliver}, 澳元原价: {au_goods_and_deliver}")
 rmb_deliver2 = 74.33 * 4 + 87.45
 print(f"澳州转运费:￥ {rmb_deliver2}")
+all_fee = all_goods_and_deliver + rmb_deliver2
 
 rate = all_goods_and_deliver / au_goods_and_deliver
 
@@ -26,11 +27,15 @@ print(f"饶奕钦营养品价值：￥{ryq_good_rmb_value:.2f}, 澳元价值：{
 print(f"肖珍营养品价值：￥{xz_good_rmb_value:.2f}, 澳元价值：{xz_good_au_value}")
 
 
-all_deliver = au_deliver * rate + rmb_deliver2
-print(f"总运费：￥{all_deliver}")
+ryq_deliver = au_deliver * rate / 2  + 74.33 + 87.45
+xz_deliver = au_deliver * rate / 2  + 74.33 * 3
+print(f"饶奕钦运费：￥{ryq_deliver:.2f}")
+print(f"肖珍运费：￥{xz_deliver:.2f}")
 
-ryq_good_add_fee = ryq_good_rmb_value + all_deliver /2
-xz_good_add_fee = xz_good_rmb_value + all_deliver /2
+ryq_good_add_fee = ryq_good_rmb_value + ryq_deliver
+xz_good_add_fee = xz_good_rmb_value + xz_deliver
 
 print(f"饶奕钦营养品加运费：￥{ryq_good_add_fee:.2f}")
 print(f"肖珍营养品加运费：￥{xz_good_add_fee:.2f}")
+
+assert( all_fee == ryq_good_add_fee + xz_good_add_fee)
