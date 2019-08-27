@@ -33,7 +33,7 @@ class Solution:
             shutil.copy(file1, self.file2)
 
         self.comit_list = []
-        self.commit_list_end = ["dongjian", "gene", self.date_str, mantis, "", ""]
+        self.commit_list_end = ["Dongjian", "Gene", self.date_str, mantis, "", ""]
         # write commit.log
         #os.system("svn st {SVN_DIR} | grep -v '~' > {SVN_LOG}")
 

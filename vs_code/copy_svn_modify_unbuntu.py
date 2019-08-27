@@ -294,6 +294,7 @@ if __name__ == "__main__":
     # if only rpt not find, send email
     if not error_file_type or error_file_type == {'rpt'}:
         a.send_mail()
+        #print("for test not send email! -----------------")
 
     print("Done!")
 
