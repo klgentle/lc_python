@@ -1,54 +1,33 @@
-#from pysnooper import snoop
-
 class Solution:
     """
-    part into three, every one use two pointer
+    solution 1: Brute force
+    for each point caculate the water, with left_max, right_max as the two side border.
+        left_max = max(height[0:i])
+        right_max = max(height[i+1:height_len])
+        water = min(left_max, right_max) - bar_height
     """
-    #@snoop()
-    def trap(self, height: list) -> int:
-        left = 0
-        right = len(height) -1
-        water_trap_l = 0
-        water_trap_r= 0
-        water_trap_m = 0
-
-        #@snoop()
-        def sub_trap(height:list,left:int,right:int) -> tuple:
-            left_out = left
-            right_out = right
-            min_heght = min(height[left],height[right])
-            # height filter, change too high height to min height
-            bar_height = sum(list(map(lambda x : x if x <= min_heght else min_heght, height[left+1:right]))) 
-            water_trap_m = (right - left - 1) * min_heght  - bar_height
-            
-            # midum part
-            while left < right:
-                if height[left] <= height[right]:
-                    left += 1
-                else:
-                    right -= 1
-
-                min_heght = min(height[left],height[right])
-                # height filter, change too high height to min height
-                bar_height = sum(list(map(lambda x : x if x <= min_heght else min_heght, height[left+1:right]))) 
-                water = (right - left - 1) * min_heght  - bar_height
-                #water_trap_m = max(water_trap_m, water)
-                if water > water_trap_m:
-                    water_trap_m = water
-                    left_out = left
-                    right_out = right
-
-            return (left_out, right_out, water_trap_m)
-        
-        left_m, right_m, water_trap_m = sub_trap(height, 0, right)
-        left, right, water_trap_l = sub_trap(height, 0, left_m)
-        left, right, water_trap_r = sub_trap(height, right_m, right)
-
-        return max(water_trap_m,0) + max(water_trap_l,0) + max(water_trap_r,0)
+    def trap(self, height: List[int]) -> int:
+        water_sum = 0
+        height_len = len(height)
 
 
-if __name__ == "__main__":
-    a = Solution()
-    #h = [0,1,0,2,1,0,1,3,2,1,2,1] 
-    h = [6,4,2,0,3,2,0,3,1,4,5,3,2,7,5,3,0,1,2,1,3,4,6,8,1,3]
-    a.trap(h)
+        left_max = 0
+        right_max = 0
+        for i, bar_height in enumerate(height):
+
+            if i != 0:
+                left_max = max(height[i-1],left_max)
+
+            if i != height_len-1:
+                right_max = max(height[i+1:height_len])
+            else:
+                right_max = 0
+
+            #print(f"i:{i}")
+            #print(f"left_max:{left_max}")
+            #print(f"right_max:{right_max}")
+            water = min(left_max, right_max) - bar_height
+            #print(f"water:{max(water,0)}")
+            water_sum += max(water,0)
+
+        return water_sum
