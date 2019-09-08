@@ -12,4 +12,4 @@ def add_and_square(number: int):
 if __name__ == "__main__":
     start_time = time.time()
     add_and_square(1000)
-    end_time = time.time()
+    print("time:",time.time()-start_time)
