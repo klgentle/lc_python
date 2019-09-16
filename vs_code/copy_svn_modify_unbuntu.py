@@ -5,9 +5,9 @@ import codecs
 import csv
 import os
 import time
-#import sh
-import sys
 
+# import sh
+import sys
 from sys import argv
 from openpyxl import Workbook
 from backupToZip import backupToZip
@@ -16,7 +16,7 @@ from send_mail_with_attach import mail
 from config_default import configs
 from create_date import getBetweenDay
 
-#from list_file import list_file
+# from list_file import list_file
 
 
 class CopyRegister(object):
@@ -25,17 +25,12 @@ class CopyRegister(object):
     """
 
     def __init__(self, date_str: str):
-        self.date_str_list = [0]
+        self.__date_str_list = [0]
         # date_str: 20190725,20190730
-        if date_str.find(',') > -1:
-            self.date_str = date_str.split(',')[-1]
-            self.date_str_list = getBetweenDay(date_str.split(',')[0],self.date_str)
-        else:
-            self.date_str = date_str
-            self.date_str_list[0] = self.date_str 
-        print(f"self.date_str_list:{self.date_str_list}")
+        self.create_date_str_list(date_str)
+        print(f"self.__date_str_list:{self.__date_str_list}")
 
-        home_path = configs.get('path').get('svn_home_path')
+        home_path = configs.get("path").get("svn_home_path")
         print(f"home_path:{home_path}")
         if not os.path.exists(home_path):
             home_path = "/mnt/e"
@@ -45,98 +40,118 @@ class CopyRegister(object):
         self.dir_name = os.path.join(self.code_home, "1300_编码/发布登记表")
         self.svnup_dir = os.path.join(self.code_home, "1300_编码")
 
-        with os.popen("uname -a") as p :
-            uname = p.read()
-            if uname.find("Microsoft") == -1:
-                # BE CAREFUL HERE ############### 
-                # linux test
-                os.system(f"svn up '{self.svnup_dir}'")
+        # BE CAREFUL HERE ###############
+        # with os.popen("uname -a") as p:
+        #    uname = p.read()
+        #    if uname.find("Microsoft") == -1:
+        #        # linux test
+        #        os.system(f"svn up '{self.svnup_dir}'")
 
-        self.target_path = os.path.join(self.code_beta_path, self.date_str + "beta")
-        if os.path.exists(self.target_path):
-            print(f"rm -rf {self.target_path}")
-            #sh.rm("-rf", f"{self.target_path}")
-            shutil.rmtree(f"{self.target_path}")
-        os.makedirs(self.target_path, exist_ok=True)
+        self.__target_path = os.path.join(self.code_beta_path, self.date_str + "beta")
+        self.make_or_clean_folder()
+        self.__data_list = []
+        self.__procedure_name_list = []
+        self.__bo_name_list = []
 
-        self.data_list = []
-        self.procedure_name_list = []
-	
-        self.bo_name_list = []
-        # print(f"self.date_str:{self.date_str}")
+    def create_date_str_list(self, date_str):
+        if date_str.find(",") > -1:
+            self.date_str = date_str.split(",")[-1]
+            self.__date_str_list = getBetweenDay(date_str.split(",")[0], self.date_str)
+        else:
+            self.date_str = date_str
+            self.__date_str_list[0] = self.date_str
+        return self.__date_str_list
 
-    def readRegister(self):
+    def make_or_clean_folder(self):
+        if os.path.exists(self.__target_path):
+            print(f"rm -rf {self.__target_path}")
+            # sh.rm("-rf", f"{self.__target_path}")
+            shutil.rmtree(f"{self.__target_path}")
+        os.makedirs(self.__target_path, exist_ok=True)
+
+    def readAllRegister(self):
         """ copy register """
-
         for folderName, subfolders, filenames in os.walk(self.dir_name):
             for filename in filenames:
                 # print('FILE INSIDE ' + folderName + ': '+ filename)
                 # find right date register excel
                 # filename[-13:-5] is datadate of register
-                if filename[-13:-5] not in self.date_str_list:
+                if filename[-13:-5] not in self.__date_str_list:
                     continue
                 # test!!!!
-                #if filename.find("支付") == -1:
+                # if filename.find("支付") == -1:
                 #    continue
 
                 # print(f"filename: {filename} --------------------------")
                 whole_filename = os.path.join(folderName, filename)
+                self.readOneRegister(whole_filename)
 
-                # copy excel file content
-                wb = openpyxl.load_workbook(whole_filename)
-                sheet = wb.active
-                for row in range(2, sheet.max_row + 1):
-                    name = sheet["C" + str(row)].value
-                    # skip no name row record 
-                    if not name:
-                        continue
-                    # 20 is hard code, if column is max than 20, should change the value
-                    data_row = [
-                        sheet[chr(i + ord("A")) + str(row)].value for i in range(0, 20)
-                    ]
-                    if isinstance(data_row[7],datetime):
-                        data_row[7] = data_row[7].strftime("%Y%m%d")
+        # print(f"data_list:{self.__data_list}")
+        print(f"data_list count:{len(self.__data_list)}")
 
-                    #print(f"data_row:{data_row}")
-                    self.data_list.append(data_row)
+    def readOneRegister(self, whole_filename: str):
+        """ copy register """
+        # copy excel file content
+        wb = openpyxl.load_workbook(whole_filename)
+        sheet = wb.active
+        for row in range(2, sheet.max_row + 1):
+            name = sheet["C" + str(row)].value
+            # skip no name row record
+            if not name:
+                continue
+            # 20 is hard code, if column is max than 20, should change the value
+            data_row = [sheet[chr(i + ord("A")) + str(row)].value for i in range(0, 20)]
+            if isinstance(data_row[7], datetime):
+                data_row[7] = data_row[7].strftime("%Y%m%d")
 
-        # print(f"data_list:{self.data_list}")
-        print(f"data_list count:{len(self.data_list)}")
+            # print(f"data_row:{data_row}")
+            self.__data_list.append(data_row)
+        return self.__data_list
+
+    def register_file_type_deal(self, file_type, path):
+        if file_type.upper() == "BO":
+            file_type = "rpt"
+        elif file_type.upper() in ("PRO", "FNC"):
+            file_type = "sql"
+        # fixing file_type
+        elif file_type.upper() != "RPT" and path.find("1370_水晶报表") > -1:
+            file_type = "rpt"
+        return file_type
 
     def copyfiles(self):
         error_file_type = set()
         # copy code files
-        for row in self.data_list:
+        for row in self.__data_list:
             name, file_type, path = row[2:5]
             if not file_type:
-                file_type = 'sql'
+                file_type = "sql"
             path = path.replace("\\", "/")
             ind = path.find("1300_编码")
 
             if ind == -1:
-                error_file_type.add('lost')
+                error_file_type.add("lost")
                 print(f"path error, skip row: {name}, {file_type}, {path}")
                 continue
-            if file_type.upper() == "BO":
-                file_type = "rpt"
-            elif file_type.upper() in ("PRO", "FNC"):
-                file_type = "sql"
-            # fixing file_type
-            elif file_type.upper() != "RPT" and path.find("1370_水晶报表") > -1: 
-                file_type = "rpt"
+            file_type = self.register_file_type_deal(file_type, path)
 
-            if file_type.upper() in ("RPT","BO"):
-                self.bo_name_list.append(name)
+            if file_type.upper() in ("RPT", "BO"):
+                self.__bo_name_list.append(name)
                 # name format: rpt to upper
                 name = name.upper()
 
-            # get folder name of code 
+            # get folder name of code
             # get the file type name to depart pro and sql
-            targetName = path[ind:].split("/")[-1]
+            path_list = path[ind:].split("/")
+            # print(f"path_list:{path_list}")
+            targetName = path_list[-1]
+            dir_name = path_list[2]
+            if path_list[1] == "1370_水晶报表":
+                dir_name = "1370_水晶报表"
 
-            if targetName in ("1350_存储过程","05Procedures"):
-                targetName = "pro" 
-                self.procedure_name_list.append(name.upper())
+            # targetName and file type deal
+            if targetName in ("1350_存储过程", "05Procedures"):
+                targetName = "pro"
+                self.__procedure_name_list.append(name.upper())
                 # file_type in this fold must be sql or pro
                 file_type = "sql"
             else:
@@ -144,55 +159,51 @@ class CopyRegister(object):
             # TODO odsuser path and MO path
 
             # strip() delete blank
-            name_and_type = name + '.' + file_type.lower().strip() 
-            name_lower_type = name.lower() + '.' + file_type.lower().strip() 
-
-            if name.find('.') > -1: # too smart
+            name_and_type = name + "." + file_type.lower().strip()
+            if name.find(".") > -1:  # too smart
                 name_and_type = name
 
-            new_file = os.path.join(
-                self.code_home, path[ind:], name_and_type
-            )
-            new_file2 = os.path.join(
-                self.code_home, path[ind:], name_lower_type
+            source_file = os.path.join(self.code_home, path[ind:], name_and_type)
+            source_file2 = os.path.join(
+                self.code_home, path[ind:], name_and_type.lower()
             )
 
-            #print(f"new_file:{new_file}")
+            # print(f"source_file:{source_file}")
 
-            self.target_path2 = os.path.join(self.target_path, targetName)
-            os.makedirs(self.target_path2, exist_ok=True)
+            target_path2 = os.path.join(self.__target_path, dir_name, targetName)
+            if not os.path.exists(target_path2):
+                os.makedirs(target_path2, exist_ok=True)
             try:
                 # todo copy ignore upper or lower
-                shutil.copy(new_file, self.target_path2)
+                shutil.copy(source_file, target_path2)
             except FileNotFoundError:
-                if os.path.exists(new_file2):
-                    shutil.copy(new_file2, self.target_path2)
+                if os.path.exists(source_file2):
+                    shutil.copy(source_file2, target_path2)
                 else:
                     error_file_type.add(file_type.lower())
-                    print(f"error! No such file: {new_file} _______________")
+                    print(f"error! No such file: {source_file} _______________")
 
         return error_file_type
 
     def saveRegisterExcel(self):
         "save excel records to one excel"
-        file1 = os.path.join(self.svnup_dir, "发布登记表", "dj", "ODS程序版本发布登记表(dj)-template.xlsx")
-        file_path_name = self.target_path + "/登记表" + self.date_str + ".xlsx"
+        file1 = os.path.join(
+            self.svnup_dir, "发布登记表", "dj", "ODS程序版本发布登记表(dj)-template.xlsx"
+        )
+        file_path_name = self.__target_path + "/登记表" + self.date_str + ".xlsx"
         shutil.copy(file1, file_path_name)
-
         # wb = Workbook()
         wb = openpyxl.load_workbook(file_path_name)
         sheet = wb.active
-        # sheet.title = self.date_str + "发布登记"
 
         # record rows
-        for row in self.data_list:
+        for row in self.__data_list:
             sheet.append(row)
-
         wb.save(filename=file_path_name)
 
     def createZipfile(self):
-        print(f"file path:{self.target_path}")
-        return backupToZip(self.target_path)
+        print(f"file path:{self.__target_path}")
+        return backupToZip(self.__target_path)
 
     def list_file(self, path: str, file_name: str, path2: str):
         to_file = open(file_name, "w")
@@ -210,36 +221,40 @@ class CopyRegister(object):
         to_file.write(f"set define off\nspool {self.date_str}_{path2}.log\n\n")
         for file_name in os.listdir(path):
             # 跳过目标文件
-            if file_name in ("pro.sql","list.sql"):
+            if file_name in ("pro.sql", "list.sql"):
                 continue
             name_without_type = file_name.split(".")[0]
-            s = f"prompt\n@@{file_name}\nprompt\nprompt {name_without_type}\nprompt ==============================\nprompt\n"
+            s = f"prompt\nprompt {name_without_type}\n@@{file_name}\nprompt\nprompt ==============================\nprompt\n"
             to_file.write(s)
 
         to_file.write("\nspool off\ncommit;\n")
         to_file.close()
 
     def listSqlFile(self):
-        dc = {
-            "pro":"pro.sql",
-            "sql":"list.sql"
-        }
-        for k, v in dc.items():
-            path2 = k 
-            path = os.path.join(self.target_path,path2)
-            #file_name = os.path.join(self.target_path, v)
-            file_name = os.path.join(path, v)
-            # list file 
-            if os.path.exists(path):
-                self.list_file2(path, file_name, path2)
-        
+        dc = {"pro": "pro.sql", "sql": "list.sql"}
+        shema_list = [
+            "CBSUSER",
+            "ODSUSER",
+            "RPTUSER",
+            "CBSUSER_MO",
+            "ODSUSER_MO",
+            "RPTUSER_MO",
+        ]
+        for schema in shema_list:
+            for short_path, file_name in dc.items():
+                path = os.path.join(self.__target_path, schema, short_path)
+                whole_file_name = os.path.join(path, file_name)
+                # list file
+                if os.path.exists(path):
+                    self.list_file2(path, whole_file_name, short_path)
+
     def createConfigCheckSql(self):
-        file_name = os.path.join(self.target_path,'config_check.sql')
+        file_name = os.path.join(self.__target_path, "config_check.sql")
         to_file = open(file_name, "w")
         # print test
-        #print(f"self.procedure_name_list:{self.procedure_name_list}")
+        # print(f"self.__procedure_name_list:{self.__procedure_name_list}")
         sql = f"""SELECT OBJECT_NAME FROM ALL_OBJECTS WHERE OWNER = 'RPTUSER' AND OBJECT_TYPE = 'PROCEDURE'
-AND OBJECT_NAME IN ({", ".join(["'" + name + "'" for name in self.procedure_name_list])})
+AND OBJECT_NAME IN ({", ".join(["'" + name + "'" for name in self.__procedure_name_list])})
 AND SUBSTR(OBJECT_NAME,-4) != '_MID'
 MINUS
 select OBJECT_NAME from ods_job_config where object_type = 'SP';
@@ -247,22 +262,23 @@ select OBJECT_NAME from ods_job_config where object_type = 'SP';
         to_file.write(f"{sql}\n")
         to_file.close()
 
-    def boNameList(self,file_name='bo_list.txt'):
-        self.bo_name_list.sort()
-        print("\n请核对今日BO上线清单：\n"+'\n'.join(self.bo_name_list)+"\n")
+    def boNameList(self, file_name="bo_list.txt"):
+        self.__bo_name_list.sort()
+        print("\n请核对今日BO上线清单：\n" + "\n".join(self.__bo_name_list) + "\n")
 
-        file_name = os.path.join(self.target_path,file_name)
+        file_name = os.path.join(self.__target_path, file_name)
         to_file = open(file_name, "w")
         to_file.write("请核对今日BO上线清单：\n")
-        for b in self.bo_name_list:
-            to_file.write(b+'\n')
+        for b in self.__bo_name_list:
+            to_file.write(b + "\n")
 
         to_file.close()
 
-    def send_mail(self,file_path=""):
+    def send_mail(self, file_path=""):
         if not file_path:
             file_path = os.path.join(self.code_beta_path, self.date_str + "beta.zip")
-        mail(self.date_str,file_path)
+        mail(self.date_str, file_path)
+
 
 if __name__ == "__main__":
     date_str = time.strftime("%Y%m%d", time.localtime())
@@ -278,7 +294,7 @@ if __name__ == "__main__":
         date_str = argv[1]
 
     a = CopyRegister(date_str)
-    a.readRegister()
+    a.readAllRegister()
     a.saveRegisterExcel()
     error_file_type = a.copyfiles()
     a.listSqlFile()
@@ -287,15 +303,9 @@ if __name__ == "__main__":
     # not create zip file, need to add rpt files
     a.createZipfile()
 
-    time_str = time.strftime("%H:%M", time.localtime())
-    #if time_str > '16:05':
-    #else:
-    #    print("Time is early than 16:05, not send email.")
     # if only rpt not find, send email
-    if not error_file_type or error_file_type == {'rpt'}:
+    if not error_file_type or error_file_type == {"rpt"}:
         a.send_mail()
-        #print("for test not send email! -----------------")
 
     print("Done!")
-
     # print("usage python[3] copy_upload_ubuntu.py '20190501'")
