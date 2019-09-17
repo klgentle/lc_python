@@ -142,11 +142,13 @@ class CopyRegister(object):
             # get folder name of code
             # get the file type name to depart pro and sql
             path_list = path[ind:].split("/")
-            # print(f"path_list:{path_list}")
             targetName = path_list[-1]
-            dir_name = path_list[2]
+            #print(f"path_list:{path_list}")
+            dir_name = ""
             if path_list[1] == "1370_水晶报表":
                 dir_name = "1370_水晶报表"
+            else:
+                dir_name = path_list[2]
 
             # targetName and file type deal
             if targetName in ("1350_存储过程", "05Procedures"):
