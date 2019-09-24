@@ -1,16 +1,15 @@
 import os
-from ViewOperate import ViewOperate
+from ViewOperate import ViewOperate 
 
-class Procedure(object):
-    """
-    procedure deal with path, procedure file name
-    TODO 本程序有一个缺陷，会全部大写，如果需要小写的，要特别注意
-    """
-    def __init__(self, proc_name:str):
-        self.__procedure_path = r"E:\svn\1300_编码\1301_ODSDB\RPTUSER\05Procedures"
-        self.__proc_name = proc_name
+
+class Procedure(object): 
+    """ procedure deal with path, procedure file name 
+    TODO 本程序有一个缺陷，会全部大写，如果需要小写的，要特别注意 """ 
+    def __init__(self, proc_name:str): 
+        self.__procedure_path = r"E:\svn\1300_编码\1301_ODSDB\RPTUSER\05Procedures" 
+        self.__proc_name = proc_name 
         self.check_and_write_schema()
-
+                    
     def get_file_name(self) -> str:
         return self.__proc_name + '.sql'
 
@@ -47,23 +46,42 @@ class Procedure(object):
             proc_cont = pro.read().upper()
         return proc_cont
     
-    @staticmethod
-    def string_replace(src_cont:str, from_str:str, to_str:str)-> str:
-        src_cont = src_cont.replace(from_str, to_str)
-        return src_cont
-
     def replace_view_with_table(self, view_dict:dict):
         proc_cont = self.read_proc_cont()
         for view, table in view_dict.items(): 
-            proc_cont = self.string_replace(proc_cont, view, table)
+            proc_cont = proc_cont.replace(view, table)
         self.write_procedure(proc_cont)
 
-    def data_area_deal(self):
-        """处理data_area
-            TODO
-            按行读取，如果出现了 on data_area, and data_area, where data_area,则在行首添加--
+    @staticmethod
+    def data_area_replace(line:str)-> str:
+        """ TODO
+            按行读取，如果出现了 ON DATA_AREA, AND DATA_AREA, WHERE DATA_AREA,则进行替换，添加--
+            ON, WHERE ->  ON 1=1 -- OR WHERE 1=1 -- 
+            AND -> -- AND 
+            ) -> \n)
         """
-        pass
+        if line.find('DATA_AREA') > -1 and (line.find('ON ') > -1 or line.find('WHERE') > -1 or line.find('AND ') > -1):
+            if line.find('ON ') > -1:
+                line = line.replace('ON ', 'ON 1=1 -- ')
+            elif line.find('WHERE') > -1:
+                line = line.replace('WHERE ', 'WHERE 1=1 -- ')
+            elif line.find('AND ') > -1:
+                line = line.replace('AND ', '--AND ')
+            elif line.find(')') > -1:
+                line = line.replace(')', '\n)')
+        return line
+
+    def data_area_deal(self):
+        """处理data_area """
+        proc_cont_list = []
+        proc_file_name = self.get_file_name()
+        with open(os.path.join(self.__procedure_path, proc_file_name),'r', encoding='UTF-8') as pro:
+            proc_cont_list = pro.readlines()
+        proc_cont_list = [item.upper() for item in proc_cont_list]
+        for index, line in enumerate(proc_cont_list):
+            proc_cont_list[index] = self.data_area_replace(line)
+                
+        self.write_procedure("".join(proc_cont_list))
 
 
 class AutoViewReplace(object):
@@ -93,8 +111,7 @@ class AutoViewReplace(object):
         return view_set
 
     def view_index(self, proc_cont:str) -> int:
-        """检查是否存在要改的视图
-        """
+        """检查是否存在要改的视图 """
         index = proc_cont.find('RPTUSER.V_') 
         return index 
 
@@ -118,19 +135,16 @@ class AutoViewReplace(object):
         procedure = Procedure(proc_name)
         procedure.replace_view_with_table(proc_view_dict)
         print(f"{proc_name} 视图已经改为原表！")
+
         procedure.data_area_deal()
         print(f"{proc_name} data_area处理完成！")
 
 
-
 if __name__ == "__main__":
     obj = AutoViewReplace()
-    #view_set = obj.procedure_view_set("p_rpt_cif035")
-    #view_set = obj.procedure_view_set("p_rpt_cif025")
-    view_set = obj.procedure_view_set("p_rpt_cif021")
-    print(view_set)
     obj.view_replace("p_rpt_cif021")
 
-    #pro = Procedure('p_rpt_cif021')
-
-    
+    # test data_area deal
+    #procedure = Procedure("p_rpt_cif021")
+    #procedure.data_area_deal()
+    #print("data_area处理完成！")

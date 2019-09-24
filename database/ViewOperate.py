@@ -23,7 +23,7 @@ class ViewOperate(object):
             # return original table name, such as ODSUSER.CBS_FH00_TU_CUS_DETAILS_M
             # TODO deal with special data such as " from  ods"
             original_table = view_content.split("FROM ")[1].replace(";", "")
-            return original_table.split("UNION")[0]
+            return original_table.split("UNION")[0].strip()
         except:
             return -1
 
@@ -76,8 +76,13 @@ if __name__ == "__main__":
         sys.exit(1)
 
     a = ViewOperate()
+    # use for search table
+    print(a.get_view_original_table(sys.argv[1]))
+
+    # save_original_table_dict in local file
+    #a.save_original_table_dict()
+
     # original_table = a.read_view_original_table('v_limit_all.sql')
     # print(original_table)
     # a.create_view_to_table_sql()
-    # use for search table
-    print(a.get_view_original_table(sys.argv[1]))
+
