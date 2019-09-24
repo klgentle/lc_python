@@ -58,6 +58,13 @@ class Procedure(object):
             proc_cont = self.string_replace(proc_cont, view, table)
         self.write_procedure(proc_cont)
 
+    def data_area_deal(self):
+        """处理data_area
+            TODO
+            按行读取，如果出现了 on data_area, and data_area, where data_area,则在行首添加--
+        """
+        pass
+
 
 class AutoViewReplace(object):
     """视图改原表，自动化：
@@ -111,12 +118,9 @@ class AutoViewReplace(object):
         procedure = Procedure(proc_name)
         procedure.replace_view_with_table(proc_view_dict)
         print(f"{proc_name} 视图已经改为原表！")
+        procedure.data_area_deal()
+        print(f"{proc_name} data_area处理完成！")
 
-    def data_area_deal(self):
-        """处理data_area
-            TODO
-        """
-        pass
 
 
 if __name__ == "__main__":
