@@ -5,8 +5,12 @@ import sys
 
 class ViewOperate(object):
     def __init__(self):
-        self.view_path = "/home/kl/svn/1300_编码/1301_ODSDB/RPTUSER/03Views"
-        self.new_path = "/mnt/e/yx_walk/report_develop/new_views"
+        # linux
+        #self.view_path = "/home/kl/svn/1300_编码/1301_ODSDB/RPTUSER/03Views"
+        #self.new_path = "/mnt/e/yx_walk/report_develop/new_views"
+        # win
+        self.view_path = r"E:\svn\1300_编码\1301_ODSDB\RPTUSER\03Views"
+        self.new_path = r"E:\yx_walk\report_develop\new_views"
         self.new_dict_file_name = "view_original_dict.txt"
         self.view_original_dict = {}
 

@@ -286,13 +286,14 @@ select OBJECT_NAME from ods_job_config where object_type = 'SP';
 if __name__ == "__main__":
     date_str = time.strftime("%Y%m%d", time.localtime())
     if len(argv) > 1 and len(argv[1]) == 8:
+        pass
         # for test
         # if int(date_str) - int(argv[1]) > 10:
         #    print(f"argv[1] {argv[1]} is to small")
         #    sys.exit(1)
-        if int(date_str) < int(argv[1]):
-            print(f"argv[1] {argv[1]} is large than today")
-            sys.exit(1)
+        #if int(date_str) < int(argv[1]):
+        #    print(f"argv[1] {argv[1]} is large than today")
+        #    sys.exit(1)
         date_str = argv[1]
     elif len(argv) > 1:
         date_str = argv[1]
@@ -307,9 +308,9 @@ if __name__ == "__main__":
     # not create zip file, need to add rpt files
     a.createZipfile()
 
-    # if only rpt not find, send email
-    # if not error_file_type or error_file_type == {"rpt"}:
-    #    a.send_mail()
+    #if only rpt not find, send email
+    if not error_file_type or error_file_type == {"rpt"}:
+       a.send_mail()
 
     print("Done!")
     # print("usage python[3] copy_upload_ubuntu.py '20190501'")
