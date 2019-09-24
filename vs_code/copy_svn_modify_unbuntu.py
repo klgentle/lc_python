@@ -158,7 +158,6 @@ class CopyRegister(object):
                 file_type = "sql"
             else:
                 folder_name = file_type.lower()
-            # TODO odsuser path and MO path
 
             # strip() delete blank
             name_and_type = name + "." + file_type.lower().strip()
@@ -171,14 +170,14 @@ class CopyRegister(object):
             )
             # print(f"source_file:{source_file}")
 
-            target_path_file = os.path.join(
-                self.__beta_path, schema_folder, folder_name, name_and_type.replace(" ", "_")
-            )
-            print(f"target_path_file:{target_path_file}")
-            if not os.path.exists(target_path_file):
-                os.makedirs(target_path_file, exist_ok=True)
+            target_path = os.path.join(self.__beta_path, schema_folder, folder_name)
+            # replace blank in file name
+            target_path_file = os.path.join(target_path, name_and_type.replace(" ", "_"))
+
+            if not os.path.exists(target_path):
+                os.makedirs(target_path, exist_ok=True)
             try:
-                # todo copy ignore upper or lower
+                # copy ignore upper or lower
                 shutil.copy(source_file, target_path_file)
             except FileNotFoundError:
                 if os.path.exists(source_file2):
