@@ -2,6 +2,7 @@ import time
 
 
 def add_and_square(number: int):
+    """求指定范围内所有满足 a*a + b*b = c*c 的a,b,c"""
     for a in range(0, number):
         for b in range(0, number):
             c = number - a - b

@@ -37,7 +37,7 @@ class CopyRegister(object):
 
         self.code_beta_path = os.path.join(home_path, "yx_walk/beta")
         self.code_home = os.path.join(home_path, "svn")
-        self.dir_name = os.path.join(self.code_home, "1300_编码/发布登记表")
+        self.schema_folder = os.path.join(self.code_home, "1300_编码/发布登记表")
         self.svnup_dir = os.path.join(self.code_home, "1300_编码")
 
         # BE CAREFUL HERE ###############
@@ -47,7 +47,7 @@ class CopyRegister(object):
         #        # linux test
         #        os.system(f"svn up '{self.svnup_dir}'")
 
-        self.__target_path = os.path.join(self.code_beta_path, self.date_str + "beta")
+        self.__beta_path = os.path.join(self.code_beta_path, self.date_str + "beta")
         self.make_or_clean_folder()
         self.__data_list = []
         self.__procedure_name_list = []
@@ -63,15 +63,15 @@ class CopyRegister(object):
         return self.__date_str_list
 
     def make_or_clean_folder(self):
-        if os.path.exists(self.__target_path):
-            print(f"rm -rf {self.__target_path}")
-            # sh.rm("-rf", f"{self.__target_path}")
-            shutil.rmtree(f"{self.__target_path}")
-        os.makedirs(self.__target_path, exist_ok=True)
+        if os.path.exists(self.__beta_path):
+            print(f"rm -rf {self.__beta_path}")
+            # sh.rm("-rf", f"{self.__beta_path}")
+            shutil.rmtree(f"{self.__beta_path}")
+        os.makedirs(self.__beta_path, exist_ok=True)
 
     def readAllRegister(self):
         """ copy register """
-        for folderName, subfolders, filenames in os.walk(self.dir_name):
+        for folderName, subfolders, filenames in os.walk(self.schema_folder):
             for filename in filenames:
                 # print('FILE INSIDE ' + folderName + ': '+ filename)
                 # find right date register excel
@@ -142,22 +142,22 @@ class CopyRegister(object):
             # get folder name of code
             # get the file type name to depart pro and sql
             path_list = path[ind:].split("/")
-            targetName = path_list[-1]
-            #print(f"path_list:{path_list}")
-            dir_name = ""
+            folder_name = path_list[-1]
+            # print(f"path_list:{path_list}")
+            schema_folder = ""
             if path_list[1] == "1370_水晶报表":
-                dir_name = "1370_水晶报表"
+                schema_folder = "1370_水晶报表"
             else:
-                dir_name = path_list[2]
+                schema_folder = path_list[2]
 
-            # targetName and file type deal
-            if targetName in ("1350_存储过程", "05Procedures"):
-                targetName = "pro"
+            # folder_name and file type deal
+            if folder_name in ("1350_存储过程", "05Procedures"):
+                folder_name = "pro"
                 self.__procedure_name_list.append(name.upper())
                 # file_type in this fold must be sql or pro
                 file_type = "sql"
             else:
-                targetName = file_type.lower()
+                folder_name = file_type.lower()
             # TODO odsuser path and MO path
 
             # strip() delete blank
@@ -169,18 +169,20 @@ class CopyRegister(object):
             source_file2 = os.path.join(
                 self.code_home, path[ind:], name_and_type.lower()
             )
-
             # print(f"source_file:{source_file}")
 
-            target_path2 = os.path.join(self.__target_path, dir_name, targetName)
-            if not os.path.exists(target_path2):
-                os.makedirs(target_path2, exist_ok=True)
+            target_path_file = os.path.join(
+                self.__beta_path, schema_folder, folder_name, name_and_type.replace(" ", "_")
+            )
+            print(f"target_path_file:{target_path_file}")
+            if not os.path.exists(target_path_file):
+                os.makedirs(target_path_file, exist_ok=True)
             try:
                 # todo copy ignore upper or lower
-                shutil.copy(source_file, target_path2)
+                shutil.copy(source_file, target_path_file)
             except FileNotFoundError:
                 if os.path.exists(source_file2):
-                    shutil.copy(source_file2, target_path2)
+                    shutil.copy(source_file2, target_path_file)
                 else:
                     error_file_type.add(file_type.lower())
                     print(f"error! No such file: {source_file} _______________")
@@ -192,7 +194,7 @@ class CopyRegister(object):
         file1 = os.path.join(
             self.svnup_dir, "发布登记表", "dj", "ODS程序版本发布登记表(dj)-template.xlsx"
         )
-        file_path_name = self.__target_path + "/登记表" + self.date_str + ".xlsx"
+        file_path_name = self.__beta_path + "/登记表" + self.date_str + ".xlsx"
         shutil.copy(file1, file_path_name)
         # wb = Workbook()
         wb = openpyxl.load_workbook(file_path_name)
@@ -204,8 +206,8 @@ class CopyRegister(object):
         wb.save(filename=file_path_name)
 
     def createZipfile(self):
-        print(f"file path:{self.__target_path}")
-        return backupToZip(self.__target_path)
+        print(f"file path:{self.__beta_path}")
+        return backupToZip(self.__beta_path)
 
     def list_file(self, path: str, file_name: str, path2: str):
         to_file = open(file_name, "w")
@@ -244,14 +246,14 @@ class CopyRegister(object):
         ]
         for schema in shema_list:
             for short_path, file_name in dc.items():
-                path = os.path.join(self.__target_path, schema, short_path)
+                path = os.path.join(self.__beta_path, schema, short_path)
                 whole_file_name = os.path.join(path, file_name)
                 # list file
                 if os.path.exists(path):
                     self.list_file2(path, whole_file_name, short_path)
 
     def createConfigCheckSql(self):
-        file_name = os.path.join(self.__target_path, "config_check.sql")
+        file_name = os.path.join(self.__beta_path, "config_check.sql")
         to_file = open(file_name, "w")
         # print test
         # print(f"self.__procedure_name_list:{self.__procedure_name_list}")
@@ -268,7 +270,7 @@ select OBJECT_NAME from ods_job_config where object_type = 'SP';
         self.__bo_name_list.sort()
         print("\n请核对今日BO上线清单：\n" + "\n".join(self.__bo_name_list) + "\n")
 
-        file_name = os.path.join(self.__target_path, file_name)
+        file_name = os.path.join(self.__beta_path, file_name)
         to_file = open(file_name, "w")
         to_file.write("请核对今日BO上线清单：\n")
         for b in self.__bo_name_list:
@@ -285,9 +287,10 @@ select OBJECT_NAME from ods_job_config where object_type = 'SP';
 if __name__ == "__main__":
     date_str = time.strftime("%Y%m%d", time.localtime())
     if len(argv) > 1 and len(argv[1]) == 8:
-        if int(date_str) - int(argv[1]) > 10:
-            print(f"argv[1] {argv[1]} is to small")
-            sys.exit(1)
+        # for test
+        # if int(date_str) - int(argv[1]) > 10:
+        #    print(f"argv[1] {argv[1]} is to small")
+        #    sys.exit(1)
         if int(date_str) < int(argv[1]):
             print(f"argv[1] {argv[1]} is large than today")
             sys.exit(1)
@@ -306,8 +309,8 @@ if __name__ == "__main__":
     a.createZipfile()
 
     # if only rpt not find, send email
-    if not error_file_type or error_file_type == {"rpt"}:
-        a.send_mail()
+    # if not error_file_type or error_file_type == {"rpt"}:
+    #    a.send_mail()
 
     print("Done!")
     # print("usage python[3] copy_upload_ubuntu.py '20190501'")
