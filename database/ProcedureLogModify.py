@@ -8,6 +8,11 @@ class ProcedudreLogModify(object):
      添加主日志，如：  V1.0   20180515 HASON       1.ADD SCHEMA
      job_step 写死的，改为变量
      添加 bat_report_log 登记
+
+    TODO add log, 修改存储过程划分:
+    按 V spend time分块
+两个日志之间不能有两个以上的insert 否则要写日志，3个insert 增加一个日志，4个insert增加两个。
+日志写在第二个insert前，
     """
 
     def __init__(self, proc_name:str):
