@@ -93,5 +93,6 @@ class Procedure(object):
         for index, line in enumerate(proc_cont_list):
             if self.data_area_check(line):
                 proc_cont_list[index] = self.data_area_replace(line)
+                print("data_area处理")
                 
         self.write_procedure("".join(proc_cont_list))

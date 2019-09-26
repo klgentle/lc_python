@@ -48,8 +48,8 @@ class ViewOperate(object):
     def get_view_original_table(self, view_name: str):
         if view_name.upper().startswith("RPTUSER"):
             view_name = view_name[8:]
-        view_dict_file = os.path.join(self.new_path, self.new_dict_file_name)
-        with open(view_dict_file) as f:
+        #view_dict_file = os.path.join(self.new_path, self.new_dict_file_name)
+        with open(self.new_dict_file_name) as f:
             view_dict = json.loads(f.read())
         return view_dict.get(view_name.upper())
 
@@ -58,7 +58,6 @@ class ViewOperate(object):
         with open(view_dict_file) as f:
             view_dict = json.loads(f.read())
 
-        sql_list = []
         view_sql = os.path.join(self.new_path, "view_sql.sql")
         with open(view_sql, "w", encoding="utf-8") as new_f:
             for view_name, table_name in view_dict.items():

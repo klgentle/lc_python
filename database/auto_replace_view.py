@@ -63,13 +63,12 @@ class AutoViewReplace(object):
         self.view_replace(proc_name)
         procedure = Procedure(proc_name)
         procedure.data_area_deal()
-        print(f"{proc_name} data_area处理完成！")
 
 
 if __name__ == "__main__":
     obj = AutoViewReplace()
     #obj.replace_view_and_data_area("p_rpt_cif021")
-    obj.replace_view_and_data_area("p_rpt_lgr001")
+    obj.replace_view_and_data_area("p_rpt_cif113")
 
     # test data_area deal
     #procedure = Procedure("p_rpt_cif021")
