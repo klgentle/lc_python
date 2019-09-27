@@ -89,7 +89,8 @@ class ProcedudreLogModify(object):
 
     @staticmethod
     def is_log_exists_and_need_modify(proc_cont_between_log) -> bool:
-        proc_cont_list = proc_cont_between_log.split("VALUES(BAT_SERIAL_NO.NEXTVAL,")
+        proc_cont_list = proc_cont_between_log.split(
+            "VALUES(BAT_SERIAL_NO.NEXTVAL,")
         # 如果存在VALUES(BAT_SERIAL_NO.NEXTVAL,则list长度会大于一
         if len(proc_cont_list) > 1 and not proc_cont_list[1].strip().startswith(
             "V_DEAL_DATE,V_JOB_STEP,V_JOB_NAME"
@@ -154,7 +155,8 @@ COMMIT;
         # read proc_cont
         procedure = self.__procedure
         proc_cont = procedure.read_proc_cont()
-        proc_cont_head, proc_cont_main = proc_cont.split("IF I_RUN_DATE IS NULL THEN\n")
+        proc_cont_head, proc_cont_main = proc_cont.split(
+            "IF I_RUN_DATE IS NULL THEN\n")
         proc_cont_head = self.modify_procedure_header(proc_cont_head)
 
         split_str = "V_JOB_ID"
@@ -176,3 +178,4 @@ COMMIT;
 if __name__ == "__main__":
     obj = ProcedudreLogModify("p_rpt_cif032")
     obj.modify_procedure_log()
+    # test vim copy
