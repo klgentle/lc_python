@@ -1,14 +1,14 @@
+import time
+import sys
+import os
+
 # 项目根目录
+from database.convert_file_to_utf8 import convert_file_to_utf8
+from string_code.StringFunctions import StringFunctions
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # 添加系统环境变量
 sys.path.append(BASE_DIR)
 # 导入模块
-from 02_string.StringFunctions import StringFunctions
-import os
-import sys
-import time
-from convert_file_to_utf8 import convert_file_to_utf8
-
 
 
 class Procedure(object):
@@ -58,10 +58,12 @@ class Procedure(object):
             ON B1.ID = B3.ID AND B1.DATA_AREA = B3.DATA_AREA AND B1.DATA_DATE = B3.DATA_DATE
             line = self.split_two_and_line(line)
         """
-        line = StringFunctions(line)
-        second_position = line.find_second_position('ADD')
-        if second_position > -1:
-            line = line.str_insert(second_position, '\n')
+        line_obj = StringFunctions(line)
+        second_position = line_obj.find_the_second_position('AND ')
+        line_strip = line.strip()
+        if not line_strip.startswith('--') and not line_strip.startswith('WHEN') and second_position > -1:
+            print('split line with two add')
+            line = line_obj.str_insert(second_position, '\n')
         return line
 
     def modify_proc_by_line(self):
@@ -69,7 +71,7 @@ class Procedure(object):
         proc_file_name = self.get_file_name()
         with open(os.path.join(self.__procedure_path, proc_file_name), 'r', encoding='UTF-8') as pro:
             proc_cont_list = pro.readlines()
-        for i in proc_cont_list:
+        for i in range(0, len(proc_cont_list)):
             proc_cont_list[i] = self.split_line_with_two_and(proc_cont_list[i])
 
         self.write_procedure("".join(proc_cont_list))
@@ -95,7 +97,7 @@ class Procedure(object):
 
     @staticmethod
     def data_area_check(line: str) -> bool:
-        if line.find('DATA_AREA') > -1 and (line.find('ON ') > -1 or line.find('WHERE') > -1 or line.find('AND ') > -1):
+        if not line.strip().startswith('--') and line.find('DATA_AREA') > -1 and (line.find('ON ') > -1 or line.find('WHERE') > -1 or line.find('AND ') > -1):
             return True
         return False
 
@@ -134,3 +136,8 @@ class Procedure(object):
             proc_cont_list[index] = self.data_area_replace(line)
 
         self.write_procedure("".join(proc_cont_list))
+
+
+if __name__ == '__main__':
+    proc = Procedure('p_rpt_cif022')
+    proc.modify_proc_by_line()

@@ -10,7 +10,7 @@ sys.path.append(BASE_DIR)
 print(BASE_DIR)
 sys.path.append('../')
 # 导入模块
-from 02_string.StringFunctions import StringFunctions
+from string_code.StringFunctions import StringFunctions
 import unittest
 
 
