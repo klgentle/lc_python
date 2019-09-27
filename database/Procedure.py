@@ -66,6 +66,14 @@ class Procedure(object):
             line = line_obj.str_insert(second_position, '\n')
         return line
 
+    @staticmethod
+    def deal_with_blanks(proc_cont:str)->str:
+        """
+        INSERT INTO  BAT_REPORT_LOG
+        TODO use 正则表达式
+        """
+        return proc_cont
+
     def modify_proc_by_line(self):
         proc_cont_list = []
         proc_file_name = self.get_file_name()

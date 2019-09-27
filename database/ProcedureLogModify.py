@@ -1,8 +1,13 @@
-from Procedure import Procedure
 import time
+import os
+import sys
+
+# 绝对路径的import
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../")
+from database.Procedure import Procedure
 
 
-class ProcedudreLogModify(object):
+class ProcedureLogModify(object):
     """
     存储过程日志修改
      添加主日志，如：  V1.0   20180515 HASON       1.ADD SCHEMA
@@ -52,7 +57,7 @@ class ProcedudreLogModify(object):
             # VALUES(BAT_SERIAL_NO.NEXTVAL, V_DEAL_DATE,'19',V_JOB_NAME
             v_job_step_line = "V_JOB_STEP:={};\n".format(int(eval(job_step)))
             proc_cont = proc_cont.replace(
-                "INSERT INTO", v_job_step_line + "INSERT INTO"
+                "INSERT INTO BAT_REPORT_LOG", v_job_step_line + "INSERT INTO BAT_REPORT_LOG"
             )
 
             # replace hard code value with v_job_step
@@ -66,6 +71,7 @@ class ProcedudreLogModify(object):
         """查找是否spend time已经减一了，如果有就修正"""
         if proc_cont.find("V_ST_TIME-1") > -1:
             return proc_cont.replace("V_ST_TIME-1", "V_ST_TIME")
+        return proc_cont
 
     def modify_report_log(self, proc_cont: str) -> str:
         """修改 bat_report_log 登记
@@ -140,7 +146,6 @@ COMMIT;
 
     def modify_procedure_between_report_log(self, proc_cont: str):
         """修改存储过程两个report_log之间的部分
-            TODO 如果两个;之间没有report_log,会导致无法添加日志
         """
         if self.is_log_exists_and_need_modify(proc_cont):
             proc_cont = self.modify_report_log(proc_cont)
@@ -155,11 +160,12 @@ COMMIT;
         procedure = self.__procedure
         proc_cont = procedure.read_proc_cont()
         proc_cont_head, proc_cont_main = proc_cont.split(
-            "IF I_RUN_DATE IS NULL THEN\n")
+            "IF I_RUN_DATE IS NULL THEN")
         proc_cont_head = self.modify_procedure_header(proc_cont_head)
 
-        split_str = "V_JOB_ID"
-        proc_cont_main_list = proc_cont_main.split(split_str)
+        main_split_str = "V_JOB_ID"
+        proc_cont_main_list = proc_cont_main.split(main_split_str)
+
         for ind in range(0, len(proc_cont_main_list)):
             proc_cont_main_list[ind] = self.modify_procedure_between_report_log(
                 proc_cont_main_list[ind]
@@ -168,13 +174,13 @@ COMMIT;
         # write procedure file
         procedure.write_procedure(
             proc_cont_head
-            + "IF I_RUN_DATE IS NULL THEN\n"
-            + split_str.join(proc_cont_main_list)
+            + "IF I_RUN_DATE IS NULL THEN"
+            + main_split_str.join(proc_cont_main_list)
         )
         print("日志修改完成!")
 
 
 if __name__ == "__main__":
-    obj = ProcedudreLogModify("p_rpt_cif032")
+    obj = ProcedureLogModify("p_rpt_cif035")
     obj.modify_procedure_log()
     # test vim copy
