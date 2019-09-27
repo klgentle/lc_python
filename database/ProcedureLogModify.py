@@ -123,8 +123,7 @@ COMMIT;
         """
         return bat_report_log
 
-    @staticmethod
-    def add_report_log(content: str, target_str: str) -> str:
+    def add_report_log(self, content: str, target_str: str) -> str:
         content_list = content.split(target_str)
         # s2 =['d', ' b ', ' c ', ' css']
         # 从第二个至最后都要加日志

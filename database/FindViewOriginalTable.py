@@ -3,7 +3,7 @@ import json
 import sys
 
 
-class ViewOperate(object):
+class FindViewOriginalTable(object):
     def __init__(self):
         # linux
         #self.view_path = "/home/kl/svn/1300_编码/1301_ODSDB/RPTUSER/03Views"
@@ -51,7 +51,7 @@ class ViewOperate(object):
         #view_dict_file = os.path.join(self.new_path, self.new_dict_file_name)
         with open(self.new_dict_file_name) as f:
             view_dict = json.loads(f.read())
-        return view_dict.get(view_name.upper())
+        return view_dict.get(view_name.upper()).strip()
 
     def create_view_to_table_sql(self):
         view_dict_file = os.path.join(self.new_path, self.new_dict_file_name)
@@ -74,14 +74,13 @@ if __name__ == "__main__":
         print("Please input view_name")
         sys.exit(1)
 
-    a = ViewOperate()
+    a = FindViewOriginalTable()
     # use for search table
     print(a.get_view_original_table(sys.argv[1]))
 
     # save_original_table_dict in local file
-    #a.save_original_table_dict()
+    # a.save_original_table_dict()
 
     # original_table = a.read_view_original_table('v_limit_all.sql')
     # print(original_table)
     # a.create_view_to_table_sql()
-
