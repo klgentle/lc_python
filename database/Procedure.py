@@ -1,19 +1,23 @@
 import time
 import sys
 import os
+import re
+#import logging.debug
 
 # 项目根目录
-from database.convert_file_to_utf8 import convert_file_to_utf8
-from string_code.StringFunctions import StringFunctions
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # 添加系统环境变量
 sys.path.append(BASE_DIR)
 # 导入模块
+from database.convert_file_to_utf8 import convert_file_to_utf8
+from string_code.StringFunctions import StringFunctions
 
 
 class Procedure(object):
     """ procedure deal with path, procedure file name 
-    TODO 本程序有一个缺陷，会全部大写，如果需要小写的，要特别注意 """
+    TODO 本程序有一个缺陷，会全部大写，如果需要小写的，要特别注意 
+    TODO import logging.debug
+    """
 
     def __init__(self, proc_name: str):
         self.__procedure_path = r"E:\svn\1300_编码\1301_ODSDB\RPTUSER\05Procedures"
@@ -54,7 +58,7 @@ class Procedure(object):
 
     @staticmethod
     def split_line_with_two_and(line: str):
-        """TODO: more than one AND to add \n
+        """more than one AND to add \n
             ON B1.ID = B3.ID AND B1.DATA_AREA = B3.DATA_AREA AND B1.DATA_DATE = B3.DATA_DATE
             line = self.split_two_and_line(line)
         """
@@ -67,12 +71,26 @@ class Procedure(object):
         return line
 
     @staticmethod
-    def deal_with_blanks(proc_cont:str)->str:
+    def normalize_report_log_insert(line:str)->str:
         """
-        INSERT INTO  BAT_REPORT_LOG
-        TODO use 正则表达式
+        change  INSERT INTO  BAT_REPORT_LOG to INSERT INTO BAT_REPORT_LOG
+        use 正则表达式
         """
-        return proc_cont
+        if line.find('INSERT') > -1 and line.find('BAT_REPORT_LOG') > -1:
+            print('deal_with_report_log_blanks')
+            line_list = line.split('BAT_REPORT_LOG') 
+            line_head = "".join([line_list[0], 'BAT_REPORT_LOG'])
+            batch_insert_pattern = r'\s*INSERT\s+INTO\s+BAT_REPORT_LOG'
+            line_head = re.sub(batch_insert_pattern,'INSERT INTO BAT_REPORT_LOG',line_head)  #, flags=re.IGNORECASE
+            line = "".join([line_head,line_list[1]])
+        return line 
+
+    @staticmethod
+    def delete_blank_of_job_step(line:str)->str:
+        job_step_pattern = r'\s*V_JOB_STEP\s*:=\s*(\d)+\s*;\s*'
+        if re.search(job_step_pattern, line): 
+            line = re.sub(job_step_pattern, r'V_JOB_STEP:=\1;', line) 
+        return line 
 
     def modify_proc_by_line(self):
         proc_cont_list = []
@@ -80,7 +98,10 @@ class Procedure(object):
         with open(os.path.join(self.__procedure_path, proc_file_name), 'r', encoding='UTF-8') as pro:
             proc_cont_list = pro.readlines()
         for i in range(0, len(proc_cont_list)):
-            proc_cont_list[i] = self.split_line_with_two_and(proc_cont_list[i])
+            line = proc_cont_list[i]
+            proc_cont_list[i] = self.split_line_with_two_and(line)
+            proc_cont_list[i] = self.delete_blank_of_job_step(line)
+            proc_cont_list[i] = self.normalize_report_log_insert(line)
 
         self.write_procedure("".join(proc_cont_list))
 
@@ -147,5 +168,6 @@ class Procedure(object):
 
 
 if __name__ == '__main__':
-    proc = Procedure('p_rpt_cif022')
-    proc.modify_proc_by_line()
+    #proc = Procedure('p_rpt_cif022')
+    proc = Procedure('p_rpt_fxd430rp')
+    #proc.modify_proc_by_line()

@@ -1,6 +1,7 @@
-import time
 import os
+import re
 import sys
+import time
 
 # 绝对路径的import
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../")
@@ -18,9 +19,8 @@ class ProcedureLogModify(object):
     按 V spend time分块
 两个日志之间不能有两个以上的insert 否则要写日志，3个insert 增加一个日志，4个insert增加两个。
 日志写在第二个insert前，
-
     改日志最好是按行读取，
-
+    # TODO joshua 日志编号 编号可以在最后统一重写一遍
     """
 
     def __init__(self, proc_name: str):
@@ -89,7 +89,7 @@ class ProcedureLogModify(object):
         如：  V1.0   20180515 HASON       1.ADD SCHEMA
         """
         date_str = time.strftime("%Y%m%d", time.localtime())
-        header_log = "  V2.0  {0} dongjian    log modify\n".format(date_str)
+        header_log = "  V2.0  {0} \tdongjian    log modify\n".format(date_str)
         log_end = "+===================="
         return proc_cont.replace(log_end, header_log + log_end)
 
@@ -115,8 +115,7 @@ class ProcedureLogModify(object):
 
     @staticmethod
     def bat_log_template():
-        bat_report_log = """
-COMMIT;
+        bat_report_log = """COMMIT;
 
 V_END_TIME:=CURRENT_TIMESTAMP ;    --处理结束时间
 V_SPEND_TIME:=ROUND(TO_NUMBER(TO_DATE(TO_CHAR(V_END_TIME,'YYYY-MM-DD HH24:MI:SS') ,'YYYY-MM-DD HH24:MI:SS')
@@ -124,37 +123,60 @@ V_SPEND_TIME:=ROUND(TO_NUMBER(TO_DATE(TO_CHAR(V_END_TIME,'YYYY-MM-DD HH24:MI:SS'
 
 V_JOB_STEP:=1;
 INSERT INTO BAT_REPORT_LOG(DEAL_SERIAL_NO,DEAL_DATE,JOB_STEP,JOB_NAME,SPEND_TIME,REMARK,JOB_ID,JOB_STATE)
-VALUES(BAT_SERIAL_NO.NEXTVAL, V_DEAL_DATE,V_JOB_STEP,V_JOB_NAME,V_SPEND_TIME,V_ERR_MSG,V_JOB_ID,'结束处理...');
-COMMIT;
-        """
+VALUES(BAT_SERIAL_NO.NEXTVAL, V_DEAL_DATE,V_JOB_STEP,V_JOB_NAME,V_SPEND_TIME,V_ERR_MSG,V_JOB_ID,V_JOB_STEP||'结束...');
+COMMIT;\n
+"""
         return bat_report_log
 
-    def add_report_log(self, content: str, target_str: str) -> str:
+    def add_report_log(self, content: str) -> str:
+        target_str = "INSERT INTO"
         content_list = content.split(target_str)
-        # s2 =['d', ' b ', ' c ', ' css']
-        # 从第二个至最后都要加日志
-        # TODO 日志编号 编号可以在最后统一重写一遍
-        to_add_log_list = content_list[2:]
+        # content_list =['开始处理...', 'RPT_CIF032_D_1...', 'RPT_CIF032_D_2...', 'BAT_REPORT_LOG']
+        # 从第二个至倒数第二都要加日志
+        keep_list = content_list[0:1]
+        to_add_log_list = content_list[1:]
         # the last one no need
         log_content_list = [" "] * len(to_add_log_list)
-        for i in range(0, len(to_add_log_list) - 1):
-            sql = to_add_log_list[i] + self.bat_log_template()
+        for i in range(0, len(to_add_log_list) - 2):
+            print('add_report_log')
+            sql = "".join([to_add_log_list[i], self.bat_log_template()])
             log_content_list[i] = sql
 
-        log_content_list[-1] = to_add_log_list[-1]
-        return target_str.join(content_list[0:2] + log_content_list)
+        # last one is bat log, no need to modify 
+        log_content_list[-2:] = to_add_log_list[-2:]
+        keep_list.extend(log_content_list)
+        return target_str.join(keep_list)
 
-    def modify_procedure_between_report_log(self, proc_cont: str):
+    def modify_log_register(self, proc_cont: str):
         """修改存储过程两个report_log之间的部分
         """
         if self.is_log_exists_and_need_modify(proc_cont):
             proc_cont = self.modify_report_log(proc_cont)
         # TODO test
-        # if proc_cont.count('INSERT INTO') >2:
-        #    proc_cont =  self.add_report_log(proc_cont)
+        if proc_cont.count('INSERT INTO') > 2:
+            proc_cont = self.add_report_log(proc_cont)
         return proc_cont
 
-    def modify_procedure_log(self):
+    def reset_job_step_value(self):
+        """modify all job_step value after log add and modify
+        """
+        procedure = self.__procedure
+        proc_cont = procedure.read_proc_cont()
+        pattern = r"V_JOB_STEP\s*:=\s*\d+;"
+        job_step_value_list = re.findall(pattern,proc_cont)
+        job_step_num = len(job_step_value_list)
+        standard_job_value_list = ['V_JOB_STEP:={};'.format(i) for i in range(job_step_num)]
+        if job_step_value_list != standard_job_value_list:
+            print("job_step value reset")
+            proc_cont_list = re.split(pattern, proc_cont)
+            # from the second to the end, add split pattern
+            for i in range(1, len(proc_cont_list)):
+                proc_cont_list[i] = "".join([standard_job_value_list[i-1], proc_cont_list[i]])
+
+        # write procedure file
+        procedure.write_procedure("".join(proc_cont_list))
+
+    def main(self):
         """主入口"""
         # read proc_cont
         procedure = self.__procedure
@@ -167,7 +189,7 @@ COMMIT;
         proc_cont_main_list = proc_cont_main.split(main_split_str)
 
         for ind in range(0, len(proc_cont_main_list)):
-            proc_cont_main_list[ind] = self.modify_procedure_between_report_log(
+            proc_cont_main_list[ind] = self.modify_log_register(
                 proc_cont_main_list[ind]
             )
 
@@ -177,10 +199,12 @@ COMMIT;
             + "IF I_RUN_DATE IS NULL THEN"
             + main_split_str.join(proc_cont_main_list)
         )
+        self.reset_job_step_value()
         print("日志修改完成!")
 
 
 if __name__ == "__main__":
-    obj = ProcedureLogModify("p_rpt_cif035")
-    obj.modify_procedure_log()
-    # test vim copy
+    obj = ProcedureLogModify("p_rpt_cif032")
+    #obj.main()
+    #obj.add_report_log()
+    obj.reset_job_step_value()
