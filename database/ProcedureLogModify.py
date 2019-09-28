@@ -2,6 +2,8 @@ import os
 import re
 import sys
 import time
+import logging
+logging.basicConfig(level=logging.DEBUG, format='%(levelname)s: %(message)s')
 
 # 绝对路径的import
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../")
@@ -10,17 +12,12 @@ from database.Procedure import Procedure
 
 class ProcedureLogModify(object):
     """
+    agr:proc_name
     存储过程日志修改
-     添加主日志，如：  V1.0   20180515 HASON       1.ADD SCHEMA
-     job_step 写死的，改为变量
-     添加 bat_report_log 登记
-
-    TODO add log, 修改存储过程划分:
-    按 V spend time分块
-两个日志之间不能有两个以上的insert 否则要写日志，3个insert 增加一个日志，4个insert增加两个。
-日志写在第二个insert前，
-    改日志最好是按行读取，
-    # TODO joshua 日志编号 编号可以在最后统一重写一遍
+     1. 添加主日志
+     2. job_step 写死的，改为变量
+     3. 添加 bat_report_log 登记
+     4. 日志编号在最后统一重写
     """
 
     def __init__(self, proc_name: str):
@@ -49,13 +46,16 @@ class ProcedureLogModify(object):
         bat_log_value = "VALUES(BAT_SERIAL_NO.NEXTVAL, V_DEAL_DATE,"
         proc_cont_last_half = proc_cont.split(bat_log_value)[1]
         job_step = proc_cont_last_half.split(",")[0]
+        if isinstance(job_step, str):
+            job_step = eval(job_step)
+        logging.debug('job_step: %s' %job_step)
 
         if proc_cont.find(error_bat_log_value) > -1:
             proc_cont = proc_cont.replace("-1", "V_JOB_STEP")
         else:
             # add line of v_job_step
             # VALUES(BAT_SERIAL_NO.NEXTVAL, V_DEAL_DATE,'19',V_JOB_NAME
-            v_job_step_line = "V_JOB_STEP:={};\n".format(int(eval(job_step)))
+            v_job_step_line = "V_JOB_STEP:={};\n".format(job_step)
             proc_cont = proc_cont.replace(
                 "INSERT INTO BAT_REPORT_LOG", v_job_step_line + "INSERT INTO BAT_REPORT_LOG"
             )
@@ -76,7 +76,7 @@ class ProcedureLogModify(object):
     def modify_report_log(self, proc_cont: str) -> str:
         """修改 bat_report_log 登记
         """
-        print("修改 bat_report_log 登记")
+        logging.info("修改 bat_report_log 登记")
         proc_cont = self.set_job_step_value_and_modify_insert(proc_cont)
         # 4.查找是否spend time已经减一了，如果有就修正
         proc_cont = self.spend_time_value_adjust(proc_cont)
@@ -137,8 +137,8 @@ COMMIT;\n
         to_add_log_list = content_list[1:]
         # the last one no need
         log_content_list = [" "] * len(to_add_log_list)
+        logging.info('add_report_log')
         for i in range(0, len(to_add_log_list) - 2):
-            print('add_report_log')
             sql = "".join([to_add_log_list[i], self.bat_log_template()])
             log_content_list[i] = sql
 
@@ -167,14 +167,14 @@ COMMIT;\n
         job_step_num = len(job_step_value_list)
         standard_job_value_list = ['V_JOB_STEP:={};'.format(i) for i in range(job_step_num)]
         if job_step_value_list != standard_job_value_list:
-            print("job_step value reset")
+            logging.info("job_step value reset")
             proc_cont_list = re.split(pattern, proc_cont)
             # from the second to the end, add split pattern
             for i in range(1, len(proc_cont_list)):
                 proc_cont_list[i] = "".join([standard_job_value_list[i-1], proc_cont_list[i]])
 
-        # write procedure file
-        procedure.write_procedure("".join(proc_cont_list))
+            # write procedure file
+            procedure.write_procedure("".join(proc_cont_list))
 
     def main(self):
         """主入口"""
@@ -200,11 +200,9 @@ COMMIT;\n
             + main_split_str.join(proc_cont_main_list)
         )
         self.reset_job_step_value()
-        print("日志修改完成!")
+        logging.info("日志修改完成!")
 
 
 if __name__ == "__main__":
     obj = ProcedureLogModify("p_rpt_cif032")
-    #obj.main()
-    #obj.add_report_log()
-    obj.reset_job_step_value()
+    obj.main()

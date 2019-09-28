@@ -2,7 +2,8 @@ import time
 import sys
 import os
 import re
-#import logging.debug
+import logging
+logging.basicConfig(level=logging.DEBUG, format='%(levelname)s: %(message)s')
 
 # 项目根目录
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -16,7 +17,7 @@ from string_code.StringFunctions import StringFunctions
 class Procedure(object):
     """ procedure deal with path, procedure file name 
     TODO 本程序有一个缺陷，会全部大写，如果需要小写的，要特别注意 
-    TODO import logging.debug
+    use re.sub(pattern, repl, string, flags=re.IGNORECASE) instead of str.replace()
     """
 
     def __init__(self, proc_name: str):
@@ -47,7 +48,7 @@ class Procedure(object):
         """ CHANGE FROM V_, JOIN V_ TO FROM RPTUSER.V_, JOIN RPTUSER.V_ """
         proc_cont = self.read_proc_cont()
         if self.need_add_schema(proc_cont):
-            print("开始修改SCHEMA")
+            logging.debug("开始修改SCHEMA")
             # deal view
             proc_cont = proc_cont.replace("FROM V_", "FROM RPTUSER.V_")
             proc_cont = proc_cont.replace("JOIN V_", "JOIN RPTUSER.V_")
@@ -66,7 +67,7 @@ class Procedure(object):
         second_position = line_obj.find_the_second_position('AND ')
         line_strip = line.strip()
         if not line_strip.startswith('--') and not line_strip.startswith('WHEN') and second_position > -1:
-            print('split line with two add')
+            logging.info('split line with two add')
             line = line_obj.str_insert(second_position, '\n')
         return line
 
@@ -77,7 +78,7 @@ class Procedure(object):
         use 正则表达式
         """
         if line.find('INSERT') > -1 and line.find('BAT_REPORT_LOG') > -1:
-            print('deal_with_report_log_blanks')
+            logging.info('deal_with_report_log_blanks')
             line_list = line.split('BAT_REPORT_LOG') 
             line_head = "".join([line_list[0], 'BAT_REPORT_LOG'])
             batch_insert_pattern = r'\s*INSERT\s+INTO\s+BAT_REPORT_LOG'
@@ -97,6 +98,7 @@ class Procedure(object):
         proc_file_name = self.get_file_name()
         with open(os.path.join(self.__procedure_path, proc_file_name), 'r', encoding='UTF-8') as pro:
             proc_cont_list = pro.readlines()
+        logging.info('modify_proc_by_line')
         for i in range(0, len(proc_cont_list)):
             line = proc_cont_list[i]
             proc_cont_list[i] = self.split_line_with_two_and(line)
@@ -118,7 +120,7 @@ class Procedure(object):
         return proc_cont
 
     def replace_view_with_table(self, view_dict: dict):
-        print("开始修改视图")
+        logging.info("开始修改视图")
         proc_cont = self.read_proc_cont()
         for view, table in view_dict.items():
             proc_cont = proc_cont.replace(view, table)
@@ -138,7 +140,7 @@ class Procedure(object):
             ) -> \n)
         """
         if self.data_area_check(line):
-            print("data_area处理")
+            logging.debug("data_area处理")
             # if ON and AND in the same line, deal ADD only
             if line.find('AND ') > -1:
                 line = line.replace('AND ', '--AND ')

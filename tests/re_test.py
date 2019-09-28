@@ -12,15 +12,16 @@ from database.Procedure import Procedure
 
 class ReTest(unittest.TestCase):
     
-    #def test_re_search(self):
-    #    batch_insert_pattern = r'\s*INSERT\s+INTO\s+BAT_REPORT_LOG'
-    #    test_input = ['INSERT INTO BAT_REPORT_LOG', ' INSERT  INTO  BAT_REPORT_LOG', 'INSERT  INTO  BAT_REPORT_LOG']
-    #    #self.assertEqual(re_batch_insert.search(test_input[0]), True)
-    #    for string in test_input:
-    #        if re.search(batch_insert_pattern, string):
-    #            print(re.sub(batch_insert_pattern,'INSERT INTO BAT_REPORT_LOG',string))  #, flags=re.IGNORECASE
-    #        else:
-    #            print(0)
+    def test_re_search(self):
+        batch_insert_pattern = r'\s*INSERT\s+INTO\s+BAT_REPORT_LOG'
+        test_input = ['INSERT INTO BAT_REPORT_LOG', ' INSERT  INTO  BAT_REPORT_LOG', 'insert  into  bat_report_log']
+        #self.assertEqual(re_batch_insert.search(test_input[0]), True)
+        for string in test_input:
+            if re.search(batch_insert_pattern, string, flags=re.IGNORECASE):
+                print(re.sub(batch_insert_pattern,'INSERT INTO BAT_REPORT_LOG',string, flags=re.IGNORECASE))  #
+                #print(re.sub('class', 'function', 'Class object', flags=re.IGNORECASE))
+            else:
+                print(string)
 
     #def test_re_findall(self):
     #    procedure = Procedure('p_rpt_cif032') 

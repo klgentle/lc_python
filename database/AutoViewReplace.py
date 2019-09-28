@@ -1,6 +1,12 @@
-from FindViewOriginalTable import FindViewOriginalTable
-from Procedure import Procedure
+import os
 import sys
+import logging
+logging.basicConfig(level=logging.DEBUG, format='%(levelname)s: %(message)s')
+
+# 绝对路径的import
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../")
+from database.FindViewOriginalTable import FindViewOriginalTable
+from database.Procedure import Procedure
 
 
 class AutoViewReplace(object):
@@ -13,17 +19,21 @@ class AutoViewReplace(object):
         pass
 
     def procedure_view_set(self, proc_name: str) -> set:
-        """返回视图集合"""
+        """返回视图集合
+        方法1：找到视图的位置，根据空格循环截取
+        方法2：TODO 正则匹配
+        """
         view_set = set()
 
         procedure = Procedure(proc_name)
         proc_cont = procedure.read_proc_cont()
-        # print(f"proc_cont:{proc_cont}")
+        # logging.info(f"proc_cont:{proc_cont}")
         # find view name
         while self.view_index(proc_cont) > -1:
             view_ind = self.view_index(proc_cont)
             proc_from_index = proc_cont[view_ind:]
             view_name, *proc_cont_list = proc_from_index.split(' ')
+            view_name = view_name.replace('\n', '')
             if not self.is_whitelist(view_name):
                 view_set.add(view_name)
             # deal with proc_cont_list
@@ -54,12 +64,13 @@ class AutoViewReplace(object):
 
         procedure = Procedure(proc_name)
         procedure.replace_view_with_table(proc_view_dict)
-        print(f"{proc_name} 视图已经改为原表！")
+        logging.info(f"{proc_name} 视图已经改为原表！")
 
         # procedure.data_area_deal()
-        #print(f"{proc_name} data_area处理完成！")
+        #logging.info(f"{proc_name} data_area处理完成！")
 
-    def replace_view_and_data_area(self, proc_name: str):
+    def main(self, proc_name: str):
+        """replace_view_and_data_area"""
         self.view_replace(proc_name)
         procedure = Procedure(proc_name)
         procedure.data_area_deal()
@@ -67,10 +78,10 @@ class AutoViewReplace(object):
 
 if __name__ == "__main__":
     if len(sys.argv) <= 1:
-        print("Please input procedure_name")
+        logging.info("Please input procedure_name")
         sys.exit(1)
 
     proc_name = sys.argv[1]
     obj = AutoViewReplace()
-    obj.replace_view_and_data_area(proc_name)
+    obj.main(proc_name)
     # obj.replace_view_and_data_area("p_rpt_cif021")

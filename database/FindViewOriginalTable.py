@@ -1,6 +1,8 @@
 import os
 import json
 import sys
+import logging
+logging.basicConfig(level=logging.DEBUG, format='%(levelname)s: %(message)s')
 
 
 class FindViewOriginalTable(object):
@@ -51,6 +53,7 @@ class FindViewOriginalTable(object):
         #view_dict_file = os.path.join(self.new_path, self.new_dict_file_name)
         with open(self.new_dict_file_name) as f:
             view_dict = json.loads(f.read())
+        logging.debug('view_name: %s'% view_name)
         return view_dict.get(view_name.upper()).strip()
 
     def create_view_to_table_sql(self):
