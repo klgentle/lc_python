@@ -1,12 +1,14 @@
+from database.Procedure import Procedure
+from database.FindViewOriginalTable import FindViewOriginalTable
 import os
 import sys
 import logging
+import re
+
 logging.basicConfig(level=logging.DEBUG, format='%(levelname)s: %(message)s')
 
 # 绝对路径的import
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../")
-from database.FindViewOriginalTable import FindViewOriginalTable
-from database.Procedure import Procedure
 
 
 class AutoViewReplace(object):
@@ -20,8 +22,18 @@ class AutoViewReplace(object):
 
     def procedure_view_set(self, proc_name: str) -> set:
         """返回视图集合
+        方法2：正则匹配
+        """
+        procedure = Procedure(proc_name)
+        proc_cont = procedure.read_proc_cont()
+        # find view name
+        view_pattern = r"RPTUSER.V_.*_ALL"
+        view_list = re.findall(view_pattern, proc_cont, flags=re.IGNORECASE)
+        return set(view_list)
+
+    def procedure_view_set_bak(self, proc_name: str) -> set:
+        """返回视图集合
         方法1：找到视图的位置，根据空格循环截取
-        方法2：TODO 正则匹配
         """
         view_set = set()
 
