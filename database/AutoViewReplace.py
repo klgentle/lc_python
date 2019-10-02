@@ -89,11 +89,13 @@ class AutoViewReplace(object):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) <= 1:
-        logging.info("Please input procedure_name")
-        sys.exit(1)
+    # if len(sys.argv) <= 1:
+    #    logging.info("Please input procedure_name")
+    #    sys.exit(1)
 
-    proc_name = sys.argv[1]
+    #proc_name = sys.argv[1]
+    #obj = AutoViewReplace()
+    # obj.main(proc_name)
+
     obj = AutoViewReplace()
-    obj.main(proc_name)
-    # obj.replace_view_and_data_area("p_rpt_cif021")
+    obj.main("p_rpt_cif021")

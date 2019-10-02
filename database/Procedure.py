@@ -1,17 +1,18 @@
-from string_code.StringFunctions import StringFunctions
-from database.convert_file_to_utf8 import convert_file_to_utf8
+import logging
+import re
 import time
+from database.convert_file_to_utf8 import convert_file_to_utf8
+from string_code.StringFunctions import StringFunctions
 import sys
 import os
-import re
-import logging
-logging.basicConfig(level=logging.DEBUG, format='%(levelname)s: %(message)s')
-
 # 项目根目录
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # 添加系统环境变量
 sys.path.append(BASE_DIR)
 # 导入模块
+
+
+logging.basicConfig(level=logging.DEBUG, format='%(levelname)s: %(message)s')
 
 
 class Procedure(object):
