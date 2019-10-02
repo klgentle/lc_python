@@ -1,4 +1,6 @@
 from docx import Document
+from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.enum.table import WD_TABLE_ALIGNMENT
 import datetime
 
 import os
@@ -83,13 +85,16 @@ class CheckInForm(object):
 
     def check_in_add_table(self, document: object, type: str):
         head_list = ["序号", "日期", "签到时间", "签退时间", "备注"]
-        table = document.add_table(rows=1, cols=len(head_list))
+        table = document.add_table(rows=1, cols=len(head_list),style='Table Grid')
         hdr_cells = table.rows[0].cells
-        hdr_cells[0].text = head_list[0]
-        hdr_cells[1].text = head_list[1]
-        hdr_cells[2].text = head_list[2]
-        hdr_cells[3].text = head_list[3]
-        hdr_cells[4].text = head_list[4]
+        # cells[i].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER  #水平居中
+        for i in range(len(head_list)):
+            hdr_cells[i].text = head_list[i]
+            hdr_cells[i].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER  #水平居中
+            #hdr_cells[1].text = head_list[1]
+            #hdr_cells[2].text = head_list[2]
+            #hdr_cells[3].text = head_list[3]
+            #hdr_cells[4].text = head_list[4]
         date_str_list = []
         if type.lower() == "normal":
             date_list = self.get_all_work_date()
@@ -103,6 +108,10 @@ class CheckInForm(object):
             row_cells[2].text = ""
             row_cells[3].text = ""
             row_cells[4].text = ""
+
+            # 设置水平居中
+            for i in range(len(head_list)):
+                row_cells[i].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER  #水平居中
         return table
 
     def write_form(self, form_type: str):
@@ -112,10 +121,12 @@ class CheckInForm(object):
         }
         document = Document(r'automatic_office\文思员工-签到表_{0}_template.docx'.format(
             form_type_name_dict.get(form_type)))
-        document.add_paragraph('姓名： 					  日期：{} 至 {}'.format(
+        paragraph = document.add_paragraph('姓名： 					  日期：{} 至 {}'.format(
             self.__work_date_start, self.__work_date_end))
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.RIGHT
 
         table = self.check_in_add_table(document, form_type)
+        table.alignment = WD_TABLE_ALIGNMENT.CENTER
         document.save(r'automatic_office\{0}文思员工-签到表_{1}.docx'.format(
             self.__year_month, form_type_name_dict.get(form_type)))
         logging.info("Done!")
