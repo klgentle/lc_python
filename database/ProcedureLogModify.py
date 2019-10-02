@@ -44,16 +44,18 @@ class ProcedureLogModify(object):
         . 将写死的job_step,改为变量
         """
         error_bat_log_pattern = (
-            r"BAT_SERIAL_NO.NEXTVAL,\n?\s*V_DEAL_DATE,\n?\s*'(-?\d+)',\n?\s*V_JOB_NAME"
+            r"V_DEAL_DATE,\n?\s*'?(-?\d+)'?,\n?\s*V_JOB_NAME"
         )
         match = re.search(error_bat_log_pattern,
                           proc_cont, flags=re.IGNORECASE)
-        job_step = match.group(1)
-        #logging.debug('job_step: %s' % job_step)
-        #logging.debug('job_step type: %s' % type(job_step))
+        try:
+            job_step = match.group(1)
+        except:
+            logging.error('proc_cont: %s' % proc_cont)
+            return proc_cont
 
         if match and job_step == '-1':
-            proc_cont = re.sub(r"V_DEAL_DATE\s*,\n?\s*'-1'", "V_DEAL_DATE,V_JOB_STEP",
+            proc_cont = re.sub(r"V_DEAL_DATE\s*,\n?\s*'?-1'?", "V_DEAL_DATE,V_JOB_STEP",
                                proc_cont, flags=re.IGNORECASE)
         else:
             # add line of v_job_step
@@ -64,7 +66,7 @@ class ProcedureLogModify(object):
                                proc_cont, flags=re.IGNORECASE)
 
             # replace hard code value with v_job_step
-            bat_log_value = r"V_DEAL_DATE,\n?\s*'{}'".format(job_step)
+            bat_log_value = r"V_DEAL_DATE,\n?\s*'?{}'?".format(job_step)
             proc_cont = re.sub(
                 bat_log_value, "V_DEAL_DATE,V_JOB_STEP",
                 proc_cont, flags=re.IGNORECASE

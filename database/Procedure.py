@@ -1,16 +1,16 @@
-import logging
-import re
 import time
-from database.convert_file_to_utf8 import convert_file_to_utf8
-from string_code.StringFunctions import StringFunctions
 import sys
 import os
+import re
+import logging
+
 # 项目根目录
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # 添加系统环境变量
 sys.path.append(BASE_DIR)
 # 导入模块
-
+from database.convert_file_to_utf8 import convert_file_to_utf8
+from string_code.StringFunctions import StringFunctions
 
 logging.basicConfig(level=logging.DEBUG, format='%(levelname)s: %(message)s')
 
@@ -24,7 +24,7 @@ class Procedure(object):
         self.__procedure_path = r"E:\svn\1300_编码\1301_ODSDB\RPTUSER\05Procedures"
         self.__proc_name = proc_name
         self.file_to_utf8()
-        self.check_and_write_schema()
+        self.add_schema()
         self.__date_str = time.strftime("%Y%m%d", time.localtime())
         self.__note = "-- DONGJIAN {} ".format(self.__date_str)
         self.modify_proc_by_line()
@@ -36,7 +36,7 @@ class Procedure(object):
     def get_file_name(self) -> str:
         return self.__proc_name + '.sql'
 
-    def check_and_write_schema(self):
+    def add_schema(self):
         """ CHANGE FROM V_, JOIN V_ TO FROM RPTUSER.V_, JOIN RPTUSER.V_ """
         proc_cont = self.read_proc_cont()
         pattern = r'(from|join)\s+(v|rpt)_'
@@ -85,7 +85,7 @@ class Procedure(object):
         proc_file_name = self.get_file_name()
         with open(os.path.join(self.__procedure_path, proc_file_name), 'r', encoding='UTF-8') as pro:
             proc_cont_list = pro.readlines()
-        logging.info('modify_proc_by_line')
+        logging.info('modify proc by line')
         for i in range(0, len(proc_cont_list)):
             line = proc_cont_list[i]
             proc_cont_list[i] = self.split_line_with_two_and(line)
@@ -109,7 +109,9 @@ class Procedure(object):
         logging.info("开始修改视图")
         proc_cont = self.read_proc_cont()
         for view, table in view_dict.items():
-            proc_cont = proc_cont.replace(view, table)
+            view_pattern = r"(RPTUSER.)?{}".format(view)
+            proc_cont = re.sub(view_pattern, table,
+                               proc_cont, flags=re.IGNORECASE)
         self.write_procedure(proc_cont)
 
     @staticmethod
@@ -167,4 +169,4 @@ if __name__ == '__main__':
     #proc = Procedure('p_rpt_cif022')
     proc = Procedure('p_rpt_cif063')
     # proc.modify_proc_by_line()
-    proc.check_and_write_schema()
+    proc.add_schema()
