@@ -1,6 +1,11 @@
 from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_TABLE_ALIGNMENT
+from docx.enum.table import WD_ALIGN_VERTICAL
+from docx.oxml.ns import qn
+from docx.shared import Pt
+from docx.shared import Inches
+from docx.shared import Cm
 import datetime
 
 import os
@@ -83,22 +88,18 @@ class CheckInForm(object):
 
         return all_work_date
 
-    def check_in_add_table(self, document: object, type: str):
+    def check_in_add_table(self, document: object, form_type: str):
         head_list = ["序号", "日期", "签到时间", "签退时间", "备注"]
         table = document.add_table(rows=1, cols=len(head_list),style='Table Grid')
         hdr_cells = table.rows[0].cells
-        # cells[i].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER  #水平居中
         for i in range(len(head_list)):
             hdr_cells[i].text = head_list[i]
             hdr_cells[i].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER  #水平居中
-            #hdr_cells[1].text = head_list[1]
-            #hdr_cells[2].text = head_list[2]
-            #hdr_cells[3].text = head_list[3]
-            #hdr_cells[4].text = head_list[4]
+            hdr_cells[i].vertical_alignment = WD_ALIGN_VERTICAL.CENTER  # 垂直居中
         date_str_list = []
-        if type.lower() == "normal":
+        if form_type.lower() == "normal":
             date_list = self.get_all_work_date()
-        elif type.lower() == "overtime":
+        elif form_type.lower() == "overtime":
             date_list = self.get_all_nature_date()
 
         for ind, date in enumerate(date_list):
@@ -112,6 +113,13 @@ class CheckInForm(object):
             # 设置水平居中
             for i in range(len(head_list)):
                 row_cells[i].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER  #水平居中
+                row_cells[i].vertical_alignment = WD_ALIGN_VERTICAL.CENTER  # 垂直居中
+
+        # 设置行高
+        if form_type.lower() == "normal":
+            for row in table.rows:
+                # WHY 1cm not the same?
+                row.height = Cm(0.88)  # 1CM
         return table
 
     def write_form(self, form_type: str):
@@ -119,11 +127,40 @@ class CheckInForm(object):
             "overtime": "带加班",
             "normal": "正常"
         }
-        document = Document(r'automatic_office\文思员工-签到表_{0}_template.docx'.format(
-            form_type_name_dict.get(form_type)))
-        paragraph = document.add_paragraph('姓名： 					  日期：{} 至 {}'.format(
+        form_type_head_dict = {
+            "overtime": "签到表（含加班/调休/请假）",
+            "normal": "签到表"
+        }
+
+        document = Document()
+        document.styles['Normal'].font.name = u'宋体'   #微软雅黑
+        document.styles['Normal'].font.size = Pt(10.5)   
+        document.styles['Normal']._element.rPr.rFonts.set(qn('w:eastAsia'), u'宋体')
+        sec = document.sections[0]             # sections对应文档中的“节”
+        sec.top_margin = Cm(2.3)
+        sec.bottom_margin = Cm(2.3)
+
+        # add header
+        paragraph = document.add_paragraph()
+        run = paragraph.add_run(form_type_head_dict.get(form_type))
+        font = run.font
+        # set font name
+        #font.name = u'宋体'
+        #run._element.rPr.rFonts.set(qn('w:eastAsia'), u'宋体')
+        font.size = Pt(16) # 三号
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        paragraph_format = paragraph.paragraph_format
+        #paragraph_format.line_spacing = 1.5 # 1.5倍行间距
+        #paragraph_format.space_after =Pt(0)       #设置段后间距
+
+        paragraph = document.add_paragraph('姓名： 			         日期：{} 至 {}'.format(
             self.__work_date_start, self.__work_date_end))
-        paragraph.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+        paragraph.alignment = WD_ALIGN_PARAGRAPH.LEFT
+        paragraph_format = paragraph.paragraph_format
+        #paragraph_format.first_line_indent = Inches(0.3) # 首行缩进
+        paragraph_format.left_indent = Cm(3.7) # 左侧缩进3.7cm
+        #paragraph_format.line_spacing = 1.5 # 1.5倍行间距
+        paragraph_format.space_after =Pt(0)       #设置段后间距
 
         table = self.check_in_add_table(document, form_type)
         table.alignment = WD_TABLE_ALIGNMENT.CENTER
