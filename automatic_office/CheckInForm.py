@@ -15,6 +15,9 @@ from automatic_office.Holiday import Holiday
 
 
 class CheckInForm(object):
+    """
+    TODO word style
+    """
     def __init__(self, year_month: str):
         # date calculate # 2019-07-26 至 2019-08-25
         if len(year_month) != 6:
