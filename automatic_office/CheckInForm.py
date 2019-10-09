@@ -5,7 +5,7 @@ import re
 import sys
 import time
 
-logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+logging.basicConfig(level=logging.DEBUG, format="%(levelname)s: %(message)s")
 # 绝对路径的import
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../")
 
@@ -123,7 +123,7 @@ class CheckInForm(object):
             if form_type.lower() == "normal":
                 row.height = Cm(0.88)
             elif form_type.lower() == "overtime":
-                row.height = Cm(0.65)
+                row.height = Cm(0.70)
         return table
 
     def write_form(self, form_type: str):
