@@ -14,6 +14,11 @@ from string_code.StringFunctions import StringFunctions
 
 logging.basicConfig(level=logging.DEBUG, format="%(levelname)s: %(message)s")
 
+# define constant variable
+AND_DATA_AREA_PATTERN = r"\s+AND\s+(\w*.)?DATA_AREA"
+ON_DATA_AREA_PATTERN = r"\s+ON\s+(\w*.)?DATA_AREA"
+WHERE_DATA_AREA_PATTERN = r"WHERE\s+(\w*.)?DATA_AREA"
+
 
 class Procedure(object):
     """ procedure deal with path, procedure file name 
@@ -161,19 +166,24 @@ class Procedure(object):
             line = self.add_header_log(line, "view replace")
             logging.debug("data_area处理")
             line = line.upper()
-            # if ON and AND in the same line, deal ADD only
-            and_pattern = r"\s+AND\s+(\w*.)?DATA_AREA"
-            on_pattern = r"\s+ON\s+(\w*.)?DATA_AREA"
-            where_pattern = r"WHERE\s+(\w*.)?DATA_AREA"
-            if re.search(and_pattern, line, re.IGNORECASE):
-                line = re.sub(and_pattern, "--" + and_pattern, line, re.IGNORECASE)
-            elif re.search(on_pattern, line, re.IGNORECASE):
+            # TODO define function for on single replace
+            if re.search(AND_DATA_AREA_PATTERN, line, re.IGNORECASE):
                 line = re.sub(
-                    on_pattern, r"\s+ON\s+1=1 -- (\w*.)?DATA_AREA", line, re.IGNORECASE
+                    AND_DATA_AREA_PATTERN,
+                    "--" + AND_DATA_AREA_PATTERN,
+                    line,
+                    re.IGNORECASE,
                 )
-            elif re.search(where_pattern, line, re.IGNORECASE):
+            elif re.search(ON_DATA_AREA_PATTERN, line, re.IGNORECASE):
                 line = re.sub(
-                    where_pattern,
+                    ON_DATA_AREA_PATTERN,
+                    r"\s+ON\s+1=1 -- (\w*.)?DATA_AREA",
+                    line,
+                    re.IGNORECASE,
+                )
+            elif re.search(WHERE_DATA_AREA_PATTERN, line, re.IGNORECASE):
+                line = re.sub(
+                    WHERE_DATA_AREA_PATTERN,
                     r"WHERE\s+1=1 --(\w*.)?DATA_AREA",
                     line,
                     re.IGNORECASE,
