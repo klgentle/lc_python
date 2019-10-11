@@ -64,13 +64,13 @@ class Procedure(object):
         """more than one AND to add \n
             ON B1.ID = B3.ID AND B1.DATA_AREA = B3.DATA_AREA AND B1.DATA_DATE = B3.DATA_DATE
         """
-        find_list = re.findall(r"AND ", line)
+        find_list = re.findall(r" AND ", line)
         if len(find_list) > 1:
             line = line.upper()
             line_strip = line.strip()
             if not line_strip.startswith("--") and not line_strip.startswith("WHEN"):
                 line_obj = StringFunctions(line)
-                second_position = line_obj.find_the_second_position("AND ")
+                second_position = line_obj.find_the_second_position(" AND ")
                 logging.info("split line with two add")
                 line = line_obj.str_insert(second_position, "\n")
         return line
@@ -130,13 +130,25 @@ class Procedure(object):
             not line.strip().startswith("--")
             and line.find("DATA_AREA") > -1
             and (
-                line.find("ON ") > -1
-                or line.find("WHERE") > -1
-                or line.find("AND ") > -1
+                line.find(" ON ") > -1
+                or line.find("WHERE ") > -1
+                or line.find(" AND ") > -1
             )
         ):
             return True
         return False
+
+    @staticmethod
+    def add_header_log(line: str, modify_content="log modify") -> str:
+        """添加起始位置的log登记
+        如：  V1.0   20180515 HASON       1.ADD SCHEMA
+        """
+        date_str = time.strftime("%Y%m%d", time.localtime())
+        header_log = "  V2.0  {0} \tdongjian    {1}\n".format(date_str, modify_content)
+        log_end = "+===================="
+        if line.find(log_end) > -1:
+            line = line.replace(log_end, header_log + log_end)
+        return line
 
     def data_area_replace(self, line: str) -> str:
         """ 
@@ -146,15 +158,26 @@ class Procedure(object):
             ) -> \n)
         """
         if self.data_area_check(line):
+            line = self.add_header_log(line, "view replace")
             logging.debug("data_area处理")
             line = line.upper()
             # if ON and AND in the same line, deal ADD only
-            if line.find("AND ") > -1:
-                line = line.replace("AND ", "--AND ")
-            elif line.find("ON ") > -1:
-                line = line.replace("ON ", "ON 1=1 -- ")
-            elif line.find("WHERE") > -1:
-                line = line.replace("WHERE ", "WHERE 1=1 -- ")
+            and_pattern = r"\s+AND\s+(\w*.)?DATA_AREA"
+            on_pattern = r"\s+ON\s+(\w*.)?DATA_AREA"
+            where_pattern = r"WHERE\s+(\w*.)?DATA_AREA"
+            if re.search(and_pattern, line, re.IGNORECASE):
+                line = re.sub(and_pattern, "--" + and_pattern, line, re.IGNORECASE)
+            elif re.search(on_pattern, line, re.IGNORECASE):
+                line = re.sub(
+                    on_pattern, r"\s+ON\s+1=1 -- (\w*.)?DATA_AREA", line, re.IGNORECASE
+                )
+            elif re.search(where_pattern, line, re.IGNORECASE):
+                line = re.sub(
+                    where_pattern,
+                    r"WHERE\s+1=1 --(\w*.)?DATA_AREA",
+                    line,
+                    re.IGNORECASE,
+                )
 
             # replace line end
             if line.find(")") > -1:

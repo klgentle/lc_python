@@ -100,16 +100,6 @@ class ProcedureLogModify(object):
         return proc_cont
 
     @staticmethod
-    def add_header_log(proc_cont: str) -> str:
-        """添加起始位置的log登记
-        如：  V1.0   20180515 HASON       1.ADD SCHEMA
-        """
-        date_str = time.strftime("%Y%m%d", time.localtime())
-        header_log = "  V2.0  {0} \tdongjian    log modify\n".format(date_str)
-        log_end = "+===================="
-        return proc_cont.replace(log_end, header_log + log_end)
-
-    @staticmethod
     def is_log_exists_and_need_modify(proc_cont_between_log) -> bool:
         proc_cont_list = proc_cont_between_log.split("BAT_SERIAL_NO.NEXTVAL,")
         # 如果存在VALUES(BAT_SERIAL_NO.NEXTVAL,则list长度会大于一
@@ -122,7 +112,7 @@ class ProcedureLogModify(object):
     def modify_procedure_header(self, proc_cont: str) -> str:
         """修改存储过程头部部分
         """
-        proc_cont = self.add_header_log(proc_cont)
+        proc_cont = self.__procedure.add_header_log(proc_cont)
         # not find then add
         if not re.search("V_JOB_STEP", proc_cont, flags=re.IGNORECASE):
             proc_cont = self.declare_job_step(proc_cont)
