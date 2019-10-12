@@ -11,7 +11,7 @@ sys.path.append(BASE_DIR)
 # 导入模块
 from database.convert_file_to_utf8 import convert_file_to_utf8
 from string_code.StringFunctions import StringFunctions
-from decorator.logging_decorator import logging_begin_end
+from decorator_test.logging_decorator import logging_begin_end
 
 logging.basicConfig(level=logging.DEBUG, format="%(levelname)s: %(message)s")
 
@@ -27,9 +27,9 @@ class Procedure(object):
     """
 
     def __init__(self, proc_name: str):
-        # self.__procedure_path = r"E:\svn\1300_编码\1301_ODSDB\RPTUSER\05Procedures"
+        self.__procedure_path = r"E:\svn\1300_编码\1301_ODSDB\RPTUSER\05Procedures"
         # svn bak path
-        self.__procedure_path = r"E:\svn\1300_编码\1301_ODSDB\RPTUSER\98Procedures"
+        # self.__procedure_path = r"E:\svn\1300_编码\1301_ODSDB\RPTUSER\98Procedures"
         self.__proc_name = proc_name
         self.file_to_utf8()
         self.add_schema()
@@ -127,7 +127,7 @@ class Procedure(object):
             proc_cont = pro.read()  # .upper()
         return proc_cont
 
-    # @logging_begin_end
+    @logging_begin_end
     def replace_view_with_table(self, view_dict: dict):
         proc_cont = self.read_proc_cont()
         for view, table in view_dict.items():
@@ -200,7 +200,7 @@ class Procedure(object):
 
         return line
 
-    # @logging_begin_end
+    @logging_begin_end
     def data_area_deal(self):
         """处理data_area """
         proc_cont_list = []

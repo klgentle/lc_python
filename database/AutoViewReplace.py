@@ -1,14 +1,14 @@
-from database.Procedure import Procedure
-from database.FindViewOriginalTable import FindViewOriginalTable
 import os
 import sys
 import logging
 import re
 
-logging.basicConfig(level=logging.DEBUG, format="%(levelname)s: %(message)s")
+logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
 # 绝对路径的import
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../")
+from database.Procedure import Procedure
+from database.FindViewOriginalTable import FindViewOriginalTable
 
 
 class AutoViewReplace(object):
