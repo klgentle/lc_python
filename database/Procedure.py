@@ -178,9 +178,9 @@ class Procedure(object):
                 logging.debug("data_area处理")
                 line = line.upper()
                 if re.search(AND_DATA_AREA_PATTERN, line, re.IGNORECASE):
-                    line = re.sub(AND_DATA_AREA_PATTERN, r"-- AND \1DATA_AREA ", line)
+                    line = re.sub(AND_DATA_AREA_PATTERN, r" --AND \1DATA_AREA ", line)
                 elif re.search(ON_DATA_AREA_PATTERN, line, re.IGNORECASE):
-                    line = re.sub(ON_DATA_AREA_PATTERN, r"ON 1=1 --\1DATA_AREA", line)
+                    line = re.sub(ON_DATA_AREA_PATTERN, r" ON 1=1 --\1DATA_AREA", line)
                 elif re.search(WHERE_DATA_AREA_PATTERN, line, re.IGNORECASE):
                     line = re.sub(
                         WHERE_DATA_AREA_PATTERN, r"WHERE 1=1 --\1DATA_AREA", line
