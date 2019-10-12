@@ -16,8 +16,8 @@ from decorator.logging_decorator import logging_begin_end
 logging.basicConfig(level=logging.DEBUG, format="%(levelname)s: %(message)s")
 
 # define constant variable
-AND_DATA_AREA_PATTERN = r"\s+AND\s+(\w*.)?DATA_AREA"
-ON_DATA_AREA_PATTERN = r"\s+ON\s+(\w*.)?DATA_AREA"
+AND_DATA_AREA_PATTERN = r"\sAND\s+(\w*.)?DATA_AREA"
+ON_DATA_AREA_PATTERN = r"\sON\s+(\w*.)?DATA_AREA"
 WHERE_DATA_AREA_PATTERN = r"WHERE\s+(\w*.)?DATA_AREA"
 
 
@@ -27,14 +27,17 @@ class Procedure(object):
     """
 
     def __init__(self, proc_name: str):
-        self.__procedure_path = r"E:\svn\1300_编码\1301_ODSDB\RPTUSER\05Procedures"
+        # self.__procedure_path = r"E:\svn\1300_编码\1301_ODSDB\RPTUSER\05Procedures"
+        # svn bak path
+        self.__procedure_path = r"E:\svn\1300_编码\1301_ODSDB\RPTUSER\98Procedures"
         self.__proc_name = proc_name
         self.file_to_utf8()
         self.add_schema()
         self.__date_str = time.strftime("%Y%m%d", time.localtime())
         self.__note = "-- DONGJIAN {} ".format(self.__date_str)
-        self.modify_proc_by_line()
-        self.delete_no_used_code()
+        # self.modify_proc_by_line()
+        # skip no need
+        # self.delete_no_used_code()
 
     def file_to_utf8(self):
         return convert_file_to_utf8(
@@ -56,7 +59,7 @@ class Procedure(object):
             )
             self.write_procedure(proc_cont)
 
-    @logging_begin_end
+    # @logging_begin_end
     def delete_no_used_code(self):
         """  """
         proc_cont = self.read_proc_cont()
@@ -87,11 +90,11 @@ class Procedure(object):
         job_step_pattern = r"\s*V_JOB_STEP\s*:=\s*(\d)+\s*;\s*"
         if re.search(job_step_pattern, line, flags=re.IGNORECASE):
             line = re.sub(
-                job_step_pattern, r"V_JOB_STEP:=\1;", line, flags=re.IGNORECASE
+                job_step_pattern, r"V_JOB_STEP:=\1;\n", line, flags=re.IGNORECASE
             )
         return line
 
-    @logging_begin_end
+    # @logging_begin_end
     def modify_proc_by_line(self):
         proc_cont_list = []
         proc_file_name = self.get_file_name()
@@ -103,7 +106,8 @@ class Procedure(object):
         for i in range(0, len(proc_cont_list)):
             line = proc_cont_list[i]
             proc_cont_list[i] = self.split_line_with_two_and(line)
-            proc_cont_list[i] = self.delete_blank_of_job_step(line)
+            # no need
+            # proc_cont_list[i] = self.delete_blank_of_job_step(line)
 
         self.write_procedure("".join(proc_cont_list))
 
@@ -123,7 +127,7 @@ class Procedure(object):
             proc_cont = pro.read()  # .upper()
         return proc_cont
 
-    @logging_begin_end
+    # @logging_begin_end
     def replace_view_with_table(self, view_dict: dict):
         proc_cont = self.read_proc_cont()
         for view, table in view_dict.items():
@@ -138,9 +142,12 @@ class Procedure(object):
             not line.strip().startswith("--")
             and line.find("DATA_AREA") > -1
             and (
-                line.find(" ON ") > -1
-                or line.find("WHERE ") > -1
-                or line.find(" AND ") > -1
+                # line.find(" ON ") > -1
+                # or line.find("WHERE ") > -1
+                # or line.find(" AND ") > -1
+                re.search(AND_DATA_AREA_PATTERN, line, re.IGNORECASE)
+                or re.search(ON_DATA_AREA_PATTERN, line, re.IGNORECASE)
+                or re.search(WHERE_DATA_AREA_PATTERN, line, re.IGNORECASE)
             )
         ):
             return True
@@ -165,46 +172,35 @@ class Procedure(object):
             AND -> -- AND 
             ) -> \n)
         """
-        if self.data_area_check(line):
-            line = self.add_header_log(line, "view replace")
-            logging.debug("data_area处理")
-            line = line.upper()
-            # TODO define function for on single replace
-            if re.search(AND_DATA_AREA_PATTERN, line, re.IGNORECASE):
-                line = re.sub(
-                    AND_DATA_AREA_PATTERN,
-                    "--" + AND_DATA_AREA_PATTERN,
-                    line,
-                    re.IGNORECASE,
-                )
-            elif re.search(ON_DATA_AREA_PATTERN, line, re.IGNORECASE):
-                line = re.sub(
-                    ON_DATA_AREA_PATTERN,
-                    r"\s+ON\s+1=1 -- (\w*.)?DATA_AREA",
-                    line,
-                    re.IGNORECASE,
-                )
-            elif re.search(WHERE_DATA_AREA_PATTERN, line, re.IGNORECASE):
-                line = re.sub(
-                    WHERE_DATA_AREA_PATTERN,
-                    r"WHERE\s+1=1 --(\w*.)?DATA_AREA",
-                    line,
-                    re.IGNORECASE,
-                )
+        try:
+            if self.data_area_check(line):
+                line = self.add_header_log(line, "data_area replace")
+                logging.debug("data_area处理")
+                line = line.upper()
+                if re.search(AND_DATA_AREA_PATTERN, line, re.IGNORECASE):
+                    line = re.sub(AND_DATA_AREA_PATTERN, r"-- AND \1DATA_AREA ", line)
+                elif re.search(ON_DATA_AREA_PATTERN, line, re.IGNORECASE):
+                    line = re.sub(ON_DATA_AREA_PATTERN, r"ON 1=1 --\1DATA_AREA", line)
+                elif re.search(WHERE_DATA_AREA_PATTERN, line, re.IGNORECASE):
+                    line = re.sub(
+                        WHERE_DATA_AREA_PATTERN, r"WHERE 1=1 --\1DATA_AREA", line
+                    )
 
-            # replace line end
-            if line.find(")") > -1:
-                line = line.replace(")", "\n)")
-            if line.find(";") > -1:
-                line = line.replace(";", "\n;")
-            if line.find("*/") > -1:
-                line = line.replace("*/", "\n*/")
-            # line add note in the end
-            line = "".join([line[:-1], self.__note, "\n"])
+                # replace line end
+                if line.find(")") > -1:
+                    line = line.replace(")", "\n)")
+                if line.find(";") > -1:
+                    line = line.replace(";", "\n;")
+                if line.find("*/") > -1:
+                    line = line.replace("*/", "\n*/")
+                # line add note in the end
+                line = "".join([line[:-1], self.__note, "\n"])
+        except:
+            logging.error(f"line deal failed, line: {line}")
 
         return line
 
-    @logging_begin_end
+    # @logging_begin_end
     def data_area_deal(self):
         """处理data_area """
         proc_cont_list = []

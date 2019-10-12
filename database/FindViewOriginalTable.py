@@ -2,18 +2,20 @@ import os
 import json
 import sys
 import logging
-logging.basicConfig(level=logging.DEBUG, format='%(levelname)s: %(message)s')
+
+logging.basicConfig(level=logging.DEBUG, format="%(levelname)s: %(message)s")
 
 
 class FindViewOriginalTable(object):
     def __init__(self):
         # linux
-        #self.view_path = "/home/kl/svn/1300_编码/1301_ODSDB/RPTUSER/03Views"
-        #self.new_path = "/mnt/e/yx_walk/report_develop/new_views"
+        # self.view_path = "/home/kl/svn/1300_编码/1301_ODSDB/RPTUSER/03Views"
+        # self.new_path = "/mnt/e/yx_walk/report_develop/new_views"
         # win
         self.view_path = r"E:\svn\1300_编码\1301_ODSDB\RPTUSER\03Views"
         self.new_path = r"E:\yx_walk\report_develop\new_views"
-        self.new_dict_file_name = "view_original_dict.txt"
+        # self.new_dict_file_name = "view_original_dict.txt"
+        self.new_dict_file_name = r"view_original_dict.txt"
         self.view_original_dict = {}
 
     def read_view_original_table(self, file_name: str):
@@ -50,10 +52,13 @@ class FindViewOriginalTable(object):
     def get_view_original_table(self, view_name: str):
         if view_name.upper().startswith("RPTUSER"):
             view_name = view_name[8:]
-        #view_dict_file = os.path.join(self.new_path, self.new_dict_file_name)
+        # view_dict_file = os.path.join(self.new_path, self.new_dict_file_name)
+        if not os.path.exists(self.new_dict_file_name):
+            self.new_dict_file_name = os.path.join("database", self.new_dict_file_name)
+
         with open(self.new_dict_file_name) as f:
             view_dict = json.loads(f.read())
-        logging.debug('view_name: %s'% view_name)
+        logging.debug("view_name: %s" % view_name)
         return view_dict.get(view_name.upper()).strip()
 
     def create_view_to_table_sql(self):

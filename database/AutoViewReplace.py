@@ -5,7 +5,7 @@ import sys
 import logging
 import re
 
-logging.basicConfig(level=logging.DEBUG, format='%(levelname)s: %(message)s')
+logging.basicConfig(level=logging.DEBUG, format="%(levelname)s: %(message)s")
 
 # 绝对路径的import
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/../")
@@ -44,17 +44,17 @@ class AutoViewReplace(object):
         while self.view_index(proc_cont) > -1:
             view_ind = self.view_index(proc_cont)
             proc_from_index = proc_cont[view_ind:]
-            view_name, *proc_cont_list = proc_from_index.split(' ')
-            view_name = view_name.replace('\n', '')
+            view_name, *proc_cont_list = proc_from_index.split(" ")
+            view_name = view_name.replace("\n", "")
             if not self.is_whitelist(view_name):
                 view_set.add(view_name)
             # deal with proc_cont_list
-            proc_cont = ' '.join(proc_cont_list)
+            proc_cont = " ".join(proc_cont_list)
         return view_set
 
     def view_index(self, proc_cont: str) -> int:
         """检查是否存在要改的视图 """
-        index = proc_cont.find('RPTUSER.V_')
+        index = proc_cont.find("RPTUSER.V_")
         return index
 
     def is_whitelist(self, view_name: str) -> bool:
@@ -75,11 +75,17 @@ class AutoViewReplace(object):
             proc_view_dict[view] = table_name
 
         procedure = Procedure(proc_name)
+        # add log
+        proc_cont = procedure.read_proc_cont()
+        procedure.add_header_log(proc_cont, "view replace with table")
+        # split two and
+        procedure.modify_proc_by_line()
+
         procedure.replace_view_with_table(proc_view_dict)
         logging.info(f"{proc_name} 视图已经改为原表！")
 
         # procedure.data_area_deal()
-        #logging.info(f"{proc_name} data_area处理完成！")
+        # logging.info(f"{proc_name} data_area处理完成！")
 
     def main(self, proc_name: str):
         """replace_view_and_data_area"""
@@ -93,9 +99,9 @@ if __name__ == "__main__":
     #    logging.info("Please input procedure_name")
     #    sys.exit(1)
 
-    #proc_name = sys.argv[1]
-    #obj = AutoViewReplace()
+    # proc_name = sys.argv[1]
+    # obj = AutoViewReplace()
     # obj.main(proc_name)
 
     obj = AutoViewReplace()
-    obj.main("p_rpt_cif021")
+    obj.main("p_rpt_dep906")
