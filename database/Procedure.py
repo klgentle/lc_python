@@ -11,6 +11,7 @@ sys.path.append(BASE_DIR)
 # 导入模块
 from database.convert_file_to_utf8 import convert_file_to_utf8
 from string_code.StringFunctions import StringFunctions
+from decorator.logging_decorator import logging_begin_end
 
 logging.basicConfig(level=logging.DEBUG, format="%(levelname)s: %(message)s")
 
@@ -55,6 +56,7 @@ class Procedure(object):
             )
             self.write_procedure(proc_cont)
 
+    @logging_begin_end
     def delete_no_used_code(self):
         """  """
         proc_cont = self.read_proc_cont()
@@ -89,6 +91,7 @@ class Procedure(object):
             )
         return line
 
+    @logging_begin_end
     def modify_proc_by_line(self):
         proc_cont_list = []
         proc_file_name = self.get_file_name()
@@ -120,8 +123,8 @@ class Procedure(object):
             proc_cont = pro.read()  # .upper()
         return proc_cont
 
+    @logging_begin_end
     def replace_view_with_table(self, view_dict: dict):
-        logging.info("开始修改视图")
         proc_cont = self.read_proc_cont()
         for view, table in view_dict.items():
             view_pattern = r"(RPTUSER.)?{}".format(view)
@@ -201,6 +204,7 @@ class Procedure(object):
 
         return line
 
+    @logging_begin_end
     def data_area_deal(self):
         """处理data_area """
         proc_cont_list = []
