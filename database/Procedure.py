@@ -20,6 +20,10 @@ AND_DATA_AREA_PATTERN = r"\sAND\s+(\w*.)?DATA_AREA"
 ON_DATA_AREA_PATTERN = r"\sON\s+(\w*.)?DATA_AREA"
 WHERE_DATA_AREA_PATTERN = r"WHERE\s+(\w*.)?DATA_AREA"
 
+class ProcedureTypeError(TypeError):
+    pass
+class ProcedureValueError(ValueError):
+    pass
 
 class Procedure(object):
     """ procedure deal with path, procedure file name 
@@ -31,6 +35,9 @@ class Procedure(object):
         # svn bak path
         # self.__procedure_path = r"E:\svn\1300_编码\1301_ODSDB\RPTUSER\98Procedures"
         self.__proc_name = proc_name
+        # raise error
+        if not os.path.exists(os.path.join(self.__procedure_path, self.get_file_name())):
+            raise ValueError("Procedure name is incorrect!")
         self.file_to_utf8()
         self.add_schema()
         self.__date_str = time.strftime("%Y%m%d", time.localtime())
