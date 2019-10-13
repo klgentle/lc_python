@@ -76,8 +76,14 @@ class Procedure(object):
         """
         find_list = re.findall(r" AND ", line)
         if len(find_list) > 1:
-            line = line.upper()
             line_strip = line.strip()
+            # do not split and "between add"
+            if re.search("BETWEEN", line, flags=re.IGNORECASE):
+                return line
+            # deal with AND C.M = 1 AND C.S = 1
+            if re.search(r"(\w*.)?M\s*=\s*(')?1(')?\s*AND\s+(\w*.)S\s*=\s*(')?1(')?", line, flags=re.IGNORECASE):
+                return line
+            line = line.upper()
             if not line_strip.startswith("--") and not line_strip.startswith("WHEN"):
                 line_obj = StringFunctions(line)
                 second_position = line_obj.find_the_second_position(" AND ")
@@ -142,9 +148,6 @@ class Procedure(object):
             not line.strip().startswith("--")
             and line.find("DATA_AREA") > -1
             and (
-                # line.find(" ON ") > -1
-                # or line.find("WHERE ") > -1
-                # or line.find(" AND ") > -1
                 re.search(AND_DATA_AREA_PATTERN, line, re.IGNORECASE)
                 or re.search(ON_DATA_AREA_PATTERN, line, re.IGNORECASE)
                 or re.search(WHERE_DATA_AREA_PATTERN, line, re.IGNORECASE)
@@ -154,16 +157,22 @@ class Procedure(object):
         return False
 
     @staticmethod
-    def add_header_log(line: str, modify_content="log modify") -> str:
+    def add_header_log(proc_cont: str, modify_content="log modify") -> str:
         """添加起始位置的log登记
         如：  V1.0   20180515 HASON       1.ADD SCHEMA
         """
         date_str = time.strftime("%Y%m%d", time.localtime())
         header_log = "  V2.0  {0} \tdongjian    {1}\n".format(date_str, modify_content)
         log_end = "+===================="
-        if line.find(log_end) > -1:
-            line = line.replace(log_end, header_log + log_end)
-        return line
+        if proc_cont.find(log_end) > -1:
+            proc_cont = proc_cont.replace(log_end, header_log + log_end)
+        return proc_cont 
+
+    def write_header_log(self, modify_content="log modify") -> None:
+        """将添加头部log登记的内容写入文件
+        """
+        proc_cont = self.add_header_log(self.read_proc_cont(), modify_content)
+        self.write_procedure(proc_cont)
 
     def data_area_replace(self, line: str) -> str:
         """ 
@@ -178,7 +187,7 @@ class Procedure(object):
                 logging.debug("data_area处理")
                 line = line.upper()
                 if re.search(AND_DATA_AREA_PATTERN, line, re.IGNORECASE):
-                    line = re.sub(AND_DATA_AREA_PATTERN, r" --AND \1DATA_AREA ", line)
+                    line = re.sub(AND_DATA_AREA_PATTERN, r" --AND \1DATA_AREA", line)
                 elif re.search(ON_DATA_AREA_PATTERN, line, re.IGNORECASE):
                     line = re.sub(ON_DATA_AREA_PATTERN, r" ON 1=1 --\1DATA_AREA", line)
                 elif re.search(WHERE_DATA_AREA_PATTERN, line, re.IGNORECASE):

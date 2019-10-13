@@ -76,8 +76,7 @@ class AutoViewReplace(object):
 
         procedure = Procedure(proc_name)
         # add log
-        proc_cont = procedure.read_proc_cont()
-        procedure.add_header_log(proc_cont, "view replace with table")
+        procedure.write_header_log("view replace with table")
         # split two and
         procedure.modify_proc_by_line()
 
@@ -104,4 +103,5 @@ if __name__ == "__main__":
     # obj.main(proc_name)
 
     obj = AutoViewReplace()
-    obj.main("p_rpt_dep906")
+    obj.main("p_rpt_cif217")
+    # obj.main("p_rpt_dep906")
