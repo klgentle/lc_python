@@ -20,10 +20,14 @@ AND_DATA_AREA_PATTERN = r"\sAND\s+(\w*.)?DATA_AREA"
 ON_DATA_AREA_PATTERN = r"\sON\s+(\w*.)?DATA_AREA"
 WHERE_DATA_AREA_PATTERN = r"WHERE\s+(\w*.)?DATA_AREA"
 
+
 class ProcedureTypeError(TypeError):
     pass
+
+
 class ProcedureValueError(ValueError):
     pass
+
 
 class Procedure(object):
     """ procedure deal with path, procedure file name 
@@ -36,7 +40,9 @@ class Procedure(object):
         # self.__procedure_path = r"E:\svn\1300_编码\1301_ODSDB\RPTUSER\98Procedures"
         self.__proc_name = proc_name
         # raise error
-        if not os.path.exists(os.path.join(self.__procedure_path, self.get_file_name())):
+        if not os.path.exists(
+            os.path.join(self.__procedure_path, self.get_file_name())
+        ):
             raise ValueError("Procedure name is incorrect!")
         self.file_to_utf8()
         self.add_schema()
@@ -88,7 +94,11 @@ class Procedure(object):
             if re.search("BETWEEN", line, flags=re.IGNORECASE):
                 return line
             # deal with AND C.M = 1 AND C.S = 1
-            if re.search(r"(\w*.)?M\s*=\s*(')?1(')?\s*AND\s+(\w*.)S\s*=\s*(')?1(')?", line, flags=re.IGNORECASE):
+            if re.search(
+                r"(\w*.)?M\s*=\s*(')?1(')?\s*AND\s+(\w*.)?S\s*=\s*(')?1(')?",
+                line,
+                flags=re.IGNORECASE,
+            ):
                 return line
             line = line.upper()
             if not line_strip.startswith("--") and not line_strip.startswith("WHEN"):
@@ -173,7 +183,7 @@ class Procedure(object):
         log_end = "+===================="
         if proc_cont.find(log_end) > -1:
             proc_cont = proc_cont.replace(log_end, header_log + log_end)
-        return proc_cont 
+        return proc_cont
 
     def write_header_log(self, modify_content="log modify") -> None:
         """将添加头部log登记的内容写入文件
@@ -209,8 +219,12 @@ class Procedure(object):
                     line = line.replace(";", "\n;")
                 if line.find("*/") > -1:
                     line = line.replace("*/", "\n*/")
-                # line add note in the end
-                line = "".join([line[:-1], self.__note, "\n"])
+                # delete line
+                if line.count("\n") <= 1:
+                    line = ""
+                else:
+                    # line add note in the end
+                    line = "".join([line[:-1], self.__note, "\n"])
         except:
             logging.error(f"line deal failed, line: {line}")
 
