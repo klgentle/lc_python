@@ -1,0 +1,23 @@
+import os
+
+def map_for_call(proc_file_name:str, call_date="20180830"):
+    proc_name = proc_file_name[:-4]
+    return "call {}('{}',:vReturn);\n".format(proc_name,call_date)
+
+def create_call_batch_procedure(call_list:str):
+    call_list = []
+    with open("call_list.sql") as file:
+        call_list = file.read().strip().split('\n')
+
+    map_call = map(map_for_call, call_list)
+    #return list(map_call)
+
+    with open("call_batch_list.sql", "w") as fw:
+        fw.write("var vReturn number;\n")
+        fw.writelines(list(map_call))
+
+
+if __name__ == "__main__":
+    #print(create_call_batch_procedure("call_list.sql")) 
+    create_call_batch_procedure("call_list.sql")
+

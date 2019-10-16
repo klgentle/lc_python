@@ -193,6 +193,7 @@ COMMIT;\n
         proc_cont_head, proc_cont_main = re.split(
             r"IF\s+I_RUN_DATE\s+IS\s+NULL", proc_cont, flags=re.IGNORECASE
         )
+        # TODO only write log after modify
         proc_cont_head = self.modify_procedure_header(proc_cont_head)
 
         main_split_str = r"V_JOB_ID"
