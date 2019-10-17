@@ -16,10 +16,8 @@ from sys import argv
 
 sender = "jian.dong2@pactera.com"  # 发件人邮箱
 # password = ''  # 发件人邮箱密码
-addressed_eamil = "klgentle@sina.com"  # 收件人邮箱
 addressed_eamil2 = [
-    "jiaming.pan@pactera.com",
-    "jiarui.qiu@pactera.com",
+    "jiaming.pan@pactera.com"
 ]  # 收件人邮箱 'BenChanHY@chbank.com',
 
 # @snoop()
