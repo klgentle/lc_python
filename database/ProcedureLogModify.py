@@ -27,6 +27,7 @@ class ProcedureLogModify(object):
 
     def __init__(self, proc_name: str):
         self.__procedure = Procedure(proc_name)
+        self.is_log_modified = False
 
     @staticmethod
     def declare_variable(variable_name: str, variable_type: str) -> str:
@@ -92,8 +93,9 @@ class ProcedureLogModify(object):
     def modify_report_log(self, proc_cont: str) -> str:
         """修改 bat_report_log 登记
         """
-        logging.info("修改 bat_report_log 登记")
         if self.is_log_exists_and_need_modify(proc_cont):
+            logging.info("修改 bat_report_log 登记")
+            self.is_log_modified = True
             proc_cont = self.set_job_step_value_and_modify_insert(proc_cont)
         proc_cont = self.spend_time_value_adjust(proc_cont)
 
@@ -158,6 +160,7 @@ COMMIT;\n
         proc_cont = self.modify_report_log(proc_cont)
         # TODO test
         if proc_cont.count("INSERT INTO") > 2:
+            self.is_log_modified = True
             proc_cont = self.add_report_log(proc_cont)
         return proc_cont
 
@@ -193,8 +196,6 @@ COMMIT;\n
         proc_cont_head, proc_cont_main = re.split(
             r"IF\s+I_RUN_DATE\s+IS\s+NULL", proc_cont, flags=re.IGNORECASE
         )
-        # TODO only write log after modify
-        proc_cont_head = self.modify_procedure_header(proc_cont_head)
 
         main_split_str = r"V_JOB_ID"
         proc_cont_main_list = re.split(
@@ -205,6 +206,9 @@ COMMIT;\n
             proc_cont_main_list[ind] = self.modify_log_register(
                 proc_cont_main_list[ind]
             )
+
+        if self.is_log_modified:
+            proc_cont_head = self.modify_procedure_header(proc_cont_head)
 
         # write procedure file
         procedure.write_procedure(
