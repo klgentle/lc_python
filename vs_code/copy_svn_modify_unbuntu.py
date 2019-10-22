@@ -5,8 +5,8 @@ import codecs
 import csv
 import os
 import time
+import platform
 
-# import sh
 import sys
 from sys import argv
 from openpyxl import Workbook
@@ -15,8 +15,7 @@ from datetime import datetime
 from send_mail_with_attach import mail
 from config_default import configs
 from create_date import getBetweenDay
-
-# from list_file import list_file
+from collections import namedtuple
 
 
 class CopyRegister(object):
@@ -26,32 +25,33 @@ class CopyRegister(object):
 
     def __init__(self, date_str: str):
         self.__date_str_list = [0]
-        # date_str: 20190725,20190730
         self.create_date_str_list(date_str)
         print(f"self.__date_str_list:{self.__date_str_list}")
 
-        home_path = configs.get("path").get("svn_home_path")
-        print(f"home_path:{home_path}")
+        self.__is_system_windows = False
+        # BE CAREFUL HERE ###############
+        if platform.uname().system == "Windows":
+            is_system_windows = True
+            os.system(f"svn up '{self.__svnup_dir}'")
+
+        if self.__is_system_windows:
+            home_path = configs.get("path").get("win_svn_home_path")
+        else:
+            home_path = configs.get("path").get("svn_home_path")
+
         if not os.path.exists(home_path):
             home_path = "/mnt/e"
+        print(f"home_path:{home_path}")
 
-        self.code_beta_path = os.path.join(home_path, "yx_walk/beta")
+        self.code_beta_path = os.path.join(home_path, "yx_walk", "beta")
         self.code_home = os.path.join(home_path, "svn")
-        self.schema_folder = os.path.join(self.code_home, "1300_编码/发布登记表")
-        self.svnup_dir = os.path.join(self.code_home, "1300_编码")
-
-        # BE CAREFUL HERE ###############
-        # with os.popen("uname -a") as p:
-        #    uname = p.read()
-        #    if uname.find("Microsoft") == -1:
-        #        # linux test
-        #        os.system(f"svn up '{self.svnup_dir}'")
+        self.__register_folder = os.path.join(self.code_home, "1300_编码", "发布登记表")
+        self.__svnup_dir = os.path.join(self.code_home, "1300_编码")
 
         self.__beta_path = os.path.join(self.code_beta_path, self.date_str + "beta")
         self.make_or_clean_folder()
         self.__data_list = []
         self.__procedure_name_list = []
-        self.__bo_name_list = []
 
     def create_date_str_list(self, date_str):
         if date_str.find(",") > -1:
@@ -65,28 +65,22 @@ class CopyRegister(object):
     def make_or_clean_folder(self):
         if os.path.exists(self.__beta_path):
             print(f"rm -rf {self.__beta_path}")
-            # sh.rm("-rf", f"{self.__beta_path}")
             shutil.rmtree(f"{self.__beta_path}")
         os.makedirs(self.__beta_path, exist_ok=True)
 
     def readAllRegister(self):
         """ copy register """
-        for folderName, subfolders, filenames in os.walk(self.schema_folder):
+        for folderName, subfolders, filenames in os.walk(self.__register_folder):
             for filename in filenames:
                 # print('FILE INSIDE ' + folderName + ': '+ filename)
                 # find right date register excel
                 # filename[-13:-5] is datadate of register
                 if filename[-13:-5] not in self.__date_str_list:
                     continue
-                # test!!!!
-                # if filename.find("支付") == -1:
-                #    continue
 
-                # print(f"filename: {filename} --------------------------")
                 whole_filename = os.path.join(folderName, filename)
                 self.readOneRegister(whole_filename)
 
-        # print(f"data_list:{self.__data_list}")
         print(f"data_list count:{len(self.__data_list)}")
 
     def readOneRegister(self, whole_filename: str):
@@ -104,7 +98,6 @@ class CopyRegister(object):
             if isinstance(data_row[7], datetime):
                 data_row[7] = data_row[7].strftime("%Y%m%d")
 
-            # print(f"data_row:{data_row}")
             self.__data_list.append(data_row)
         return self.__data_list
 
@@ -118,6 +111,27 @@ class CopyRegister(object):
             file_type = "rpt"
         return file_type
 
+    def get_bo_list(self): 
+        bo_name_list = []
+        for row in self.__data_list:
+            name, file_type, path = row[2:5]
+            if file_type.upper() in ("RPT", "BO"):
+                bo_name_list.append(name)
+    
+        return sorted(bo_name_list)
+
+    def register_data_normalize(self):
+        """
+            TODO 数据标准化
+            > filetype 标准化
+            > filename 不要加filetype
+            > filetype path标准化 
+        """
+        register_file_tuple = namedtuple('register_data',('file_name','file_type', 'file_path')) 
+        for row in self.__data_list:
+            name, file_type, path = row[2:5]
+        return register_file_tuple
+
     def copyfiles(self):
         error_file_type = set()
         # copy code files
@@ -125,7 +139,6 @@ class CopyRegister(object):
             name, file_type, path = row[2:5]
             if not file_type:
                 file_type = "sql"
-            path = path.replace("\\", "/")
             ind = path.find("1300_编码")
 
             if ind == -1:
@@ -135,13 +148,14 @@ class CopyRegister(object):
             file_type = self.register_file_type_deal(file_type, path)
 
             if file_type.upper() in ("RPT", "BO"):
-                self.__bo_name_list.append(name)
                 # name format: rpt to upper
                 name = name.upper()
 
             # get folder name of code
             # get the file type name to depart pro and sql
-            path_list = path[ind:].split("/")
+            if path.find("\\") > -1: 
+                path = path.replace("\\", os.sep)
+            path_list = path[ind:].split(os.sep)
             folder_name = path_list[-1]
             # print(f"path_list:{path_list}")
             schema_folder = ""
@@ -172,7 +186,9 @@ class CopyRegister(object):
 
             target_path = os.path.join(self.__beta_path, schema_folder, folder_name)
             # replace blank in file name
-            target_path_file = os.path.join(target_path, name_and_type.replace(" ", "_"))
+            target_path_file = os.path.join(
+                target_path, name_and_type.replace(" ", "_")
+            )
 
             if not os.path.exists(target_path):
                 os.makedirs(target_path, exist_ok=True)
@@ -191,7 +207,7 @@ class CopyRegister(object):
     def saveRegisterExcel(self):
         "save excel records to one excel"
         file1 = os.path.join(
-            self.svnup_dir, "发布登记表", "dj", "ODS程序版本发布登记表(dj)-template.xlsx"
+            self.__svnup_dir, "发布登记表", "dj", "ODS程序版本发布登记表(dj)-template.xlsx"
         )
         file_path_name = self.__beta_path + "/登记表" + self.date_str + ".xlsx"
         shutil.copy(file1, file_path_name)
@@ -207,16 +223,6 @@ class CopyRegister(object):
     def createZipfile(self):
         print(f"file path:{self.__beta_path}")
         return backupToZip(self.__beta_path)
-
-    def list_file(self, path: str, file_name: str, path2: str):
-        to_file = open(file_name, "w")
-        to_path = f"D:\jdong\\beta\\{self.date_str}beta\\{path2}"
-        for f in os.listdir(path):
-            s = f"@@{to_path}\{f};\n"
-            to_file.write(s)
-
-        to_file.write("commit;\n")
-        to_file.close()
 
     def list_file2(self, path: str, file_name: str, path2: str):
         to_file = open(file_name, "w")
@@ -254,8 +260,6 @@ class CopyRegister(object):
     def createConfigCheckSql(self):
         file_name = os.path.join(self.__beta_path, "config_check.sql")
         to_file = open(file_name, "w")
-        # print test
-        # print(f"self.__procedure_name_list:{self.__procedure_name_list}")
         sql = f"""SELECT OBJECT_NAME FROM ALL_OBJECTS WHERE OWNER = 'RPTUSER' AND OBJECT_TYPE = 'PROCEDURE'
 AND OBJECT_NAME IN ({", ".join(["'" + name + "'" for name in self.__procedure_name_list])})
 AND SUBSTR(OBJECT_NAME,-4) != '_MID'
@@ -265,52 +269,49 @@ select OBJECT_NAME from ods_job_config where object_type = 'SP';
         to_file.write(f"{sql}\n")
         to_file.close()
 
-    def boNameList(self, file_name="bo_list.txt"):
-        self.__bo_name_list.sort()
-        print("\n请核对今日BO上线清单：\n" + "\n".join(self.__bo_name_list) + "\n")
+    def write_bo_list(self, file_name="bo_list.txt"):
+        bo_name_list = self.get_bo_list()
+        print("\n请核对今日BO上线清单：\n" + "\n".join(bo_name_list) + "\n")
 
         file_name = os.path.join(self.__beta_path, file_name)
-        to_file = open(file_name, "w")
-        to_file.write("请核对今日BO上线清单：\n")
-        for b in self.__bo_name_list:
-            to_file.write(b + "\n")
-
-        to_file.close()
+        with open(file_name, "w") as to_file:
+            to_file.write("请核对今日BO上线清单：\n")
+            for b in bo_name_list:
+                to_file.write(b + "\n")
 
     def send_mail(self, file_path=""):
         if not file_path:
             file_path = os.path.join(self.code_beta_path, self.date_str + "beta.zip")
         mail(self.date_str, file_path)
 
+    def copy_file_from_register(self):
+        """main function for call"""
+        self.readAllRegister()
+        self.saveRegisterExcel()
+        self.register_data_normalize()
+        error_file_type = self.copyfiles()
+        self.listSqlFile()
+        self.createConfigCheckSql()
+        self.write_bo_list()
+        self.createZipfile()
+
+        # if only rpt not find, send email
+        # if not error_file_type or error_file_type == {"rpt"}:
+        #   a.send_mail()
+
 
 if __name__ == "__main__":
+    # print("usage python[3] copy_upload_ubuntu.py '20190501'")
     date_str = time.strftime("%Y%m%d", time.localtime())
     if len(argv) > 1 and len(argv[1]) == 8:
-        pass
-        # for test
-        # if int(date_str) - int(argv[1]) > 10:
-        #    print(f"argv[1] {argv[1]} is to small")
-        #    sys.exit(1)
-        #if int(date_str) < int(argv[1]):
-        #    print(f"argv[1] {argv[1]} is large than today")
-        #    sys.exit(1)
+        if int(date_str) - int(argv[1]) > 10:
+            print(f"argv[1] {argv[1]} is too small")
+            sys.exit(1)
         date_str = argv[1]
     elif len(argv) > 1:
         date_str = argv[1]
 
     a = CopyRegister(date_str)
-    a.readAllRegister()
-    a.saveRegisterExcel()
-    error_file_type = a.copyfiles()
-    a.listSqlFile()
-    a.createConfigCheckSql()
-    a.boNameList()
-    # not create zip file, need to add rpt files
-    a.createZipfile()
-
-    #if only rpt not find, send email
-    if not error_file_type or error_file_type == {"rpt"}:
-       a.send_mail()
+    a.copy_file_from_register()
 
     print("Done!")
-    # print("usage python[3] copy_upload_ubuntu.py '20190501'")

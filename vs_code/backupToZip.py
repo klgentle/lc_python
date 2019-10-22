@@ -4,12 +4,11 @@
 
 import zipfile, os
 import shutil
-import sh
 
 
 def backupToZip(folder: str):
 
-    # TODO encrypt 
+    # TODO encrypt
     # change path
     dirname = os.path.dirname(folder)
     os.chdir(dirname)
@@ -18,8 +17,7 @@ def backupToZip(folder: str):
 
     zipFilename = os.path.basename(folder) + ".zip"
     if os.path.exists(zipFilename):
-        #shutil.rmtree(zipFilename) 
-        sh.rm(zipFilename) 
+        os.remove(zipFilename)
 
     # create the ZIP file
     print(f"Creating {zipFilename}..")
@@ -27,10 +25,10 @@ def backupToZip(folder: str):
 
     # walk the entire folder tree and compress the files in each folder
     base_folder = os.path.basename(folder)
-    #print(f"base_folder:{base_folder}")
+    # print(f"base_folder:{base_folder}")
 
     for foldername, subfolders, filenames in os.walk(folder):
-        #print(f"Adding files in {foldername}")
+        # print(f"Adding files in {foldername}")
         # backupZip.write(foldername)
         short_foldername = foldername[len(dirname) :]
         backupZip.write(foldername, short_foldername)  # 重命名(去掉文件名前面的绝对路径）
