@@ -36,10 +36,9 @@ class CopyRegister(object):
         self.__procedure_name_list = []
 
     def init_path(self):
+        home_path = configs.get("path").get("svn_home_path")
         if self.is_system_windows():
             home_path = configs.get("path").get("win_svn_home_path")
-        else:
-            home_path = configs.get("path").get("svn_home_path")
 
         if not os.path.exists(home_path):
             home_path = "/mnt/e"
@@ -60,9 +59,11 @@ class CopyRegister(object):
         return is_system_windows
 
     def update_svn(self):
+        # TODO svn: E020024: Error resolving case of ''E:\svn\1300_编码''
         if self.is_system_windows():
             # BE CAREFUL HERE ###############
             try:
+                print("Call svn up ......")
                 os.system(f"svn up '{self.__svnup_dir}'")
             except Exception as e:
                 print("SVN UP ERROR: ", e.__doc__)
