@@ -28,30 +28,44 @@ class CopyRegister(object):
         self.create_date_str_list(date_str)
         print(f"self.__date_str_list:{self.__date_str_list}")
 
-        self.__is_system_windows = False
-        # BE CAREFUL HERE ###############
-        if platform.uname().system == "Windows":
-            is_system_windows = True
-            os.system(f"svn up '{self.__svnup_dir}'")
+        self.init_path()
+        self.update_svn()
 
-        if self.__is_system_windows:
+        self.make_or_clean_folder()
+        self.__data_list = []
+        self.__procedure_name_list = []
+
+    def init_path(self):
+        if self.is_system_windows():
             home_path = configs.get("path").get("win_svn_home_path")
         else:
             home_path = configs.get("path").get("svn_home_path")
 
         if not os.path.exists(home_path):
             home_path = "/mnt/e"
+
         print(f"home_path:{home_path}")
 
-        self.code_beta_path = os.path.join(home_path, "yx_walk", "beta")
         self.code_home = os.path.join(home_path, "svn")
         self.__register_folder = os.path.join(self.code_home, "1300_编码", "发布登记表")
         self.__svnup_dir = os.path.join(self.code_home, "1300_编码")
 
-        self.__beta_path = os.path.join(self.code_beta_path, self.date_str + "beta")
-        self.make_or_clean_folder()
-        self.__data_list = []
-        self.__procedure_name_list = []
+        code_beta_path = os.path.join(home_path, "yx_walk", "beta")
+        self.__beta_path = os.path.join(code_beta_path, self.date_str + "beta")
+
+    def is_system_windows(self):
+        is_system_windows = False
+        if platform.uname().system == "Windows":
+            is_system_windows = True
+        return is_system_windows
+
+    def update_svn(self):
+        if self.is_system_windows():
+            # BE CAREFUL HERE ###############
+            try:
+                os.system(f"svn up '{self.__svnup_dir}'")
+            except Exception as e:
+                print("SVN UP ERROR: ", e.__doc__)
 
     def create_date_str_list(self, date_str):
         if date_str.find(",") > -1:
@@ -111,13 +125,13 @@ class CopyRegister(object):
             file_type = "rpt"
         return file_type
 
-    def get_bo_list(self): 
+    def get_bo_list(self):
         bo_name_list = []
         for row in self.__data_list:
             name, file_type, path = row[2:5]
             if file_type.upper() in ("RPT", "BO"):
                 bo_name_list.append(name)
-    
+
         return sorted(bo_name_list)
 
     def register_data_normalize(self):
@@ -127,7 +141,9 @@ class CopyRegister(object):
             > filename 不要加filetype
             > filetype path标准化 
         """
-        register_file_tuple = namedtuple('register_data',('file_name','file_type', 'file_path')) 
+        register_file_tuple = namedtuple(
+            "register_data", ("file_name", "file_type", "file_path")
+        )
         for row in self.__data_list:
             name, file_type, path = row[2:5]
         return register_file_tuple
@@ -153,7 +169,7 @@ class CopyRegister(object):
 
             # get folder name of code
             # get the file type name to depart pro and sql
-            if path.find("\\") > -1: 
+            if path.find("\\") > -1:
                 path = path.replace("\\", os.sep)
             path_list = path[ind:].split(os.sep)
             folder_name = path_list[-1]
@@ -281,7 +297,9 @@ select OBJECT_NAME from ods_job_config where object_type = 'SP';
 
     def send_mail(self, file_path=""):
         if not file_path:
-            file_path = os.path.join(self.code_beta_path, self.date_str + "beta.zip")
+            file_path = os.path.join(
+                os.path.basename(self.__beta_path), self.date_str + "beta.zip"
+            )
         mail(self.date_str, file_path)
 
     def copy_file_from_register(self):
