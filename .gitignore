@@ -46,7 +46,7 @@ temp
 # python
 .__pycache__
 *.pyc
-config_default.py
+#config_default.py
 *.py[cod]
 *.so
 *.egg
