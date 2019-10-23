@@ -15,7 +15,8 @@ from datetime import datetime
 from send_mail_with_attach import mail
 from config_default import configs
 from create_date import getBetweenDay
-from collections import namedtuple
+
+# from collections import namedtuple
 
 
 class CopyRegister(object):
@@ -30,10 +31,10 @@ class CopyRegister(object):
 
         self.init_path()
         self.update_svn()
-
         self.make_or_clean_folder()
         self.__data_list = []
         self.__procedure_name_list = []
+        self.__error_file_type = set()
 
     def init_path(self):
         home_path = configs.get("path").get("svn_home_path")
@@ -87,7 +88,6 @@ class CopyRegister(object):
         """ copy register """
         for folderName, subfolders, filenames in os.walk(self.__register_folder):
             for filename in filenames:
-                # print('FILE INSIDE ' + folderName + ': '+ filename)
                 # find right date register excel
                 # filename[-13:-5] is datadate of register
                 if filename[-13:-5] not in self.__date_str_list:
@@ -135,22 +135,58 @@ class CopyRegister(object):
 
         return sorted(bo_name_list)
 
+    @staticmethod
+    def change_path_sep(path):
+        if path.find("\\") > -1 and os.sep != "\\":
+            path = path.replace("\\", os.sep)
+        elif path.find("/") > -1 and os.sep != "/":
+            path = path.replace("/", os.sep)
+        return path
+
+    @staticmethod
+    def filename_normlize(filename):
+        """   > filetype 标准化 """
+        return filename.split(".")[0]
+
+    @staticmethod
+    def filetype_normlize(filetype):
+        if not file_type:
+            return "sql"
+
+    def filepath_normlize(self, filepath):
+        ind = path.find("1300_编码")
+        if ind == -1:
+            self.__error_file_type.add("lost")
+            print(f"path error, skip path: {path}")
+        filepath = change_path_sep(filepath[ind:])
+        return filepath
+
     def register_data_normalize(self):
+        file_name_path = map(lambda data_row: data_row[2:5], self.__data_list)
+        file_name_path = map(
+            lambda data: (
+                filename_normlize(data[0]),
+                filetype_normlize(data[1]),
+                filepath_normlize(data[2]),
+            ),
+            file_name_path,
+        )
         """
             TODO 数据标准化
-            > filetype 标准化
             > filename 不要加filetype
             > filetype path标准化 
+            map
+            map
+            three functions
+            complecat method
         """
-        register_file_tuple = namedtuple(
-            "register_data", ("file_name", "file_type", "file_path")
-        )
-        for row in self.__data_list:
-            name, file_type, path = row[2:5]
-        return register_file_tuple
+        # if file_type.upper() in ("RPT", "BO"):
+        #    # name format: rpt to upper
+        #    name = name.upper()
+
+        return file_name_path
 
     def copyfiles(self):
-        error_file_type = set()
         # copy code files
         for row in self.__data_list:
             name, file_type, path = row[2:5]
@@ -159,7 +195,7 @@ class CopyRegister(object):
             ind = path.find("1300_编码")
 
             if ind == -1:
-                error_file_type.add("lost")
+                self.__error_file_type.add("lost")
                 print(f"path error, skip row: {name}, {file_type}, {path}")
                 continue
             file_type = self.register_file_type_deal(file_type, path)
@@ -170,8 +206,7 @@ class CopyRegister(object):
 
             # get folder name of code
             # get the file type name to depart pro and sql
-            if path.find("\\") > -1:
-                path = path.replace("\\", os.sep)
+            change_path_sep(path)
             path_list = path[ind:].split(os.sep)
             folder_name = path_list[-1]
             # print(f"path_list:{path_list}")
@@ -216,10 +251,10 @@ class CopyRegister(object):
                 if os.path.exists(source_file2):
                     shutil.copy(source_file2, target_path_file)
                 else:
-                    error_file_type.add(file_type.lower())
+                    self.__error_file_type.add(file_type.lower())
                     print(f"error! No such file: {source_file} _______________")
 
-        return error_file_type
+        return self.__error_file_type
 
     def saveRegisterExcel(self):
         "save excel records to one excel"
@@ -308,14 +343,14 @@ select OBJECT_NAME from ods_job_config where object_type = 'SP';
         self.readAllRegister()
         self.saveRegisterExcel()
         self.register_data_normalize()
-        error_file_type = self.copyfiles()
+        self.__error_file_type = self.copyfiles()
         self.listSqlFile()
         self.createConfigCheckSql()
         self.write_bo_list()
         self.createZipfile()
 
         # if only rpt not find, send email
-        # if not error_file_type or error_file_type == {"rpt"}:
+        # if not self.__error_file_type or self.__error_file_type == {"rpt"}:
         #   a.send_mail()
 
 

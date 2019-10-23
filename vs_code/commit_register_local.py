@@ -1,19 +1,24 @@
+
+import datetime
 import openpyxl
+import platform
+import pysnooper
+import sys
 import shutil, os
 import time
-import sys
+
 from sys import argv
-import pysnooper
-import datetime
 from date_add import date_add
 
 SVN_DIR = "/mnt/e/svn/1300_编码/"
 SVN_LOG = "/mnt/e/svn/commit.log"
+if platform.uname().system == "Windows":
+    SVN_DIR = "E:\\svn\\1300_编码\\"
+    SVN_LOG = "E:\\svn\\commit.log"
 
 
 class Solution:
-    """
-    """
+    """ read log to write excel for install """
 
     def __init__(self, date_str, mantis, module_type):
         # svn up ########os.system(f"svn up '{SVN_DIR}'")
@@ -28,39 +33,40 @@ class Solution:
         self.file2 = os.path.join(
             self.regi_dir, f"ODS程序版本发布登记表{module_type_name}-{self.date_str}.xlsx"
         )
-        #print(f"self.file2:{self.file2}")
+        # print(f"self.file2:{self.file2}")
         if not os.path.exists(self.file2):
             shutil.copy(file1, self.file2)
 
         self.comit_list = []
         self.commit_list_end = ["Dongjian", "Gene", self.date_str, mantis, "", ""]
         # write commit.log
-        #os.system("svn st {SVN_DIR} | grep -v '~' > {SVN_LOG}")
+        # os.system("svn st {SVN_DIR} | grep -v '~' > {SVN_LOG}")
 
-    #@pysnooper.snoop()
+    # @pysnooper.snoop()
     def logRead(self):
-        svn_log = open(SVN_LOG,encoding='utf-8-sig') # deal with \ufeff
+        svn_log = open(SVN_LOG, encoding="utf-8-sig")  # deal with \ufeff
         for line in svn_log.readlines():
             line = line.strip()
-            #print(f"line:{line}")
-            if line.startswith("Modified") or line.startswith("Modify") or line.startswith("Adding"):
+            # print(f"line:{line}")
+            if (
+                line.startswith("Modified")
+                or line.startswith("Modify")
+                or line.startswith("Adding")
+            ):
                 if line.find("ODS程序版本发布登记表") > -1:
                     continue
                 # delete  application/octet-stream
                 if line.find("application/octet-stream") > -1:
-                    line = line.replace("application/octet-stream",'').strip()
+                    line = line.replace("application/octet-stream", "").strip()
 
-                path_file = line[line.find('1300_编码'):]
-                spliter = '\\'
-                if path_file.find('/') > -1:
-                    spliter = '/'
-                path_list = path_file.split(spliter)
+                path_file = line[line.find("1300_编码") :]
+                path_list = path_file.split(os.sep)
                 # 跳过建表语句
-                #if path_list[-2] == "1380_建表语句":
+                # if path_list[-2] == "1380_建表语句":
                 #    continue
 
                 # print(f"path_list:{path_list}")
-                path = "1000_编辑区\\" + "\\".join(path_list[:-1])
+                path = os.path.join("1000_编辑区" + os.sep.join(path_list[:-1]))
                 file_list = path_list[-1].split(".")
                 # print(f"file_list:{file_list}")
                 file_name = file_list[0]
@@ -107,12 +113,11 @@ if __name__ == "__main__":
     today = time.strftime("%Y%m%d", time.localtime())
     date_str = time.strftime("%Y%m%d", time.localtime())
     time_str = time.strftime("%H:%M", time.localtime())
-    if time_str > '16:10':
+    if time_str > "16:10":
         # today add one day
-        date_str = date_add(1) 
+        date_str = date_add(1)
     mantis = ""
     module_type = "dj"
-
 
     if len(argv) == 2 and len(argv[1]) == 8:
         date_str = argv[1]
@@ -126,7 +131,7 @@ if __name__ == "__main__":
         print("usage: python3 commit_register.py '20190501' mantis_id, module_type")
         sys.exit(1)
 
-    if len(argv) >1 and argv[1].find('d+')>-1:
+    if len(argv) > 1 and argv[1].find("d+") > -1:
         # get days from d+days
         days = int(argv[1][2:])
         date_str = date_add(days)
