@@ -59,7 +59,6 @@ class CopyRegister(object):
         return is_system_windows
 
     def update_svn(self):
-        # TODO svn: E020024: Error resolving case of ''E:\svn\1300_编码''
         if self.is_system_windows():
             # BE CAREFUL HERE ###############
             try:
