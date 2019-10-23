@@ -64,7 +64,8 @@ class CopyRegister(object):
             # BE CAREFUL HERE ###############
             try:
                 print("Call svn up ......")
-                os.system(f"svn up '{self.__svnup_dir}'")
+                os.chdir(f"{self.__svnup_dir}")
+                os.system("svn up")
             except Exception as e:
                 print("SVN UP ERROR: ", e.__doc__)
 
