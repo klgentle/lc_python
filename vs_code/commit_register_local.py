@@ -9,6 +9,7 @@ import time
 
 from sys import argv
 from date_add import date_add
+from copy_svn_modify import CopyRegister
 
 SVN_DIR = "/mnt/e/svn/1300_编码/"
 SVN_LOG = "/mnt/e/svn/commit.log"
@@ -60,13 +61,14 @@ class Solution:
                     line = line.replace("application/octet-stream", "").strip()
 
                 path_file = line[line.find("1300_编码") :]
+                path_file = CopyRegister.change_path_sep(path_file)
                 path_list = path_file.split(os.sep)
                 # 跳过建表语句
                 # if path_list[-2] == "1380_建表语句":
                 #    continue
 
-                # print(f"path_list:{path_list}")
-                path = os.path.join("1000_编辑区" + os.sep.join(path_list[:-1]))
+                print(f"path_list:{path_list}")
+                path = os.path.join("1000_编辑区", os.path.dirname(path_file))
                 file_list = path_list[-1].split(".")
                 # print(f"file_list:{file_list}")
                 file_name = file_list[0]

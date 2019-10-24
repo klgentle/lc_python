@@ -116,16 +116,6 @@ class CopyRegister(object):
             self.__data_list.append(data_row)
         return self.__data_list
 
-    def register_file_type_deal(self, file_type, path):
-        if file_type.upper() == "BO":
-            file_type = "rpt"
-        elif file_type.upper() in ("PRO", "FNC"):
-            file_type = "sql"
-        # fixing file_type
-        elif file_type.upper() != "RPT" and path.find("1370_水晶报表") > -1:
-            file_type = "rpt"
-        return file_type
-
     def get_bo_list(self):
         bo_name_list = []
         for row in self.__data_list:
@@ -145,101 +135,88 @@ class CopyRegister(object):
 
     @staticmethod
     def filename_normlize(filename):
-        """   > filetype 标准化 """
+        """   > filename 标准化 """
         return filename.split(".")[0]
 
     @staticmethod
-    def filetype_normlize(filetype):
+    def filetype_normlize(file_type):
+        """
+            > filetype 标准化 
+        """
         if not file_type:
             return "sql"
+        if file_type.upper() == "BO":
+            file_type = "rpt"
+        elif file_type.upper() in ("PRO", "FNC"):
+            file_type = "sql"
+        return file_type.lower()
+
+    @staticmethod
+    def get_schema_folder(path_list):
+        schema_folder = ""
+        if path_list[1] == "1370_水晶报表":
+            schema_folder = "1370_水晶报表"
+        else:
+            schema_folder = path_list[2]
+        return schema_folder
 
     def filepath_normlize(self, filepath):
-        ind = path.find("1300_编码")
-        if ind == -1:
-            self.__error_file_type.add("lost")
-            print(f"path error, skip path: {path}")
-        filepath = change_path_sep(filepath[ind:])
+        """
+            > filepath 标准化 
+        """
+        # fix 1300编码 to 1300_编码
+        if filepath.find("1300编码") > -1:
+            filepath = filepath.replace("1300编码", "1300_编码")
+
+        # cut path from 1300
+        if filepath.find("1300_编码") > -1:
+            filepath = filepath[filepath.find("1300_编码") :]
+        filepath = self.change_path_sep(filepath)
         return filepath
 
     def register_data_normalize(self):
-        file_name_path = map(lambda data_row: data_row[2:5], self.__data_list)
-        file_name_path = map(
-            lambda data: (
-                filename_normlize(data[0]),
-                filetype_normlize(data[1]),
-                filepath_normlize(data[2]),
-            ),
-            file_name_path,
-        )
         """
             TODO 数据标准化
-            > filename 不要加filetype
-            > filetype path标准化 
-            map
-            map
-            three functions
             complecat method
         """
-        # if file_type.upper() in ("RPT", "BO"):
-        #    # name format: rpt to upper
-        #    name = name.upper()
+        file_name_path = map(lambda data_row: data_row[2:5], self.__data_list)
+        file_name_path = map(
+            lambda data: [
+                self.filename_normlize(data[0].strip()),
+                self.filetype_normlize(data[1].strip()),
+                self.filepath_normlize(data[2].strip()),
+            ],
+            file_name_path,
+        )
+        return list(file_name_path)
 
-        return file_name_path
-
-    def copyfiles(self):
-        # copy code files
-        for row in self.__data_list:
-            name, file_type, path = row[2:5]
-            if not file_type:
-                file_type = "sql"
-            ind = path.find("1300_编码")
-
-            if ind == -1:
-                self.__error_file_type.add("lost")
-                print(f"path error, skip row: {name}, {file_type}, {path}")
-                continue
-            file_type = self.register_file_type_deal(file_type, path)
+    def register_data_deal(self, file_name_path: list):
+        file_name_path_list = [" "] * len(file_name_path)
+        for index, data in enumerate(file_name_path):
+            name, file_type, path = data
 
             if file_type.upper() in ("RPT", "BO"):
-                # name format: rpt to upper
                 name = name.upper()
-
-            # get folder name of code
-            # get the file type name to depart pro and sql
-            change_path_sep(path)
-            path_list = path[ind:].split(os.sep)
-            folder_name = path_list[-1]
-            # print(f"path_list:{path_list}")
-            schema_folder = ""
-            if path_list[1] == "1370_水晶报表":
-                schema_folder = "1370_水晶报表"
-            else:
-                schema_folder = path_list[2]
-
-            # folder_name and file type deal
-            if folder_name in ("1350_存储过程", "05Procedures"):
-                folder_name = "pro"
+            file_folder = file_type
+            if path.endswith("05Procedures"):
                 self.__procedure_name_list.append(name.upper())
-                # file_type in this fold must be sql or pro
-                file_type = "sql"
-            else:
-                folder_name = file_type.lower()
+                file_folder = "pro"
 
-            # strip() delete blank
-            name_and_type = name + "." + file_type.lower().strip()
-            if name.find(".") > -1:  # too smart
-                name_and_type = name
+            whole_file_name = name + "." + file_type
+            file_name_path_list[index] = [whole_file_name, file_folder, path]
 
-            source_file = os.path.join(self.code_home, path[ind:], name_and_type)
-            source_file2 = os.path.join(
-                self.code_home, path[ind:], name_and_type.lower()
-            )
-            # print(f"source_file:{source_file}")
+        return file_name_path_list
 
-            target_path = os.path.join(self.__beta_path, schema_folder, folder_name)
-            # replace blank in file name
+    def copyfiles(self, file_name_path_list):
+        # copy code files
+        for whole_file_name, file_folder, path in file_name_path_list:
+            schema_folder = self.get_schema_folder(path.split(os.sep))
+            source_file = os.path.join(self.code_home, path, whole_file_name)
+            source_file2 = os.path.join(self.code_home, path, whole_file_name.lower())
+
+            target_path = os.path.join(self.__beta_path, schema_folder, file_folder)
             target_path_file = os.path.join(
-                target_path, name_and_type.replace(" ", "_")
+                target_path, whole_file_name.replace(" ", "_")
             )
 
             if not os.path.exists(target_path):
@@ -342,8 +319,8 @@ select OBJECT_NAME from ods_job_config where object_type = 'SP';
         """main function for call"""
         self.readAllRegister()
         self.saveRegisterExcel()
-        self.register_data_normalize()
-        self.__error_file_type = self.copyfiles()
+        register_data = self.register_data_normalize()
+        self.__error_file_type = self.copyfiles(self.register_data_deal(register_data))
         self.listSqlFile()
         self.createConfigCheckSql()
         self.write_bo_list()
