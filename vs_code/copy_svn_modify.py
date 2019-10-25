@@ -20,7 +20,7 @@ from create_date import getBetweenDay
 
 
 class CopyRegister(object):
-    """ copy 'svn/1300_编码' upload register and upload file 
+    """ copy svn/1300_编码 upload register and upload file 
        "usage python[3] copy_upload_ubuntu.py '20190501'"
     """
 
@@ -136,7 +136,10 @@ class CopyRegister(object):
     @staticmethod
     def filename_normlize(filename):
         """   > filename 标准化 """
-        return filename.split(".")[0]
+        if filename.find(".") > 0:
+            filename = os.path.splitext(filename)[0]
+        return filename
+
 
     @staticmethod
     def filetype_normlize(file_type):
@@ -228,7 +231,7 @@ class CopyRegister(object):
                 if os.path.exists(source_file2):
                     shutil.copy(source_file2, target_path_file)
                 else:
-                    self.__error_file_type.add(file_type.lower())
+                    self.__error_file_type.add(whole_file_name.split('.')[1])
                     print(f"error! No such file: {source_file} _______________")
 
         return self.__error_file_type
