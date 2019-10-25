@@ -59,34 +59,17 @@ if __name__ == "__main__":
     #    logging.info("Please input procedure_name")
     #    sys.exit(1)
 
-    # file_name = r"database\payment_list.txt"
-    # file_name = r"E:\yx_walk\report_develop\view_to_replace\deposit_report_list.txt"
-    # file_name = r"E:\yx_walk\report_develop\view_to_replace\cif_list.txt"
-    ## file_name = r"E:\yx_walk\report_develop\view_to_replace\bi_list.txt"
+    # file_name = r"E:\yx_walk\report_develop\view_to_replace\sec_list.txt"
     # proc_list = read_file_to_list(file_name)
     # proc_list = ["p_rpt_" + x.lower() for x in proc_list]
     # proc_list = ["p_itf_" + x.lower() for x in proc_list]
     proc_list = [
-        "p_rpt_cif058",
-        "p_rpt_cif150",
-        "p_rpt_cif613_3",
-        "p_rpt_cifsb013",
-        "p_rpt_cif088e",
-        "p_rpt_cif088k",
-        "p_rpt_cif088rc",
-        "p_rpt_cif089_1",
-        "p_rpt_cif089c1",
-        "p_rpt_cif089c2",
-        "p_rpt_cif089cn",
-        "p_rpt_cif089cp",
-        "p_rpt_cif089ka",
-        "p_rpt_cif089kn",
-        "p_rpt_cif089kp",
-        "p_rpt_cif089r1",
-        "p_rpt_cif089r2",
-        "p_rpt_cif089rn",
-        "p_rpt_cif089rp",
-        "p_rpt_cif096",
+        "p_rpt_sec141_2",
+        "p_rpt_sec141_3",
+        "p_rpt_sec141",
+        "p_rpt_sec215_1",
+        "p_rpt_sec215",
+        "p_rpt_sec351",
     ]
     error_dict = batch_replace(proc_list, "view_and_log")
     print("-------------", error_dict)

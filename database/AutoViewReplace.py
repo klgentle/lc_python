@@ -26,8 +26,8 @@ class AutoViewReplace(object):
         """
         procedure = Procedure(proc_name)
         proc_cont = procedure.read_proc_cont()
-        # find view name
-        view_pattern = r"V_.*_ALL"
+        # find view name \w match word and line not comma
+        view_pattern = r"V_\w*_ALL"
         view_list = re.findall(view_pattern, proc_cont, flags=re.IGNORECASE)
         return set(view_list)
 

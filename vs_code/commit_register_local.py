@@ -78,6 +78,8 @@ class Solution:
                     module = modu[1][:3]
 
                 file_type = file_list[-1].replace("\n", "")
+                # 兼容 windows
+                path = path.replace(os.sep, "\\")
                 row = (
                     [module, "报表"] + [file_name, file_type, path] + self.commit_list_end
                 )
