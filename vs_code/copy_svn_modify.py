@@ -6,6 +6,7 @@ import csv
 import os
 import time
 import platform
+#import pysvn
 
 import sys
 from sys import argv
@@ -15,8 +16,7 @@ from datetime import datetime
 from send_mail_with_attach import mail
 from config_default import configs
 from create_date import getBetweenDay
-
-# from collections import namedtuple
+from SvnOperate import SvnOperate
 
 
 class CopyRegister(object):
@@ -29,8 +29,10 @@ class CopyRegister(object):
         self.create_date_str_list(date_str)
         print(f"self.__date_str_list:{self.__date_str_list}")
 
+        self.svn = SvnOperate()
         self.init_path()
-        self.update_svn()
+        #svn_client = pysvn.Client()
+        self.svn.update_windows_svn_path(self.__svnup_dir)
         self.make_or_clean_folder()
         self.__data_list = []
         self.__procedure_name_list = []
@@ -38,7 +40,7 @@ class CopyRegister(object):
 
     def init_path(self):
         home_path = configs.get("path").get("svn_home_path")
-        if self.is_system_windows():
+        if self.svn.is_system_windows():
             home_path = configs.get("path").get("win_svn_home_path")
 
         if not os.path.exists(home_path):
@@ -53,21 +55,6 @@ class CopyRegister(object):
         code_beta_path = os.path.join(home_path, "yx_walk", "beta")
         self.__beta_path = os.path.join(code_beta_path, self.date_str + "beta")
 
-    def is_system_windows(self):
-        is_system_windows = False
-        if platform.uname().system == "Windows":
-            is_system_windows = True
-        return is_system_windows
-
-    def update_svn(self):
-        if self.is_system_windows():
-            # BE CAREFUL HERE ###############
-            try:
-                print("Call svn up ......")
-                os.chdir(f"{self.__svnup_dir}")
-                os.system("svn up")
-            except Exception as e:
-                print("SVN UP ERROR: ", e.__doc__)
 
     def create_date_str_list(self, date_str):
         if date_str.find(",") > -1:

@@ -6,6 +6,7 @@ import pysnooper
 import sys
 import shutil, os
 import time
+import platform
 
 from sys import argv
 from date_add import date_add
@@ -22,12 +23,13 @@ class Solution:
     """ read log to write excel for install """
 
     def __init__(self, date_str, mantis, module_type):
+        self.svn_up()
         # svn up ########os.system(f"svn up '{SVN_DIR}'")
         # copy template change excel name
         self.regi_dir = os.path.join(SVN_DIR, "发布登记表", module_type)
 
         file1 = os.path.join(self.regi_dir, "ODS程序版本发布登记表(dj)-template.xlsx")
-        self.date_str = date_str  # str time.strftime("%Y%m%d", time.localtime())
+        self.date_str = date_str
         module_type_name = f"({module_type})"
         if module_type.upper() == "DEPOSIT":
             module_type_name = ""
