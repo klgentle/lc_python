@@ -32,7 +32,7 @@ class CopyRegister(object):
         self.svn = SvnOperate()
         self.init_path()
         #svn_client = pysvn.Client()
-        self.svn.update_windows_svn_path(self.__svnup_dir)
+        self.svn.update_windows_svn(self.__svnup_dir)
         self.make_or_clean_folder()
         self.__data_list = []
         self.__procedure_name_list = []

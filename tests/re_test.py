@@ -1,4 +1,3 @@
-from database.Procedure import Procedure
 import unittest
 import re
 import os
@@ -9,6 +8,7 @@ from os.path import dirname
 BASE_DIR = dirname(dirname(os.path.abspath(__file__)))
 # 添加系统环境变量
 sys.path.append(BASE_DIR)
+from database.Procedure import Procedure
 
 
 class ReTest(unittest.TestCase):
@@ -19,13 +19,17 @@ class ReTest(unittest.TestCase):
         """
         line = "INSERT  INTO  BAT_REPORT_LOG (DEAL_SERIAL_NO,DEAL_DATE,JOB_STEP,JOB_NAME,SPEND_TIME,REMARK,JOB_ID,JOB_STATE)"
         # modify here
-        batch_insert_pattern = r'\s*INSERT\s+INTO\s+BAT_REPORT_LOG(.*)'
+        batch_insert_pattern = r"\s*INSERT\s+INTO\s+BAT_REPORT_LOG(.*)"
         if re.search(batch_insert_pattern, line, flags=re.IGNORECASE):
             # logging.debug('deal_with_report_log_blanks')
-            line = re.sub(batch_insert_pattern,
-                          r'INSERT INTO BAT_REPORT_LOG\1', line, flags=re.IGNORECASE)
+            line = re.sub(
+                batch_insert_pattern,
+                r"INSERT INTO BAT_REPORT_LOG\1",
+                line,
+                flags=re.IGNORECASE,
+            )
         print(line)
-        print('test_normalize_report_log_insert end --------------------')
+        print("test_normalize_report_log_insert end --------------------")
 
     # def test_re_search1(self):
     #    print('--------------------')
@@ -41,15 +45,24 @@ class ReTest(unittest.TestCase):
     #    print('--------------------')
 
     def test_re_search(self):
-        batch_insert_pattern = r'\s*INSERT\s+INTO\s+BAT_REPORT_LOG'
-        test_input = ['INSERT INTO BAT_REPORT_LOG',
-                      ' INSERT  INTO  BAT_REPORT_LOG', 'insert  into  bat_report_log']
-        #self.assertEqual(re_batch_insert.search(test_input[0]), True)
+        batch_insert_pattern = r"\s*INSERT\s+INTO\s+BAT_REPORT_LOG"
+        test_input = [
+            "INSERT INTO BAT_REPORT_LOG",
+            " INSERT  INTO  BAT_REPORT_LOG",
+            "insert  into  bat_report_log",
+        ]
+        # self.assertEqual(re_batch_insert.search(test_input[0]), True)
         for string in test_input:
             if re.search(batch_insert_pattern, string, flags=re.IGNORECASE):
-                print(re.sub(batch_insert_pattern,
-                             'INSERT INTO BAT_REPORT_LOG', string, flags=re.IGNORECASE))  #
-                #print(re.sub('class', 'function', 'Class object', flags=re.IGNORECASE))
+                print(
+                    re.sub(
+                        batch_insert_pattern,
+                        "INSERT INTO BAT_REPORT_LOG",
+                        string,
+                        flags=re.IGNORECASE,
+                    )
+                )  #
+                # print(re.sub('class', 'function', 'Class object', flags=re.IGNORECASE))
             else:
                 print(string)
 

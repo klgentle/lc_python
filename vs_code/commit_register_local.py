@@ -11,6 +11,7 @@ import platform
 from sys import argv
 from date_add import date_add
 from copy_svn_modify import CopyRegister
+from SvnOperate import SvnOperate
 
 SVN_DIR = "/mnt/e/svn/1300_编码/"
 SVN_LOG = "/mnt/e/svn/commit.log"
@@ -23,7 +24,8 @@ class Solution:
     """ read log to write excel for install """
 
     def __init__(self, date_str, mantis, module_type):
-        self.svn_up()
+        self.svn = SvnOperate()
+        self.svn.update_windows_svn(SVN_LOG)
         # svn up ########os.system(f"svn up '{SVN_DIR}'")
         # copy template change excel name
         self.regi_dir = os.path.join(SVN_DIR, "发布登记表", module_type)
@@ -44,6 +46,8 @@ class Solution:
         self.commit_list_end = ["Dongjian", "Gene", self.date_str, mantis, "", ""]
         # write commit.log
         # os.system("svn st {SVN_DIR} | grep -v '~' > {SVN_LOG}")
+
+    def 
 
     # @pysnooper.snoop()
     def logRead(self):
