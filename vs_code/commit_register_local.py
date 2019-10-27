@@ -2,7 +2,7 @@
 import datetime
 import openpyxl
 import platform
-import pysnooper
+#import pysnooper
 import sys
 import shutil, os
 import time
@@ -24,8 +24,12 @@ class Solution:
     """ read log to write excel for install """
 
     def __init__(self, date_str, mantis, module_type):
-        self.svn = SvnOperate()
-        self.svn.update_windows_svn(SVN_LOG)
+        try:
+            self.svn = SvnOperate(SVN_DIR)
+            #self.svn.update_windows_svn()
+            self.svn_add_commit()
+        except Exception as e:
+            print("svn error:", e.__doc__)
         # svn up ########os.system(f"svn up '{SVN_DIR}'")
         # copy template change excel name
         self.regi_dir = os.path.join(SVN_DIR, "发布登记表", module_type)
@@ -47,18 +51,32 @@ class Solution:
         # write commit.log
         # os.system("svn st {SVN_DIR} | grep -v '~' > {SVN_LOG}")
 
-    def 
+    def svn_add_commit(self):
+        self.svn.svn_add()
+        self.svn.svn_delete()
+        self.svn.svn_commit_code()
+
+    def commit_register(self):
+        try:
+            self.svn.svn_add()
+            self.svn.svn_commit()
+        except Exception as e:
+            print("svn error:", e.__doc__)
 
     # @pysnooper.snoop()
     def logRead(self):
-        svn_log = open(SVN_LOG, encoding="utf-8-sig")  # deal with \ufeff
+        if platform.uname().system == "Windows":
+            svn_log = open(SVN_LOG, encoding="gb2312")
+        else:
+            svn_log = open(SVN_LOG, encoding="utf-8-sig")  # deal with \ufeff
         for line in svn_log.readlines():
             line = line.strip()
-            # print(f"line:{line}")
+            print(f"line:{line}")
             if (
-                line.startswith("Modified")
-                or line.startswith("Modify")
+                line.startswith("Sending")
                 or line.startswith("Adding")
+                or line.startswith("Modified")
+                or line.startswith("Modify")
             ):
                 if line.find("ODS程序版本发布登记表") > -1:
                     continue
@@ -66,15 +84,22 @@ class Solution:
                 if line.find("application/octet-stream") > -1:
                     line = line.replace("application/octet-stream", "").strip()
 
-                path_file = line[line.find("1300_编码") :]
+                path_file = line
+                if line.find("1300_编码") > -1:
+                    path_file = line[line.find("1300_编码") :]
+                else:
+                    path_file = line.split(" ")[-1]
+                    # add 1300
+                    path_file = os.path.join("1300_编码", path_file)
                 path_file = CopyRegister.change_path_sep(path_file)
+                #print(f"path_file: {path_file}")
+                path = os.path.join("1000_编辑区", os.path.dirname(path_file))
                 path_list = path_file.split(os.sep)
                 # 跳过建表语句
                 # if path_list[-2] == "1380_建表语句":
                 #    continue
 
                 print(f"path_list:{path_list}")
-                path = os.path.join("1000_编辑区", os.path.dirname(path_file))
                 file_list = path_list[-1].split(".")
                 # print(f"file_list:{file_list}")
                 file_name = file_list[0]
@@ -156,3 +181,4 @@ if __name__ == "__main__":
     a = Solution(date_str, mantis, module_type)
     a.logRead()
     a.logRegister()
+    a.commit_register()

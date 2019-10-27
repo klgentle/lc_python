@@ -12,8 +12,17 @@ SVN_DIR = r"E:\svn\1300_编码"
 
 
 def test_svn_add():
-    SvnOperate().svn_add(SVN_DIR)
+    SvnOperate(SVN_DIR).svn_add()
+
+
+def test_svn_commit():
+    SvnOperate(SVN_DIR).svn_commit()
+
+
+def test_svn_commit_code():
+    SvnOperate(SVN_DIR).svn_commit_code()
 
 
 if __name__ == "__main__":
-    test_svn_add()
+    test_svn_commit()
+
