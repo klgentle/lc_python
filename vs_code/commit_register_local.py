@@ -99,7 +99,7 @@ class Solution:
                 # if path_list[-2] == "1380_建表语句":
                 #    continue
 
-                print(f"path_list:{path_list}")
+                #print(f"path_list:{path_list}")
                 file_list = path_list[-1].split(".")
                 # print(f"file_list:{file_list}")
                 file_name = file_list[0]
