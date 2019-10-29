@@ -27,6 +27,7 @@ def get_stock():
     print("to show plot ------------------")
     # 绘制btc价格曲线
     df["ClosePrice"].plot(figsize=(14, 7))
+    # plt.show() not work on WSL
     plt.show()
 
 
