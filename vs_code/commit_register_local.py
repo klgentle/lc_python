@@ -181,4 +181,4 @@ if __name__ == "__main__":
     a = Solution(date_str, mantis, module_type)
     a.logRead()
     a.logRegister()
-    a.commit_register()
+    #a.commit_register()
