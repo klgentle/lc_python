@@ -55,6 +55,7 @@ class Solution:
         self.svn.svn_add()
         self.svn.svn_delete()
         self.svn.svn_commit_code()
+        self.svn.update_svn()
 
     def commit_register(self):
         try:

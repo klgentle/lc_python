@@ -29,10 +29,10 @@ class CopyRegister(object):
         self.create_date_str_list(date_str)
         print(f"self.__date_str_list:{self.__date_str_list}")
 
-        self.svn = SvnOperate()
         self.init_path()
+        self.svn = SvnOperate(self.__svnup_dir)
         #svn_client = pysvn.Client()
-        self.svn.update_windows_svn(self.__svnup_dir)
+        self.svn.update_windows_svn()
         self.make_or_clean_folder()
         self.__data_list = []
         self.__procedure_name_list = []
@@ -40,7 +40,8 @@ class CopyRegister(object):
 
     def init_path(self):
         home_path = configs.get("path").get("svn_home_path")
-        if self.svn.is_system_windows():
+        #if self.svn.is_system_windows():
+        if platform.uname().system == "Windows":
             home_path = configs.get("path").get("win_svn_home_path")
 
         if not os.path.exists(home_path):
