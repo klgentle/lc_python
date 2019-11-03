@@ -32,3 +32,5 @@ babaDf=data.get_data_yahoo(gafataDict['阿里巴巴'],start_date, end_date)
 #或者从Morningstar数据源获取阿里巴巴数据
 #babaDf=data.DataReader(gafataDict['阿里巴巴'],'morningstar',start_date, end_date)
 
+#查看前5行数据
+babaDf.head()
