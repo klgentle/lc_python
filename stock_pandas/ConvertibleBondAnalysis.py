@@ -12,8 +12,7 @@ import time
 
 class ConvertibleBondAnalysis(object):
     def __init__(self):
-        #self._bond_data = pd.read_csv("convertibile_bond.csv", "gbk")
-        self._bond_data = pd.read_csv("convertibile_bond.csv", "gb18030")
+        self._bond_data = pd.read_csv("convertibile_bond.csv")
         #self.set_open_price()
         #self._bond_data_with_price = pd.read_csv("convertibile_bond_with_price.csv", "GB2312")
 
@@ -29,7 +28,13 @@ class ConvertibleBondAnalysis(object):
     def get_bond_open_value(self, code: str, open_date: str) -> int:
         # open_date format "2017-01-01"
         print(f"enter get_bond_open_value for test ----------------- code:{code}, open_date:{open_date}")
-        bond_data = web.get_data_yahoo(code, open_date, open_date)
+        if open_date > "2019-11-04":
+            return 0
+        try:
+            bond_data = web.get_data_yahoo(code, open_date, open_date)
+        except Exception as e:
+            print("Error:", e.__doc__) 
+            return 0
         # print(bond_data.head())
         # 取第一天开板价格
         return bond_data.loc[open_date, "Open"]
@@ -44,24 +49,31 @@ class ConvertibleBondAnalysis(object):
         #return bond_data.loc[open_date, "Open"]
 
     def set_open_price(self):
-        self._bond_data["open_price"] = [
-            # TODO check error KeyError: 'Date'
-            # how to deal one row in pandas
+        #self._bond_data.loc[:, "open_price"] = [
+        # TODO check error KeyError: 'Date'
+        open_price_list = [
             self.get_bond_open_value(
-                self._bond_data.iloc[i][0].split(",")[9].rjust(6,"0") +".ss",  #stock_code
-                self.date_change_format(self._bond_data.iloc[i][0].split(",")[8])  #open_date
+                str(self._bond_data.iat[i,9]).rjust(6,"0") +".ss",  #stock_code
+                self.date_change_format(self._bond_data.iat[i,8])  #open_date
             )
             for i in self._bond_data.index
         ]
-        self._bond_data.to_csv(
-            "./convertibile_bond_with_price.csv", sep=",", header=True
-        )
+
+        print(f"open_price_list: {open_price_list}")
+
+        #self._bond_data.to_csv(
+        #    "./convertibile_bond_with_price.csv", sep=",", header=True
+        #)
 
     def test_data_detect(self):
-        #print(self._bond_data.head())
-        print(self._bond_data.iloc[2])
-        print(type(self._bond_data.iloc[2]))
-        print("-------------", self._bond_data.iloc[2][0])
+        #print(self._bond_data.iloc[2])
+        #print(type(self._bond_data.iloc[2]))
+        #print("-------------", self._bond_data.iloc[2][0])
+
+        print("------------- head", self._bond_data.head())
+        print("------------- iat[1,8]", self._bond_data.iat[1,8])
+        print("------------- iat[1,9]", self._bond_data.iat[1,9])
+        print("------------- iat[1,10]", self._bond_data.iat[1,10])
 
     def test_data_detect2(self):
         print(self._bond_data_with_price.head())
