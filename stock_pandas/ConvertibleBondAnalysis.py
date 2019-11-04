@@ -14,8 +14,8 @@ class ConvertibleBondAnalysis(object):
     def __init__(self):
         #self._bond_data = pd.read_csv("convertibile_bond.csv", "gbk")
         self._bond_data = pd.read_csv("convertibile_bond.csv", "gb18030")
-        self.set_open_price()
-        self._bond_data_with_price = pd.read_csv("convertibile_bond_with_price.csv", "GB2312")
+        #self.set_open_price()
+        #self._bond_data_with_price = pd.read_csv("convertibile_bond_with_price.csv", "GB2312")
 
     @staticmethod
     def date_change_format(from_date: str) -> str:
@@ -28,17 +28,28 @@ class ConvertibleBondAnalysis(object):
 
     def get_bond_open_value(self, code: str, open_date: str) -> int:
         # open_date format "2017-01-01"
+        print(f"enter get_bond_open_value for test ----------------- code:{code}, open_date:{open_date}")
         bond_data = web.get_data_yahoo(code, open_date, open_date)
         # print(bond_data.head())
         # 取第一天开板价格
         return bond_data.loc[open_date, "Open"]
 
+    def get_bond_open_value_print(self, code: str, open_date: str) -> int:
+        # for test
+        # open_date format "2017-01-01"
+        #bond_data = web.get_data_yahoo(code, open_date, open_date)
+        # print(bond_data.head())
+        # 取第一天开板价格
+        print(f"for test ----------------- code:{code}, open_date:{open_date}")
+        #return bond_data.loc[open_date, "Open"]
+
     def set_open_price(self):
         self._bond_data["open_price"] = [
-            # TODO check error
+            # TODO check error KeyError: 'Date'
+            # how to deal one row in pandas
             self.get_bond_open_value(
-                self._bond_data.iloc[i][0].split(",")[9] +".ss",  #stock_code
-                self.date_change_format(self._bond_data.iloc[i][0].split(",")[8]),  #open_date
+                self._bond_data.iloc[i][0].split(",")[9].rjust(6,"0") +".ss",  #stock_code
+                self.date_change_format(self._bond_data.iloc[i][0].split(",")[8])  #open_date
             )
             for i in self._bond_data.index
         ]
@@ -64,8 +75,9 @@ class ConvertibleBondAnalysis(object):
 if __name__ == "__main__":
     obj = ConvertibleBondAnalysis()
     # 用正股价格去推算可转债上市价格
-    # obj.get_bond_open_value("601818.ss", "2017-04-05")
+    #obj.get_bond_open_value("601818.ss", "2017-04-05")
     # print(obj.date_change_format("2017/4/5"))
     #obj.test_data_index()
-    obj.test_data_detect2()
+    #obj.test_data_detect2()
     #obj.test_data_detect()
+    obj.set_open_price()
