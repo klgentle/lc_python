@@ -34,7 +34,7 @@ class Solution:
         # copy template change excel name
         self.regi_dir = os.path.join(SVN_DIR, "发布登记表", module_type)
 
-        file1 = os.path.join(self.regi_dir, "ODS程序版本发布登记表(dj)-template.xlsx")
+        file1 = os.path.join(self.regi_dir, f"ODS程序版本发布登记表({module_type})-template.xlsx")
         self.date_str = date_str
         module_type_name = f"({module_type})"
         if module_type.upper() == "DEPOSIT":
@@ -153,7 +153,7 @@ if __name__ == "__main__":
         # today add one day
         date_str = date_add(1)
     mantis = ""
-    module_type = "dj"
+    module_type = "cif"
 
     if len(argv) == 2 and len(argv[1]) == 8:
         date_str = argv[1]
@@ -162,7 +162,7 @@ if __name__ == "__main__":
     elif len(argv) == 4:
         date_str, mantis, module_type = argv[1], argv[2], argv[3]
         if not argv[3]:
-            module_type = "dj"
+            module_type = "cif"
     elif len(argv) > 4:
         print("usage: python3 commit_register.py '20190501' mantis_id, module_type")
         sys.exit(1)

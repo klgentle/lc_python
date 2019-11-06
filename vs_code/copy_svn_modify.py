@@ -227,7 +227,7 @@ class CopyRegister(object):
     def saveRegisterExcel(self):
         "save excel records to one excel"
         file1 = os.path.join(
-            self.__svnup_dir, "发布登记表", "dj", "ODS程序版本发布登记表(dj)-template.xlsx"
+            self.__svnup_dir, "发布登记表", "cif", "ODS程序版本发布登记表(cif)-template.xlsx"
         )
         file_path_name = self.__beta_path + "/登记表" + self.date_str + ".xlsx"
         shutil.copy(file1, file_path_name)
