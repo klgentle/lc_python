@@ -35,9 +35,9 @@ class Procedure(object):
     """
 
     def __init__(self, proc_name: str):
-        self.__procedure_path = r"E:\svn\1300_编码\1301_ODSDB\RPTUSER\05Procedures"
+        #self.__procedure_path = r"E:\svn\1300_编码\1301_ODSDB\RPTUSER\05Procedures"
         # svn bak path
-        # self.__procedure_path = r"E:\svn\1300_编码\1301_ODSDB\RPTUSER\98Procedures"
+        self.__procedure_path = r"E:\svn\1300_编码\1301_ODSDB\RPTUSER\98Procedures_bak_20191016"
         self.__proc_name = proc_name
         # raise error
         if not os.path.exists(

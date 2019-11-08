@@ -71,5 +71,7 @@ if __name__ == "__main__":
         "p_rpt_sec215",
         "p_rpt_sec351",
     ]
-    error_dict = batch_replace(proc_list, "view_and_log")
+    ###error_dict = batch_replace(proc_list, "view_and_log")
+    # 尽量少改动
+    error_dict = batch_replace(proc_list, "view")
     print("-------------", error_dict)
