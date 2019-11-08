@@ -103,5 +103,5 @@ if __name__ == "__main__":
     # obj.main(proc_name)
 
     obj = AutoViewReplace()
-    obj.main("p_rpt_cif217")
+    obj.main("p_rpt_macoa410")
     # obj.main("p_rpt_dep906")

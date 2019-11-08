@@ -59,7 +59,7 @@ class FindViewOriginalTable(object):
         with open(self.new_dict_file_name) as f:
             view_dict = json.loads(f.read())
         logging.debug("view_name: %s" % view_name)
-        return view_dict.get(view_name.upper()).strip()
+        return view_dict.get(view_name.upper().strip())
 
     def create_view_to_table_sql(self):
         view_dict_file = os.path.join(self.new_path, self.new_dict_file_name)

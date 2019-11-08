@@ -59,18 +59,18 @@ if __name__ == "__main__":
     #    logging.info("Please input procedure_name")
     #    sys.exit(1)
 
-    # file_name = r"E:\yx_walk\report_develop\view_to_replace\sec_list.txt"
-    # proc_list = read_file_to_list(file_name)
+    file_name = r"E:\yx_walk\report_develop\view_to_replace\loan_list.txt"
+    proc_list = read_file_to_list(file_name)
     # proc_list = ["p_rpt_" + x.lower() for x in proc_list]
     # proc_list = ["p_itf_" + x.lower() for x in proc_list]
-    proc_list = [
-        "p_rpt_sec141_2",
-        "p_rpt_sec141_3",
-        "p_rpt_sec141",
-        "p_rpt_sec215_1",
-        "p_rpt_sec215",
-        "p_rpt_sec351",
-    ]
+    # proc_list = [
+    #     "p_rpt_sec141_2",
+    #     "p_rpt_sec141_3",
+    #     "p_rpt_sec141",
+    #     "p_rpt_sec215_1",
+    #     "p_rpt_sec215",
+    #     "p_rpt_sec351",
+    # ]
     ###error_dict = batch_replace(proc_list, "view_and_log")
     # 尽量少改动
     error_dict = batch_replace(proc_list, "view")

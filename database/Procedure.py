@@ -35,9 +35,11 @@ class Procedure(object):
     """
 
     def __init__(self, proc_name: str):
-        #self.__procedure_path = r"E:\svn\1300_编码\1301_ODSDB\RPTUSER\05Procedures"
+        # self.__procedure_path = r"E:\svn\1300_编码\1301_ODSDB\RPTUSER\05Procedures"
         # svn bak path
-        self.__procedure_path = r"E:\svn\1300_编码\1301_ODSDB\RPTUSER\98Procedures_bak_20191016"
+        self.__procedure_path = (
+            r"E:\svn\1300_编码\1301_ODSDB\RPTUSER\98Procedures_bak_20191016"
+        )
         self.__proc_name = proc_name
         # raise error
         if not os.path.exists(
@@ -155,7 +157,10 @@ class Procedure(object):
         proc_cont = self.read_proc_cont()
         for view, table in view_dict.items():
             view_pattern = r"(RPTUSER.)?{}".format(view)
-            proc_cont = re.sub(view_pattern, table, proc_cont, flags=re.IGNORECASE)
+            try:
+                proc_cont = re.sub(view_pattern, table, proc_cont, flags=re.IGNORECASE)
+            except Exception as e:
+                print("view: ", view, e.__doc__)
         self.write_procedure(proc_cont)
 
     @staticmethod
