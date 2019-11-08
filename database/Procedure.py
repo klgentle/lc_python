@@ -34,11 +34,13 @@ class Procedure(object):
     use re.sub(pattern, repl, string, flags=re.IGNORECASE) instead of str.replace()
     """
 
-    def __init__(self, proc_name: str):
+    def __init__(self, proc_name: str, schema="RPTUSER"):
         # self.__procedure_path = r"E:\svn\1300_编码\1301_ODSDB\RPTUSER\05Procedures"
         # svn bak path
-        self.__procedure_path = (
-            r"E:\svn\1300_编码\1301_ODSDB\RPTUSER\98Procedures_bak_20191016"
+        # to DEPART FH00 AND FM00
+        self.__schema = schema.upper()
+        self.__procedure_path = r"E:\svn\1300_编码\1301_ODSDB\{}\98Procedures_bak_20191016".format(
+            self.__schema
         )
         self.__proc_name = proc_name
         # raise error
@@ -156,11 +158,14 @@ class Procedure(object):
     def replace_view_with_table(self, view_dict: dict):
         proc_cont = self.read_proc_cont()
         for view, table in view_dict.items():
-            view_pattern = r"(RPTUSER.)?{}".format(view)
+            # TODO shema
+            if self.__schema == "RPTUSER_MO":
+                table = table.replace("FH00", "FM00")
+            view_pattern = r"(RPTUSER.|RPTUSER_MO.)?{}".format(view)
             try:
                 proc_cont = re.sub(view_pattern, table, proc_cont, flags=re.IGNORECASE)
             except Exception as e:
-                print("view: ", view, e.__doc__)
+                logging.error("view: ", view, e.__doc__)
         self.write_procedure(proc_cont)
 
     @staticmethod

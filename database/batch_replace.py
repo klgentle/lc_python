@@ -12,14 +12,15 @@ from database.ProcedureLogModify import ProcedureLogModify
 from database.AutoViewReplace import AutoViewReplace
 
 
-def run_replace_view(proc_name: str):
+def run_replace_view(proc_name: str, schema="RPTUSER"):
     # modify view name, data_area
     proc_view = AutoViewReplace()
-    proc_view.main(proc_name)
+    proc_view.main(proc_name, schema)
 
 
-def run_modify_log(proc_name: str):
+def run_modify_log(proc_name: str, schema="RPTUSER"):
     # modify log
+    # TODO add schema
     proc_log = ProcedureLogModify(proc_name)
     proc_log.main()
 
@@ -34,22 +35,28 @@ def read_file_to_list(file_name: str) -> list:
 
 def batch_replace(proc_list: list, replace_type="view_and_log"):
     error_dict = {}
-    for proc in proc_list:
+    for content in proc_list:
+        proc, schema = content.split("\t")
+        if not schema:
+            schema = "RPTUSER"
+        # print(f"content:{content}")
+        # print(f"proc:{proc}")
+        # print(f"schema:{schema}")
         # modify view name, data_area
         try:
             # proc_view = AutoViewReplace()
             # proc_view.main(proc)
             if replace_type == "view":
-                run_replace_view(proc)
+                run_replace_view(proc, schema)
             elif replace_type == "log":
-                run_modify_log(proc)
+                run_modify_log(proc, schema)
             else:
-                run_replace_view(proc)
-                run_modify_log(proc)
+                run_replace_view(proc, schema)
+                run_modify_log(proc, schema)
         except Exception as e:
             # error_dict[proc] = e.__str__
             error_dict[proc] = e.__doc__
-            print(f"error, {proc}")
+            print(f"error, {proc}, {schema}")
 
     return error_dict
 
@@ -60,17 +67,22 @@ if __name__ == "__main__":
     #    sys.exit(1)
 
     file_name = r"E:\yx_walk\report_develop\view_to_replace\loan_list.txt"
-    proc_list = read_file_to_list(file_name)
+    # proc_list = read_file_to_list(file_name)
     # proc_list = ["p_rpt_" + x.lower() for x in proc_list]
     # proc_list = ["p_itf_" + x.lower() for x in proc_list]
-    # proc_list = [
-    #     "p_rpt_sec141_2",
-    #     "p_rpt_sec141_3",
-    #     "p_rpt_sec141",
-    #     "p_rpt_sec215_1",
-    #     "p_rpt_sec215",
-    #     "p_rpt_sec351",
-    # ]
+    proc_list = [
+        "P_RPT_AFT019E	RPTUSER_MO",
+        "P_RPT_CIF114D1	RPTUSER_MO",
+        "P_RPT_CIF114D5	RPTUSER_MO",
+        "P_RPT_ILN160	RPTUSER_MO",
+        "P_RPT_ILN180B	RPTUSER_MO",
+        "P_RPT_ILN200	RPTUSER_MO",
+        "P_RPT_ILN200R	RPTUSER_MO",
+        "P_RPT_ILN250	RPTUSER_MO",
+        "P_RPT_ILN250A	RPTUSER_MO",
+        "P_RPT_MACOA410	RPTUSER_MO",
+        "P_RPT_MOR160	RPTUSER_MO",
+    ]
     ###error_dict = batch_replace(proc_list, "view_and_log")
     # 尽量少改动
     error_dict = batch_replace(proc_list, "view")

@@ -20,50 +20,51 @@ class AutoViewReplace(object):
     def __init__(self):
         pass
 
-    def procedure_view_set(self, proc_name: str) -> set:
+    def procedure_view_set(self, proc_name: str, schema="RPTUSER") -> set:
         """返回视图集合
         方法2：正则匹配
         """
-        procedure = Procedure(proc_name)
+        procedure = Procedure(proc_name, schema)
         proc_cont = procedure.read_proc_cont()
         # find view name \w match word and line not comma
         view_pattern = r"V_\w*_ALL"
         view_list = re.findall(view_pattern, proc_cont, flags=re.IGNORECASE)
         return set(view_list)
 
-    def procedure_view_set_bak(self, proc_name: str) -> set:
-        """返回视图集合
-        方法1：找到视图的位置，根据空格循环截取
-        """
-        view_set = set()
+    # def procedure_view_set_bak(self, proc_name: str) -> set:
+    #    """返回视图集合
+    #    方法1：找到视图的位置，根据空格循环截取
+    #    """
+    #    view_set = set()
 
-        procedure = Procedure(proc_name)
-        proc_cont = procedure.read_proc_cont()
-        # logging.info(f"proc_cont:{proc_cont}")
-        # find view name
-        while self.view_index(proc_cont) > -1:
-            view_ind = self.view_index(proc_cont)
-            proc_from_index = proc_cont[view_ind:]
-            view_name, *proc_cont_list = proc_from_index.split(" ")
-            view_name = view_name.replace("\n", "")
-            if not self.is_whitelist(view_name):
-                view_set.add(view_name)
-            # deal with proc_cont_list
-            proc_cont = " ".join(proc_cont_list)
-        return view_set
+    #    procedure = Procedure(proc_name)
+    #    proc_cont = procedure.read_proc_cont()
+    #    # logging.info(f"proc_cont:{proc_cont}")
+    #    # find view name
+    #    while self.view_index(proc_cont) > -1:
+    #        view_ind = self.view_index(proc_cont)
+    #        proc_from_index = proc_cont[view_ind:]
+    #        view_name, *proc_cont_list = proc_from_index.split(" ")
+    #        view_name = view_name.replace("\n", "")
+    #        if not self.is_whitelist(view_name):
+    #            view_set.add(view_name)
+    #        # deal with proc_cont_list
+    #        proc_cont = " ".join(proc_cont_list)
+    #    return view_set
 
-    def view_index(self, proc_cont: str) -> int:
-        """检查是否存在要改的视图 """
-        index = proc_cont.find("RPTUSER.V_")
-        return index
+    # def view_index(self, proc_cont: str) -> int:
+    #    """检查是否存在要改的视图 """
+    #    index = proc_cont.find("RPTUSER.V_")
+    #    return index
 
     def is_whitelist(self, view_name: str) -> bool:
         """是否白名单（不需要修改）的视图"""
         return False
 
-    def view_replace(self, proc_name: str):
+    def view_replace(self, proc_name: str, schema="RPTUSER"):
         """替换视图"""
-        proc_view_set = self.procedure_view_set(proc_name)
+        proc_view_set = self.procedure_view_set(proc_name, schema)
+        logging.debug(f"proc_view_set:{proc_view_set}")
         if not proc_view_set:
             return
 
@@ -74,7 +75,7 @@ class AutoViewReplace(object):
             table_name = view_obj.get_view_original_table(view)
             proc_view_dict[view] = table_name
 
-        procedure = Procedure(proc_name)
+        procedure = Procedure(proc_name, schema)
         # add log
         procedure.write_header_log("view replace with table")
         # split two and
@@ -86,10 +87,10 @@ class AutoViewReplace(object):
         # procedure.data_area_deal()
         # logging.info(f"{proc_name} data_area处理完成！")
 
-    def main(self, proc_name: str):
+    def main(self, proc_name: str, schema="RPTUSER"):
         """replace_view_and_data_area"""
-        self.view_replace(proc_name)
-        procedure = Procedure(proc_name)
+        self.view_replace(proc_name, schema)
+        procedure = Procedure(proc_name, schema)
         procedure.data_area_deal()
 
 
