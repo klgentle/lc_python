@@ -240,7 +240,7 @@ class Procedure(object):
 
         return line
 
-    def deal_data_area_in_select(self) -> None:
+    def deal_data_area_in_sub_select(self) -> None:
         """ 
             处理子查询的data_area
             case 0: some_filed1, T.data_area, some_filed2
@@ -273,7 +273,7 @@ class Procedure(object):
             proc_cont_list[index] = self.data_area_replace(line)
 
         self.write_procedure("".join(proc_cont_list))
-        self.deal_data_area_in_select()
+        self.deal_data_area_in_sub_select()
 
 
 if __name__ == "__main__":
