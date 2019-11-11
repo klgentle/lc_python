@@ -240,6 +240,26 @@ class Procedure(object):
 
         return line
 
+    def deal_data_area_in_sub_select(self) -> None:
+        """ 
+            处理子查询的data_area
+            case 0: some_filed1, T.data_area, some_filed2
+            case 1:         ,T.data_area\n ,some_filed\n
+            case 2:         T.data_area,\n some_filed,\n
+            question re.sub替换了两个\n:
+            re \s matches any whitespace character, this is equivalent to the set [ \t\n\r\f\v].
+        """
+        logging.debug("deal data_area in select")
+        proc_cont = self.read_proc_cont()
+        comma_around_data_area = r",\s*(\w*.)?DATA_AREA\s*,"
+        # case 1, 2, 3
+        comma_before_or_after_data_area = r"(\s*)(,)?\s*(\w*.)?DATA_AREA\s*(,)?\s*"
+        proc_cont = re.sub(comma_around_data_area, r",", proc_cont, flags=re.IGNORECASE)
+        proc_cont = re.sub(
+            comma_before_or_after_data_area, r"\1", proc_cont, flags=re.IGNORECASE
+        )
+        self.write_procedure(proc_cont)
+
     @logging_begin_end
     def data_area_deal(self):
         """处理data_area """
@@ -249,11 +269,11 @@ class Procedure(object):
             os.path.join(self.__procedure_path, proc_file_name), "r", encoding="UTF-8"
         ) as pro:
             proc_cont_list = pro.readlines()
-        proc_cont_list = [item for item in proc_cont_list]  # item.upper()
         for index, line in enumerate(proc_cont_list):
             proc_cont_list[index] = self.data_area_replace(line)
 
         self.write_procedure("".join(proc_cont_list))
+        self.deal_data_area_in_sub_select()
 
 
 if __name__ == "__main__":
