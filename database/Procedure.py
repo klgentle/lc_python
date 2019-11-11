@@ -72,7 +72,7 @@ class Procedure(object):
         if search_obj:
             # add RPTUSER
             proc_cont = re.sub(
-                pattern, r"\1 RPTUSER.\2_", proc_cont, flags=re.IGNORECASE
+                pattern, r"\1 {}.\2_".format(self.__schema), proc_cont, flags=re.IGNORECASE
             )
             self.write_procedure(proc_cont)
 
