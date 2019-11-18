@@ -33,9 +33,9 @@ class ConvertibleBondAnalysis(object):
         try:
             bond_data = web.get_data_yahoo(code, open_date, open_date)
         except Exception as e:
-            print("Error:", e.__doc__) 
+            print("Error:", e.__doc__, e.__cause__, e.__context__) 
             return 0
-        # print(bond_data.head())
+        print(bond_data.loc[open_date, "Open"])
         # 取第一天开板价格
         return bond_data.loc[open_date, "Open"]
 
@@ -88,8 +88,9 @@ if __name__ == "__main__":
     obj = ConvertibleBondAnalysis()
     # 用正股价格去推算可转债上市价格
     #obj.get_bond_open_value("601818.ss", "2017-04-05")
+    obj.get_bond_open_value("002174.ss", "2019-10-21")
     # print(obj.date_change_format("2017/4/5"))
     #obj.test_data_index()
     #obj.test_data_detect2()
     #obj.test_data_detect()
-    obj.set_open_price()
+    #obj.set_open_price()
