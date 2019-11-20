@@ -4,3 +4,7 @@ class MyClass(object):
         self.name = name
         self.identifier = identifier 
         # self.set_up() ...
+
+if __name__ == "__main__":
+    a = MyClass()
+
