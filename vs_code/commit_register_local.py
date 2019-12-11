@@ -7,6 +7,7 @@ import sys
 import shutil, os
 import time
 import platform
+import re
 
 from sys import argv
 from date_add import date_add
@@ -104,7 +105,8 @@ class Solution:
                 file_list = path_list[-1].split(".")
                 # print(f"file_list:{file_list}")
                 file_name = file_list[0]
-                modu = file_name.upper().split("RPT_")
+                #modu = file_name.upper().split("RPT_")
+                modu = re.split("RPT_|ITF_", file_name.upper())
                 module = ""
                 if len(modu) > 1:
                     module = modu[1][:3]
