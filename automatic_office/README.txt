@@ -1,2 +1,1 @@
-TODO:
-生成word模板
+usage: python CheckInForm.py yyyymm 
