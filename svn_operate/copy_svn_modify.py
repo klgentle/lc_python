@@ -37,6 +37,7 @@ class CopyRegister(object):
         self.__data_list = []
         self.__procedure_name_list = []
         self.__error_file_type = set()
+        print("init complete")
 
     def init_path(self):
         home_path = configs.get("path").get("svn_home_path")
@@ -171,6 +172,7 @@ class CopyRegister(object):
             complecat method
         """
         file_name_path = map(lambda data_row: data_row[2:5], self.__data_list)
+        #print(f"data_list:{self.__data_list}_________________")
         file_name_path = map(
             lambda data: [
                 self.filename_normlize(data[0].strip()),
@@ -309,13 +311,19 @@ select OBJECT_NAME from ods_job_config where object_type = 'SP';
     def copy_file_from_register(self):
         """main function for call"""
         self.readAllRegister()
+        print("read complete")
         self.saveRegisterExcel()
+        print("save complete")
         register_data = self.register_data_normalize()
         self.__error_file_type = self.copyfiles(self.register_data_deal(register_data))
         self.listSqlFile()
+        print("list file complete")
         self.createConfigCheckSql()
+        print("create config done")
         self.write_bo_list()
+        print("write bo done")
         self.createZipfile()
+        print("all done")
 
         # if only rpt not find, send email
         # if not self.__error_file_type or self.__error_file_type == {"rpt"}:
@@ -324,6 +332,7 @@ select OBJECT_NAME from ods_job_config where object_type = 'SP';
 
 if __name__ == "__main__":
     # print("usage python[3] copy_upload_ubuntu.py '20190501'")
+    # print("usage python[3] copy_upload_ubuntu.py 20181201,20200114")
     date_str = time.strftime("%Y%m%d", time.localtime())
     if len(argv) > 1 and len(argv[1]) == 8:
         if int(date_str) - int(argv[1]) > 10:
