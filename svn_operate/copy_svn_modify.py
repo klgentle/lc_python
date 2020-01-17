@@ -6,7 +6,8 @@ import csv
 import os
 import time
 import platform
-#import pysvn
+
+# import pysvn
 
 import sys
 from sys import argv
@@ -31,7 +32,6 @@ class CopyRegister(object):
 
         self.init_path()
         self.svn = SvnOperate(self.__svnup_dir)
-        #svn_client = pysvn.Client()
         self.svn.update_windows_svn()
         self.make_or_clean_folder()
         self.__data_list = []
@@ -41,7 +41,7 @@ class CopyRegister(object):
 
     def init_path(self):
         home_path = configs.get("path").get("svn_home_path")
-        #if self.svn.is_system_windows():
+        # if self.svn.is_system_windows():
         if platform.uname().system == "Windows":
             home_path = configs.get("path").get("win_svn_home_path")
 
@@ -56,7 +56,6 @@ class CopyRegister(object):
 
         code_beta_path = os.path.join(home_path, "yx_walk", "beta")
         self.__beta_path = os.path.join(code_beta_path, self.date_str + "beta")
-
 
     def create_date_str_list(self, date_str):
         if date_str.find(",") > -1:
@@ -92,13 +91,20 @@ class CopyRegister(object):
         # copy excel file content
         wb = openpyxl.load_workbook(whole_filename)
         sheet = wb.active
+        # skip head
         for row in range(2, sheet.max_row + 1):
             name = sheet["C" + str(row)].value
-            # skip no name row record
+            # skip blank record
             if not name:
                 continue
+
             # 20 is hard code, if column is max than 20, should change the value
             data_row = [sheet[chr(i + ord("A")) + str(row)].value for i in range(0, 20)]
+            path = data_row[4]
+            # skip no path record
+            if not path:
+                print(f"No path, please check register: {data_row}_________________")
+                continue
             if isinstance(data_row[7], datetime):
                 data_row[7] = data_row[7].strftime("%Y%m%d")
 
@@ -129,7 +135,6 @@ class CopyRegister(object):
             filename = os.path.splitext(filename)[0]
         return filename
 
-
     @staticmethod
     def filetype_normlize(file_type):
         """
@@ -157,6 +162,7 @@ class CopyRegister(object):
             > filepath 标准化 
         """
         # fix 1300编码 to 1300_编码
+        # print(f"filepath:{filepath}________________")
         if filepath.find("1300编码") > -1:
             filepath = filepath.replace("1300编码", "1300_编码")
 
@@ -172,12 +178,12 @@ class CopyRegister(object):
             complecat method
         """
         file_name_path = map(lambda data_row: data_row[2:5], self.__data_list)
-        #print(f"data_list:{self.__data_list}_________________")
+        # print(f"data_list:{self.__data_list}_________________")
         file_name_path = map(
             lambda data: [
-                self.filename_normlize(data[0].strip()),
-                self.filetype_normlize(data[1].strip()),
-                self.filepath_normlize(data[2].strip()),
+                self.filename_normlize(data[0]),
+                self.filetype_normlize(data[1]),
+                self.filepath_normlize(data[2]),
             ],
             file_name_path,
         )
@@ -221,7 +227,7 @@ class CopyRegister(object):
                 if os.path.exists(source_file2):
                     shutil.copy(source_file2, target_path_file)
                 else:
-                    self.__error_file_type.add(whole_file_name.split('.')[1])
+                    self.__error_file_type.add(whole_file_name.split(".")[1])
                     print(f"error! No such file: {source_file} _______________")
 
         return self.__error_file_type
