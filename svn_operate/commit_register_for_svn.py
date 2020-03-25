@@ -184,3 +184,4 @@ if __name__ == "__main__":
     a.logRead()
     a.logRegister()
     a.commit_register()
+    print(f"time:{time_str}")

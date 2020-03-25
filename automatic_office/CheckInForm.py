@@ -23,38 +23,29 @@ class CheckInForm(object):
     """
 
     def __init__(self, year_month: str):
-        # date calculate # 2019-07-26 至 2019-08-25
+        # date calculate # 本月5号到下月4号
         if len(year_month) != 6:
             print("Please input year_month with format: YYYYMM!")
             sys.exit(1)
         self.__input_year = int(year_month[:4])
         self.__input_month = int(year_month[4:])
-        self.__input_day = 25
         self.__date_start = self.calculate_date_start()
-        self.__date_end = datetime.date(
-            self.__input_year, self.__input_month, self.__input_day
-        )
+        self.__date_end = self.calculate_date_end()
+
         self.__work_date_start = self.__date_start.strftime("%Y-%m-%d")
         self.__work_date_end = self.__date_end.strftime("%Y-%m-%d")
         self.__year_month = year_month
 
     def calculate_date_start(self) -> datetime.date:
-        year = self.__input_year
-        month = self.__input_month - 1
-        day = 26
-        if month == 0:
-            month = 12
-            year -= 1
-        return datetime.date(year, month, day)
+        return datetime.date(self.__input_year, self.__input_month, 5)
 
-    # def calculate_date_end(self) -> datetime.date:
-    #    year = self.__input_year
-    #    month = self.__input_month + 1
-    #    day = 25
-    #    if month == 13:
-    #        month = 1
-    #        year += 1
-    #    return datetime.date(year, month, day)
+    def calculate_date_end(self) -> datetime.date:
+        year = self.__input_year
+        month = self.__input_month + 1
+        if month == 13:
+            month = 12
+            year += 1
+        return datetime.date(year, month, 4)
 
     def get_all_nature_date(self) -> list:
         """
