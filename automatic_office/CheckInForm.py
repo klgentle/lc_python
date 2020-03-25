@@ -4,6 +4,7 @@ import os
 import re
 import sys
 import time
+import platform
 
 logging.basicConfig(level=logging.DEBUG, format="%(levelname)s: %(message)s")
 # 绝对路径的import
@@ -157,9 +158,13 @@ class CheckInForm(object):
 
         table = self.check_in_add_table(document, form_type)
         table.alignment = WD_TABLE_ALIGNMENT.CENTER
+
         document.save(
-            r".\doc_file\文思员工-{0}月签到表_新模版_{1}.docx".format(
-                self.__input_month, form_type_name_dict.get(form_type)
+            os.path.join(
+                "doc_file",
+                "文思员工-{0}月签到表_新模版_{1}.docx".format(
+                    self.__input_month, form_type_name_dict.get(form_type)
+                ),
             )
         )
         logging.info("Done!")
