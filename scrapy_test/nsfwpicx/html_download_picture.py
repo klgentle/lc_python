@@ -104,10 +104,10 @@ class GetNsfwPicture(object):
     def download_all_pictures(self, from_number, end_number):
         for i in range(from_number, end_number, -1):
             print("Deal with page index:", i)
+            self.download_one_html(i)
             # 休息，防止被封
             time.sleep(12)
-            print("Sleep 10 second")
-            self.download_one_html(i)
+            print("Sleep 12 second")
 
 
 if __name__ == "__main__":
