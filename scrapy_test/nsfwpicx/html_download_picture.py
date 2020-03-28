@@ -21,6 +21,16 @@ class GetNsfwPicture(object):
         # 删除非数字(-)的字符串
         return int(re.sub(r'\D', "", input_str))
 
+    @staticmethod
+    def change_char_to_number(filename)-> str:
+        # xxx.jpg to ord(x)ord(x)ord(x).jpg
+        name_list = filename.split(".")
+        pre_name = name_list[0]
+        for i in pre_name:
+            if not i.isdigit():
+                name_list[0] = pre_name.replace(i, str(ord(i)))
+        return ".".join(name_list)
+
     def get_picure_addrs(self, pageNumber):
         """
         获取单个页面中的全部图片地址
@@ -42,22 +52,23 @@ class GetNsfwPicture(object):
             read_number = self.find_read_number(str(read_num))
             print("read_number", read_number)
 
-            if read_number < 2000:
-                print("Read_number to small", pageNumber)
-                return (" ", None)
+            # 可能有坑，尤其是新页面阅读量少
+            #if read_number < 2000:
+            #    print("Read_number to small", pageNumber)
+            #    return (" ", None)
 
             # 精确定位地址集
             picture_text = soup.find_all(attrs={"itemprop": "articleBody"})
             tempList = re.findall(p, str(picture_text))
-            for each in tempList:
-                picList.append(each)
-                # print("-------------test each addr:", each)
+            for addr in tempList:
+                picList.append(addr)
+                # print("-------------test each addr:", addr)
             print("保存图片链接成功")
             tempList = []
         except Exception as e:
             print("保存图片链接失败:", e.__doc__)
         picList = sorted(list(set(picList)))
-        pprint.pprint(picList)
+        #pprint.pprint(picList)
 
         return (title, picList)
 
@@ -67,24 +78,23 @@ class GetNsfwPicture(object):
         root2 = os.path.join(self.root, str(pageNumber) + "_" + title.replace(" ", "_"))
         if not os.path.exists(root2):
             os.mkdir(root2)
+
         print("folder:", root2)
-        for each in picList:
-            # 过滤异常的文件
-            #if each.find("/") == -1:
-            #    print("no / address", each)
-            #    continue
-            filename = each.split("/")[-1]
-            path = os.path.join(root2, filename)
-            if not os.path.exists(path):
+        for addr in picList:
+            filename = addr.split("/")[-1]
+            # 解决 windows 不区分大小写的问题
+            filename = self.change_char_to_number(filename)
+            file_path = os.path.join(root2, filename)
+            if not os.path.exists(file_path):
                 # save file
-                r = requests.get(each, headers=self.kv)
+                r = requests.get(addr, headers=self.kv)
                 r.raise_for_status()
-                with open(path, "wb") as f:
+                with open(file_path, "wb") as f:
                     f.write(r.content)
-                #urllib.request.urlretrieve(each,filename=path)
+                #urllib.request.urlretrieve(addr,filename=file_path)
                 print("动图已保存", pageNumber)
-            else:
-                print("动图已存在")
+            #else:
+            #    print("动图已存在")
 
     
     def download_one_html(self, pageNumber):
@@ -105,6 +115,11 @@ if __name__ == "__main__":
     #pageNumber = 1162
     #g.download_one_html(pageNumber)
 
-    from_number = 1019
+    from_number = 1014
     end_number = 500 
     g.download_all_pictures(from_number, end_number)
+
+    #print("s57I.jpg")
+    #print(g.change_char_to_number("s57I.jpg"))
+    #print("s57i.jpg")
+    #print(g.change_char_to_number("s57i.jpg"))
