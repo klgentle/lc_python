@@ -25,10 +25,10 @@ class GetNsfwPicture(object):
     def change_char_to_number(filename)-> str:
         # xxx.jpg to ord(x)ord(x)ord(x).jpg
         name_list = filename.split(".")
-        pre_name = name_list[0]
-        for i in pre_name:
+        # 尽量不要用临时变量，容易误导人
+        for i in name_list[0]:
             if not i.isdigit():
-                name_list[0] = pre_name.replace(i, str(ord(i)))
+                name_list[0] = name_list[0].replace(i, str(ord(i)))
         return ".".join(name_list)
 
     def get_picure_addrs(self, pageNumber):
@@ -93,8 +93,8 @@ class GetNsfwPicture(object):
                     f.write(r.content)
                 #urllib.request.urlretrieve(addr,filename=file_path)
                 print("动图已保存", pageNumber)
-            #else:
-            #    print("动图已存在")
+            else:
+                print("-------------------动图已存在")
 
     
     def download_one_html(self, pageNumber):
@@ -115,11 +115,13 @@ if __name__ == "__main__":
     #pageNumber = 1162
     #g.download_one_html(pageNumber)
 
-    from_number = 1014
-    end_number = 500 
-    g.download_all_pictures(from_number, end_number)
+    #from_number = 1000
+    #end_number = 500 
+    #g.download_all_pictures(from_number, end_number)
 
-    #print("s57I.jpg")
-    #print(g.change_char_to_number("s57I.jpg"))
-    #print("s57i.jpg")
-    #print(g.change_char_to_number("s57i.jpg"))
+    #s = "sqbc.jpg"
+    #print(s)
+    #print(g.change_char_to_number(s))
+    #s = "SQBC.jpg"
+    #print(s)
+    #print(g.change_char_to_number(s))
