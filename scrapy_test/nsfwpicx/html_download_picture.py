@@ -1,12 +1,13 @@
 import requests
 import os
 import re
-from urllib.parse import quote_plus, unquote_plus
 import random
-from bs4 import BeautifulSoup
 #import urllib.request
 import time
 import pprint
+
+from bs4 import BeautifulSoup
+from urllib.parse import quote_plus, unquote_plus
 
 
 class GetNsfwPicture(object):
@@ -21,15 +22,15 @@ class GetNsfwPicture(object):
         # 删除非数字(-)的字符串
         return int(re.sub(r'\D', "", input_str))
 
-    @staticmethod
-    def change_char_to_number(filename)-> str:
-        # xxx.jpg to ord(x)ord(x)ord(x).jpg
-        name_list = filename.split(".")
-        # 尽量不要用临时变量，容易误导人
-        for i in name_list[0]:
-            if not i.isdigit():
-                name_list[0] = name_list[0].replace(i, str(ord(i)))
-        return ".".join(name_list)
+    #@staticmethod
+    #def change_char_to_number(filename)-> str:
+    #    # xxx.jpg to ord(x)ord(x)ord(x).jpg
+    #    name_list = filename.split(".")
+    #    # 尽量不要用临时变量，容易误导人
+    #    for i in name_list[0]:
+    #        if not i.isdigit():
+    #            name_list[0] = name_list[0].replace(i, str(ord(i)))
+    #    return ".".join(name_list)
 
     def get_picure_addrs(self, pageNumber):
         """
@@ -80,10 +81,11 @@ class GetNsfwPicture(object):
             os.mkdir(root2)
 
         print("folder:", root2)
-        for addr in picList:
-            filename = addr.split("/")[-1]
+        for i, addr in enumerate(picList):
             # 解决 windows 不区分大小写的问题
-            filename = self.change_char_to_number(filename)
+            filename = addr.split("/")[-1] + str(i)
+            #filename = self.change_char_to_number(filename)
+            #datetime.datetime.now().microsecond
             file_path = os.path.join(root2, filename)
             if not os.path.exists(file_path):
                 # save file
@@ -92,9 +94,9 @@ class GetNsfwPicture(object):
                 with open(file_path, "wb") as f:
                     f.write(r.content)
                 #urllib.request.urlretrieve(addr,filename=file_path)
-                print("动图已保存", pageNumber)
+                print("图片已保存")
             else:
-                print("-------------------动图已存在")
+                print("-------------------图片已存在")
 
     
     def download_one_html(self, pageNumber):
@@ -115,9 +117,9 @@ if __name__ == "__main__":
     #pageNumber = 1162
     #g.download_one_html(pageNumber)
 
-    #from_number = 1000
-    #end_number = 500 
-    #g.download_all_pictures(from_number, end_number)
+    from_number = 998 
+    end_number = 500 
+    g.download_all_pictures(from_number, end_number)
 
     #s = "sqbc.jpg"
     #print(s)
