@@ -98,7 +98,7 @@ class GetNsfwPicture(object):
                 #    f.write(r.content)
                 #urllib.request.urlretrieve(addr,filename=file_path)
                 # 多进程下载图片
-                subprocess.Popen(['curl', addr, '-o', file_path])
+                subprocess.Popen(['curl', addr, '-o', file_path, '--silent'])
 
                 print("图片已保存")
             else:
