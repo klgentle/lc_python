@@ -4,8 +4,9 @@ import re
 from urllib.parse import quote_plus, unquote_plus
 import random
 from bs4 import BeautifulSoup
-import urllib.request
+#import urllib.request
 import time
+import pprint
 
 
 class GetNsfwPicture(object):
@@ -22,6 +23,7 @@ class GetNsfwPicture(object):
 
     def get_picure_addrs(self, pageNumber):
         """
+        获取单个页面中的全部图片地址
         """
         url = "http://nsfwpicx.com/{}.html#".format(pageNumber)
         picList = []
@@ -41,7 +43,7 @@ class GetNsfwPicture(object):
             print("read_number", read_number)
 
             if read_number < 2000:
-                print("read_number to small")
+                print("Read_number to small", pageNumber)
                 return (" ", None)
 
             # 精确定位地址集
@@ -54,21 +56,23 @@ class GetNsfwPicture(object):
             tempList = []
         except Exception as e:
             print("保存图片链接失败:", e.__doc__)
+        picList = sorted(list(set(picList)))
+        pprint.pprint(picList)
 
         return (title, picList)
 
     def download_picture(self, title_picList, pageNumber):
         # root 保存目录
-        title, picList = title_picList[0], list(set(title_picList[1]))
+        title, picList = title_picList
         root2 = os.path.join(self.root, str(pageNumber) + "_" + title.replace(" ", "_"))
         if not os.path.exists(root2):
             os.mkdir(root2)
         print("folder:", root2)
         for each in picList:
             # 过滤异常的文件
-            if each.find("/") == -1:
-                print("no / address", each)
-                continue
+            #if each.find("/") == -1:
+            #    print("no / address", each)
+            #    continue
             filename = each.split("/")[-1]
             path = os.path.join(root2, filename)
             if not os.path.exists(path):
@@ -77,8 +81,6 @@ class GetNsfwPicture(object):
                 r.raise_for_status()
                 with open(path, "wb") as f:
                     f.write(r.content)
-                # 休息，防止被封
-                time.sleep(1)
                 #urllib.request.urlretrieve(each,filename=path)
                 print("动图已保存", pageNumber)
             else:
@@ -91,9 +93,10 @@ class GetNsfwPicture(object):
 
     def download_all_pictures(self, from_number, end_number):
         for i in range(from_number, end_number, -1):
-            print("deal with page index:", i)
+            print("Deal with page index:", i)
             # 休息，防止被封
-            time.sleep(20)
+            time.sleep(12)
+            print("Sleep 10 second")
             self.download_one_html(i)
 
 
@@ -102,6 +105,6 @@ if __name__ == "__main__":
     #pageNumber = 1162
     #g.download_one_html(pageNumber)
 
-    from_number = 1023
+    from_number = 1019
     end_number = 500 
     g.download_all_pictures(from_number, end_number)
