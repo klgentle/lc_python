@@ -30,37 +30,47 @@ class GetNsfwPicture(object):
         """
         url = "http://nsfwpicx.com/{}.html#".format(pageNumber)
         picList = []
-        try:
-            r = requests.get(url, headers=self.kv)
-            r.raise_for_status()
-            r.encoding = r.apparent_encoding
+        title = "_"
+        # try:
+        #    pass
+        # except Exception as e:
+        #    print("保存图片链接失败:", e.__doc__)
 
-            soup = BeautifulSoup(r.text, "html.parser")
-            title = soup.title.text.replace(" - Nsfwpicx", "")
-            p = re.compile("https://qpix.com/images/\d{4}/\d{2}/\d{2}/\w*\.jpg")
+        r = requests.get(url, headers=self.kv)
+        r.raise_for_status()
+        r.encoding = r.apparent_encoding
 
-            # 查找阅读人数
-            #read_num = soup.find_all(attrs={"class": "post-meta"})
-            #read_number = self.get_read_number(str(read_num))
-            #print("read_number", read_number)
+        soup = BeautifulSoup(r.text, "html.parser")
+        title = soup.title.text.replace(" - Nsfwpicx", "")
 
-            # 可能有坑，尤其是新页面阅读量少
-            # if read_number < 2000:
-            #    print("Read_number to small", pageNumber)
-            #    return (" ", None)
+        # 查找阅读人数
+        # read_num = soup.find_all(attrs={"class": "post-meta"})
+        # read_number = self.get_read_number(str(read_num))
+        # print("read_number", read_number)
 
-            # 精确定位地址集
-            picture_text = soup.find_all(attrs={"itemprop": "articleBody"})
-            # tempList = re.findall(p, r.text)
-            tempList = re.findall(p, str(picture_text))
-            for addr in tempList:
-                picList.append(addr)
-                # print("-------------test each addr:", addr)
+        ## 可能有坑，尤其是新页面阅读量少
+        # if read_number < 2000:
+        #    print("Read_number to small", pageNumber)
+        #    return (" ", None)
+
+        # 精确定位地址集
+        # picture_text = soup.find_all(attrs={"itemprop": "articleBody"})
+        # pprint.pprint("-------------picture_text",picture_text)
+
+        # pprint.pprint(r.text)
+        # p = re.compile("https://qpix.com/images/\d{4}/\d{2}/\d{2}/\w*\.jpg")
+        p = re.compile(
+            "(https://qpix.com/images/\d{4}/\d{2}/\d{2}/\w*\.jpg|http://85.117.234.129/images/\d{4}/\d{2}/\d{2}/\w*\.jpg)"
+        )
+        # tempList = re.findall(p, str(picture_text))
+        tempList = re.findall(p, r.text)
+        for addr in tempList:
+            picList.append(addr)
+            # print("-------------test each addr:", addr)
+        if len(picList) > 0:
             print("保存图片链接成功", pageNumber)
-            tempList = []
-        except Exception as e:
-            print("保存图片链接失败:", e.__doc__)
-        # pprint.pprint(list(set(picList)))
+        tempList = []
+        pprint.pprint(list(set(picList)))
 
         return (title, list(set(picList)))
 
@@ -74,31 +84,31 @@ class GetNsfwPicture(object):
 
         print("folder:", root2)
         # 切换目录
-        #os.chdir(root2)
+        # os.chdir(root2)
         for i, addr in enumerate(picList):
             # 解决 windows 不区分大小写的问题
             filename = "".join([str(i), "_", addr.split("/")[-1]])
             file_path = os.path.join(root2, filename)
 
             # 多进程下载图片
-            subprocess.Popen(['curl', addr, '-o', file_path, '--silent'])
+            # subprocess.Popen(['curl', addr, '-o', file_path, '--silent'])
+            subprocess.Popen(["curl", addr, "-o", file_path])
 
         print("图片下载中")
-        #print("Page {} finished in {:.3f} seconds".format(pageNumber,time.time()-start))
+        # print("Page {} finished in {:.3f} seconds".format(pageNumber,time.time()-start))
 
-            #if not os.path.exists(file_path):
-            #    pass
-            #    # save file
-            #    #r = requests.get(addr, headers=self.kv)
-            #    #r.raise_for_status()
-            #    #with open(file_path, "wb") as f:
-            #    #    f.write(r.content)
-            #    #urllib.request.urlretrieve(addr,filename=file_path)
-            #    #print("图片已保存")
+        # if not os.path.exists(file_path):
+        #    pass
+        #    # save file
+        #    #r = requests.get(addr, headers=self.kv)
+        #    #r.raise_for_status()
+        #    #with open(file_path, "wb") as f:
+        #    #    f.write(r.content)
+        #    #urllib.request.urlretrieve(addr,filename=file_path)
+        #    #print("图片已保存")
 
-
-            #else:
-            #    print("-------------------图片已存在")
+        # else:
+        #    print("-------------------图片已存在")
 
     def download_one_html(self, pageNumber):
         titlelist = self.get_picure_addrs(pageNumber)
@@ -108,16 +118,18 @@ class GetNsfwPicture(object):
         for i in range(from_number, end_number, -1):
             print("Deal with page index:", i)
             self.download_one_html(i)
-            # 休息，防止被封
-            time.sleep(20)
-            print("---------Sleep 20 second--------- ...\n")
+            # 休息，防止被封, 等并行的下载完成
+            sleep_second = 30
+            print("---------Sleep {} second start--------- ...".format(sleep_second))
+            time.sleep(sleep_second)
+            print("---------Sleep {} second end---------\n".format(sleep_second))
 
 
 if __name__ == "__main__":
     g = GetNsfwPicture()
-    # pageNumber = 1162
-    # g.download_one_html(pageNumber)
+    pageNumber = 881
+    g.download_one_html(pageNumber)
 
-    from_number = 986
-    end_number = 500
-    g.download_all_pictures(from_number, end_number)
+    # from_number = 881
+    # end_number = 500
+    # g.download_all_pictures(from_number, end_number)
