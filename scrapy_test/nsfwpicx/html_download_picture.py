@@ -20,19 +20,9 @@ class GetNsfwPicture(object):
         self.root = "/mnt/d/code_test/game_test/nsf"
 
     @staticmethod
-    def find_read_number(input_str) -> int:
+    def get_read_number(input_str) -> int:
         # 删除非数字(-)的字符串
         return int(re.sub(r"\D", "", input_str))
-
-    # @staticmethod
-    # def change_char_to_number(filename)-> str:
-    #    # xxx.jpg to ord(x)ord(x)ord(x).jpg
-    #    name_list = filename.split(".")
-    #    # 尽量不要用临时变量，容易误导人
-    #    for i in name_list[0]:
-    #        if not i.isdigit():
-    #            name_list[0] = name_list[0].replace(i, str(ord(i)))
-    #    return ".".join(name_list)
 
     def get_picure_addrs(self, pageNumber):
         """
@@ -48,12 +38,11 @@ class GetNsfwPicture(object):
             soup = BeautifulSoup(r.text, "html.parser")
             title = soup.title.text.replace(" - Nsfwpicx", "")
             p = re.compile("https://qpix.com/images/\d{4}/\d{2}/\d{2}/\w*\.jpg")
-            # tempList = re.findall(p, r.text)
 
             # 查找阅读人数
-            read_num = soup.find_all(attrs={"class": "post-meta"})
-            read_number = self.find_read_number(str(read_num))
-            print("read_number", read_number)
+            #read_num = soup.find_all(attrs={"class": "post-meta"})
+            #read_number = self.get_read_number(str(read_num))
+            #print("read_number", read_number)
 
             # 可能有坑，尤其是新页面阅读量少
             # if read_number < 2000:
@@ -62,21 +51,22 @@ class GetNsfwPicture(object):
 
             # 精确定位地址集
             picture_text = soup.find_all(attrs={"itemprop": "articleBody"})
+            # tempList = re.findall(p, r.text)
             tempList = re.findall(p, str(picture_text))
             for addr in tempList:
                 picList.append(addr)
                 # print("-------------test each addr:", addr)
-            print("保存图片链接成功")
+            print("保存图片链接成功", pageNumber)
             tempList = []
         except Exception as e:
             print("保存图片链接失败:", e.__doc__)
-        picList = sorted(list(set(picList)))
-        # pprint.pprint(picList)
+        # pprint.pprint(list(set(picList)))
 
-        return (title, picList)
+        return (title, list(set(picList)))
 
     def download_picture(self, title_picList, pageNumber):
         # root 保存目录
+        start = time.time()
         title, picList = title_picList
         root2 = os.path.join(self.root, str(pageNumber) + "_" + title.replace(" ", "_"))
         if not os.path.exists(root2):
@@ -84,25 +74,31 @@ class GetNsfwPicture(object):
 
         print("folder:", root2)
         # 切换目录
-        os.chdir(root2)
+        #os.chdir(root2)
         for i, addr in enumerate(picList):
             # 解决 windows 不区分大小写的问题
             filename = "".join([str(i), "_", addr.split("/")[-1]])
             file_path = os.path.join(root2, filename)
 
-            if not os.path.exists(file_path):
-                # save file
-                #r = requests.get(addr, headers=self.kv)
-                #r.raise_for_status()
-                #with open(file_path, "wb") as f:
-                #    f.write(r.content)
-                #urllib.request.urlretrieve(addr,filename=file_path)
-                # 多进程下载图片
-                subprocess.Popen(['curl', addr, '-o', file_path, '--silent'])
+            # 多进程下载图片
+            subprocess.Popen(['curl', addr, '-o', file_path, '--silent'])
 
-                print("图片已保存")
-            else:
-                print("-------------------图片已存在")
+        print("图片下载中")
+        #print("Page {} finished in {:.3f} seconds".format(pageNumber,time.time()-start))
+
+            #if not os.path.exists(file_path):
+            #    pass
+            #    # save file
+            #    #r = requests.get(addr, headers=self.kv)
+            #    #r.raise_for_status()
+            #    #with open(file_path, "wb") as f:
+            #    #    f.write(r.content)
+            #    #urllib.request.urlretrieve(addr,filename=file_path)
+            #    #print("图片已保存")
+
+
+            #else:
+            #    print("-------------------图片已存在")
 
     def download_one_html(self, pageNumber):
         titlelist = self.get_picure_addrs(pageNumber)
@@ -113,8 +109,8 @@ class GetNsfwPicture(object):
             print("Deal with page index:", i)
             self.download_one_html(i)
             # 休息，防止被封
-            time.sleep(12)
-            print("Sleep 12 second")
+            time.sleep(20)
+            print("---------Sleep 20 second--------- ...\n")
 
 
 if __name__ == "__main__":
@@ -122,6 +118,6 @@ if __name__ == "__main__":
     # pageNumber = 1162
     # g.download_one_html(pageNumber)
 
-    from_number = 995
+    from_number = 986
     end_number = 500
     g.download_all_pictures(from_number, end_number)
