@@ -3,7 +3,7 @@ import pandas as pd
 from datetime import datetime
 import backtrader as bt
 import matplotlib.pyplot as plt
-#%matplotlib inline   #SyntaxError: invalid syntax
+#%matplotlib inline   #在jupyter notebook上运行
 
 #正常显示画图时出现的中文和负号
 from pylab import mpl
@@ -64,3 +64,27 @@ data = bt.feeds.PandasData(dataname=dataframe,fromdate=start,todate=end)
 
 
 
+# 初始化cerebro回测系统设置                           
+cerebro = bt.Cerebro()  
+#将数据传入回测系统
+cerebro.adddata(data) 
+# 将交易策略加载到回测系统中
+cerebro.addstrategy(my_strategy1) 
+# 设置初始资本为10,000
+startcash = 10000
+cerebro.broker.setcash(startcash) 
+# 设置交易手续费为 0.2%
+cerebro.broker.setcommission(commission=0.002) 
+
+
+d1=start.strftime('%Y%m%d')
+d2=end.strftime('%Y%m%d')
+print(f'初始资金: {startcash}\n回测期间：{d1}:{d2}')
+#运行回测系统
+cerebro.run()
+#获取回测结束后的总资金
+portvalue = cerebro.broker.getvalue()
+pnl = portvalue - startcash
+#打印结果
+print(f'总资金: {round(portvalue,2)}')
+print(f'净收益: {round(pnl,2)}')
