@@ -58,8 +58,15 @@ class Holiday(object):
 if __name__ == "__main__":
     obj = Holiday()
     # print(obj.api_holiday("20190929"))
-    print(obj.is_holiday("20200101"))
-    print(obj.is_holiday("20200130"))
-    print(obj.is_holiday("20200119"))
-    print(obj.is_holiday("20200118"))
-    print(obj.is_holiday("20200112"))
+    print(20200101)
+    assert obj.is_holiday("20200101") is True
+    print(20200130)
+    assert obj.is_holiday("20200130") is True
+    print(20200119)
+    assert obj.is_holiday("20200119") is False
+    print(20200118)
+    assert obj.is_holiday("20200118") is True
+    print(20200112)
+    assert obj.is_holiday("20200112") is True
+    print(20200326)
+    assert obj.is_holiday("20200326") is False 
