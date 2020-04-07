@@ -91,11 +91,8 @@ class GetNsfwPicture(object):
             file_path = os.path.join(root2, filename)
 
             # 多进程下载图片
-            # subprocess.Popen(['curl', addr, '-o', file_path, '--silent'])
-            subprocess.Popen(["curl", addr, "-o", file_path])
-
-        print("图片下载中")
-        # print("Page {} finished in {:.3f} seconds".format(pageNumber,time.time()-start))
+            subprocess.Popen(['curl', addr, '-o', file_path, '--silent'])
+            print("图片下载中", pageNumber)
 
         # if not os.path.exists(file_path):
         #    pass
@@ -127,9 +124,10 @@ class GetNsfwPicture(object):
 
 if __name__ == "__main__":
     g = GetNsfwPicture()
-    pageNumber = 881
-    g.download_one_html(pageNumber)
+    #pageNumber = 881
+    #g.download_one_html(pageNumber)
 
-    # from_number = 881
-    # end_number = 500
-    # g.download_all_pictures(from_number, end_number)
+    from_number = 1249
+    end_number = 1229
+    #end_number = 1200
+    g.download_all_pictures(from_number, end_number)
