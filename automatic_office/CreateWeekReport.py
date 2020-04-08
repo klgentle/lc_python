@@ -11,6 +11,16 @@ import pprint
 class CreateWeekReport(object):
     def __init__(self):
         pass
+    
+    @staticmethod
+    def get_from_end_str(date_tuple:tuple)->: str
+        """
+        date_tuple: (datetime.date(2020, 3, 5), datetime.date(2020, 3, 7))
+        """
+        return "-".join([datetime.datetime.strftime(date_tuple[0],'%Y%m%d'),
+                         datetime.datetime.strftime(date_tuple[1],'%Y%m%d')])
+
+
 
     # @pysnooper.snoop()
     # 查看一下，为什么默认值没有显示设置为空，结果会变？
