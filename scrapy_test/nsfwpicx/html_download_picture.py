@@ -112,22 +112,34 @@ class GetNsfwPicture(object):
         self.download_picture(titlelist, pageNumber)
 
     def download_all_pictures(self, from_number, end_number):
-        for i in range(from_number, end_number, -1):
+        for i in range(from_number, end_number-1, -1):
             print("Deal with page index:", i)
             self.download_one_html(i)
             # 休息，防止被封, 等并行的下载完成
-            sleep_second = 30
+            sleep_second = 20
             print("---------Sleep {} second start--------- ...".format(sleep_second))
             time.sleep(sleep_second)
             print("---------Sleep {} second end---------\n".format(sleep_second))
 
+    def download_list_pictures(self, index_list):
+        for i in index_list:
+            print("Deal with page index:", i)
+            self.download_one_html(i)
+            # 休息，防止被封, 等并行的下载完成
+            sleep_second = 20
+            print("---------Sleep {} second start--------- ...".format(sleep_second))
+            time.sleep(sleep_second)
+            print("---------Sleep {} second end---------\n".format(sleep_second))
 
 if __name__ == "__main__":
     g = GetNsfwPicture()
     #pageNumber = 881
     #g.download_one_html(pageNumber)
 
-    from_number = 1249
-    end_number = 1229
-    #end_number = 1200
-    g.download_all_pictures(from_number, end_number)
+    #from_number = 1289
+    #end_number = 1289
+    ##end_number = 1200
+    #g.download_all_pictures(from_number, end_number)
+
+    index_list = [1289, 1285]
+    g.download_list_pictures(index_list)
