@@ -77,6 +77,7 @@ class CheckInForm(object):
                 "----------------{0}------------".format(from_date.strftime("%Y%m%d"))
             )
 
+        # TODO write work_date
         return all_work_date
 
     def check_in_add_table(self, document: object, form_type: str):
