@@ -28,7 +28,12 @@ class CreateWeekReport(object):
 
     @staticmethod
     def copy_file(from_end_str: str):
-        from_dir = os.path.join("automatic_office", "doc_file")
+        # from_dir = "doc_file"
+        from_dir = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)) + "/../",
+            "automatic_office",
+            "doc_file",
+        )
         from_file = "创兴银行香港ODS项目周报_董坚_from_end_str.docx"
         shutil.copy(
             os.path.join(from_dir, from_file),

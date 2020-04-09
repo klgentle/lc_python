@@ -6,5 +6,112 @@ def sqlFormat(sql: str) -> str:
 
 
 if __name__ == "__main__":
-    sql = """select * from (select a, b, sum(c) from foo where d = 1 and e in ('a', 'b') group by f) t1 join (select a, g from bar) t2 on t1.a = t2.a left outer join t3 on t1.a = t3.a"""
+    sql = """WITH TMP_CUSTOMER_NAME AS
+(
+    SELECT
+         T61.ID
+        ,T61.NAME_1||' '||T61.NAME_2        AS CUST_NAME
+    FROM ODSUSER.CBS_FH00_CUSTOMER_M T61 --CUSTOMER INFO
+    WHERE T61.M = '1'
+      AND T61.S = '1'
+      AND T61.DATA_DATE = date'2019-12-31'
+)
+SELECT DISTINCT
+    date'2019-12-31'                                                                            AS DATA_DATE
+    --,T1.DATA_DATE
+    ,REPLACE(SUBSTR(TO_CHAR(T2.LGAC_ACCOUNT_NO, '99999,99,999999,9'),4),',', '-')              AS LG_A_C_NO
+    ,REPLACE(T61.CUST_NAME||CHR(10)||NVL(T62.CUST_NAME,' ')||CHR(10)||NVL(T63.CUST_NAME,' ')
+      ||CHR(10)||NVL(T64.CUST_NAME,' ')||CHR(10)||NVL(T65.CUST_NAME,' '),CHR(10)||' ',NULL)    AS CUST_NAME1            -- write 5 lines in one field, and delete blank line dongjian 20190918
+                                                                                                                        --,T1.LGI_AMT-T1.LGI_REDEEM_AMT AS BALANCE_HKE
+    ,NVL(T11.BALANCE_HKE,0)                                                                    AS BALANCE_HKE           -- DONGJIAN 20190919
+    ,NVL(RPTUSER.F_EX_OTH_TO_HKD(T3.LIMIT_CURRENCY,T3.LIMIT_AMOUNT,T1.DATA_DATE),0)            AS LG_LIMIT_HKE
+    ,CASE WHEN T9.COLLATERAL_TYPE IN ('10','11') THEN RPTUSER.FUC_FORMAT_AC_NO(T5.ACCOUNT_NO)
+          ELSE T10.DESCRIPTION
+          END                                                                                  AS COLLATERAL_TYPE
+    ,CASE WHEN T9.COLLATERAL_TYPE IN ('10','11') THEN NVL(RPTUSER.F_EX_OTH_TO_HKD(T9.CURRENCY,T9.NOMINAL_VALUE,T1.DATA_DATE),0)
+          ELSE NULL
+          END                                                                                  AS F_D_AMOUNT_HKE
+
+    ,CASE WHEN NVL(T9.COLLATERAL_TYPE, 'NULL') NOT IN ('10','11') AND T9.COLLATERAL_CODE = '70' THEN NVL(RPTUSER.F_EX_OTH_TO_HKD(T9.CURRENCY,T9.NOMINAL_VALUE,T1.DATA_DATE),0)    -- DONGJIAN 20191126 MAINIS#13496
+          WHEN NVL(T9.COLLATERAL_TYPE, 'NULL') NOT IN ('10','11') THEN NVL(RPTUSER.F_EX_OTH_TO_HKD(T9.CURRENCY,T9.NOMINAL_VALUE,T1.DATA_DATE),0)                                  -- [GENE 20200216], fixing collateral value
+          ELSE NULL
+          END                                                                                  AS VALUATION_HKE
+    ,0                                                                                         AS TTL_F_D               --BO DO IT
+    ,0                                                                                         AS TTL                   --BO DO IT
+    ,CASE WHEN T9.COLLATERAL_TYPE IN ('10','11') THEN 1 ELSE 0 END                             AS IS_COLL_TYPE_10_11
+
+FROM ODSUSER.LGR_LG_ISSUES T1
+LEFT JOIN ODSUSER.LGR_LG_ACCOUNTS T2 --LG INFO  -- CHANGE LEFT JOIN TO INNER JOIN DONGJIAN 20190917
+     ON T2.DATA_DATE = T1.DATA_DATE
+    AND T1.LGAC_ACCOUNT_NO = T2.LGAC_ACCOUNT_NO
+
+LEFT JOIN
+(
+    SELECT
+         T.LGAC_ACCOUNT_NO                                                                  AS LGAC_ACCOUNT_NO
+        ,SUM(NVL(RPTUSER.F_EX_OTH_TO_HKD(T.LGI_CURRENCY_CODE, T.LGI_AMT, T.DATA_DATE), 0))  AS BALANCE_HKE
+    FROM ODSUSER.LGR_LG_ISSUES T
+    WHERE T.LGI_ISSUE_DATE <= date'2019-12-31'  -- DONGJIAN 20190918 according to RFS
+      AND T.DATA_DATE = date'2019-12-31'
+    GROUP BY T.LGAC_ACCOUNT_NO
+) T11 ON T2.LGAC_ACCOUNT_NO = T11.LGAC_ACCOUNT_NO  --BALANCE_HKE 要SUM起来
+
+LEFT JOIN
+(
+    SELECT DISTINCT      -- DUPLICATE DATAS FIX DONGJIAN 20190918
+         LIMIT_CURRENCY
+        ,LIMIT_AMOUNT
+        ,LIMIT_ID
+        ,AVAILABLE_MARKER
+    FROM RPTUSER.RPT_LIMIT_MID
+    WHERE DATA_DATE = date'2019-12-31'
+) T3 ON T2.LGAC_LIMIT_ID = T3.LIMIT_ID --LIMIT INFO
+
+/*
+LEFT JOIN RPTUSER.RPT_COLLATERAL_MID T4 --COLLATERAL INFO
+    ON T4.DATA_DATE = date'2019-12-31'
+   AND T3.LIMIT_ID = T4.LIMIT_REFERENCE
+*/
+
+LEFT JOIN TMP_CUSTOMER_NAME T61 ON T2.LGAC_CUSTOMER_ID1 = T61.ID        -- DONGJIAN 20190917
+LEFT JOIN TMP_CUSTOMER_NAME T62 ON T2.LGAC_CUSTOMER_ID2 = T62.ID        -- DONGJIAN 20190917
+LEFT JOIN TMP_CUSTOMER_NAME T63 ON T2.LGAC_CUSTOMER_ID3 = T63.ID        -- DONGJIAN 20190917
+LEFT JOIN TMP_CUSTOMER_NAME T64 ON T2.LGAC_CUSTOMER_ID4 = T64.ID        -- DONGJIAN 20190917
+LEFT JOIN TMP_CUSTOMER_NAME T65 ON T2.LGAC_CUSTOMER_ID5 = T65.ID        -- DONGJIAN 20190917
+
+LEFT JOIN
+(
+    SELECT DISTINCT
+        T7.ID
+       ,T7.LIMIT_REFERENCE                                  --DONGJIAN 20190918
+    FROM ODSUSER.CBS_FH00_COLLATERAL_RIGHT_M T7             --COLLATERAL RIGHT
+    LEFT JOIN ODSUSER.CBS_FH00_COLLATERAL_RIGHT T8          --COLLATERAL RIGHT
+        ON T8.ID = T7.ID
+       AND T8.DATA_DATE = date'2019-12-31'
+    WHERE (TO_DATE(T8.EXPIRY_DATE,'YYYY-MM-DD') >= date'2019-12-31' OR T8.EXPIRY_DATE IS NULL)
+       /*AND T7.M = '1' AND T7.S = '1'*/  -- DONGJIAN 20190918
+       AND T7.LIMIT_REFERENCE IS NOT NULL -- NULL VALUE CAN'T JOIN DONGJIAN 20190919
+       AND T7.DATA_DATE = date'2019-12-31'
+) T7 ON T7.LIMIT_REFERENCE = T2.LGAC_LIMIT_ID
+
+LEFT JOIN ODSUSER.CBS_FH00_COLLATERAL T9
+    ON T9.ID = T7.ID || '.1'
+   AND (TO_DATE(T9.EXPIRY_DATE,'YYYY-MM-DD') >= date'2019-12-31' OR T9.EXPIRY_DATE IS NULL) -- DONGJIAN 20190918
+   AND T9.DATA_DATE = date'2019-12-31'
+
+LEFT JOIN RPTUSER.RPT_AA_ARRANGEMENT_TD_MID T5 --FIX DEPOSIT INFO
+    ON T5.ARRANGEMENT = T9.APPLICATION_ID     -- DONGJIAN 20190917
+   AND T5.DATA_DATE = date'2019-12-31'
+
+LEFT JOIN ODSUSER.CBS_FH00_COLLATERAL_TYPE_M T10
+    ON T9.COLLATERAL_TYPE = T10.ID
+   AND M = '1' AND S = '1'
+   AND T10.DATA_DATE = date'2019-12-31'
+
+WHERE (T3.LIMIT_ID IS NULL OR T3.AVAILABLE_MARKER = 'Y')  -- DONGJIAN 20190917
+   AND T1.LGI_STATUS = 'O'
+   --AND T1.LGI_DUE_DATE > date'2019-12-31'  --- LGI_DUE_DATE 不能限制，不然会过滤数据
+   --AND TRUNC(T1.DATA_DATE,'MM') = TRUNC(date'2019-12-31','MM')
+   AND T2.LGAC_ACCOUNT_NO = '49259490006119'
+;"""
     print(sqlFormat(sql))

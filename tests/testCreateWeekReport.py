@@ -11,6 +11,7 @@ BASE_DIR = dirname(dirname(os.path.abspath(__file__)))
 sys.path.append(BASE_DIR)
 from automatic_office.CreateWeekReport import CreateWeekReport
 
+
 class testCreateWeekReport(unittest.TestCase):
     def setUp(self):
         print("setUp...")
@@ -18,8 +19,19 @@ class testCreateWeekReport(unittest.TestCase):
 
     def test_copy_file(self):
         self.report.copy_file("20200305-20200306")
-        file_path = os.path.join("automatic_office","doc_file", "创兴银行香港ODS项目周报_董坚_20200305-20200306")
-        assert os.path.exists(file_path) 
+        file_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)) + "/../",
+            "automatic_office",
+            "doc_file",
+            "创兴银行香港ODS项目周报_董坚_20200305-20200306.docx",
+        )
+        assert os.path.exists(file_path) is True
+
+    def test_replace_date_str(self):
+        content = "lslldf from_end_str"
+        assert self.report.replace_date_str(content,"from_end_str","20200305-20200306") == "lslldf 20200305-20200306"
+
+        
 
     def tearDown(self):
         print("tearDown...")
