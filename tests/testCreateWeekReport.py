@@ -4,6 +4,7 @@ from os.path import dirname
 import datetime
 import pprint
 import unittest
+import docx
 
 # 项目根目录
 BASE_DIR = dirname(dirname(os.path.abspath(__file__)))
@@ -16,9 +17,17 @@ class testCreateWeekReport(unittest.TestCase):
     def setUp(self):
         print("setUp...")
         self.report = CreateWeekReport("202003")
+        self.target_file = os.path.join(
+            self.report.from_dir,
+            self.report.from_file.replace("fromEndStr", "20200305-20200306"),
+        )
+        self.target_file2 = os.path.join(
+            self.report.from_dir,
+            self.report.from_file.replace("fromEndStr", "20200305-20200306_"),
+        )
 
     def test_copy_file(self):
-        self.report.copy_file("20200305-20200306")
+        self.report.copy_file(self.target_file)
         file_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)) + "/../",
             "automatic_office",
@@ -29,9 +38,17 @@ class testCreateWeekReport(unittest.TestCase):
 
     def test_replace_date_str(self):
         content = "lslldf from_end_str"
-        assert self.report.replace_date_str(content,"from_end_str","20200305-20200306") == "lslldf 20200305-20200306"
+        assert (
+            self.report.replace_date_str(content, "from_end_str", "20200305-20200306")
+            == "lslldf 20200305-20200306"
+        )
 
-        
+    def test_check_and_change(self):
+        date_tuple = (datetime.date(2020, 3, 5), datetime.date(2020, 3, 6))
+        document = docx.Document(self.target_file)
+        document = self.report.check_and_change(document, date_tuple)
+        document.save(self.target_file)
+        # 无法 assert 只能肉眼看 
 
     def tearDown(self):
         print("tearDown...")
