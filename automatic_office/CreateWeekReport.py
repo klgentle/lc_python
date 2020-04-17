@@ -6,7 +6,7 @@ import sys
 import shutil
 import docx
 from xlrd import open_workbook
-import xlutils
+from xlutils.copy import copy
 
 
 # 绝对路径的import
@@ -67,14 +67,16 @@ class CreateWeekReport(object):
         return document
 
     def check_excel_change(self, file_name, date_tuple: tuple):
-        file_path = os.path.join(os.from_dir, file_name)
+        file_path = os.path.join(self.from_dir, file_name)
         wb = open_workbook(file_path)
         sheet = wb.sheet_by_index(0)
-        newwb = xlutils.copy(wb)
+        #newwb = xlutils.copy(wb)
+        newwb = copy(wb)
         newsheet = newwb.get_sheet(0)
 
-        for row in range(sheet.get_rows()):
-            for col in range(sheet.get_cols()):
+        #for row in range(sheet.get_rows()):
+        for row in range(sheet.nrows):
+            for col in range(sheet.ncols):
                 if sheet.cell(row, col).value in ("fromEndStr","fromDate", "endDate"):
                     newsheet.write(row, col, self.replace_all_str(sheet.cell(row, col).value, date_tuple))
                     print(f"excel value{sheet.cell(row, col).value}")
