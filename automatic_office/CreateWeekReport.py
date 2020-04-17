@@ -5,8 +5,8 @@ import os
 import sys
 import shutil
 import docx
-from xlrd import open_workbook
-from xlutils.copy import copy
+
+import openpyxl
 
 
 # 绝对路径的import
@@ -45,7 +45,7 @@ class CreateWeekReport(object):
             content = content.replace(date_name, date_str)
         return content
 
-    def replace_all_str(self, text:str, date_tuple: tuple)->str:
+    def replace_all_str(self, text: str, date_tuple: tuple) -> str:
         text = self.replace_date_str(
             text, "fromEndStr", self.interval.get_from_end_str(date_tuple)
         )
@@ -56,58 +56,48 @@ class CreateWeekReport(object):
             text, "endDate", self.interval.get_end_date(date_tuple)
         )
         return text
-         
 
     def check_word_change(self, document, date_tuple: tuple):
         for para in document.paragraphs:
             for i, run in enumerate(para.runs):
                 run.text = self.replace_all_str(run.text, date_tuple)
                 # test
-                #print(f"i:{i},run:{run.text}")
+                # print(f"i:{i},run:{run.text}")
         return document
 
     def check_excel_change(self, file_name, date_tuple: tuple):
         file_path = os.path.join(self.from_dir, file_name)
-        wb = open_workbook(file_path)
-        sheet = wb.sheet_by_index(0)
-        #newwb = xlutils.copy(wb)
-        newwb = copy(wb)
-        newsheet = newwb.get_sheet(0)
+        wb = openpyxl.load_workbook(file_path)
+        sheet = wb.active
 
-        #for row in range(sheet.get_rows()):
-        for row in range(sheet.nrows):
-            for col in range(sheet.ncols):
-                if sheet.cell(row, col).value in ("fromEndStr","fromDate", "endDate"):
-                    newsheet.write(row, col, self.replace_all_str(sheet.cell(row, col).value, date_tuple))
-                    print(f"excel value{sheet.cell(row, col).value}")
-        newwb.save(file_path)
+        for row in range(1, sheet.max_row + 1):
+            for col in range(1, sheet.max_column + 1):
+                if sheet.cell(row, col).value in ("fromEndStr", "fromDate", "endDate"):
+                    # print(f"excel value:[{sheet.cell(row, col).value}]")
+                    # 替换单元格的值
+                    sheet.cell(row, col).value = self.replace_all_str(
+                        sheet.cell(row, col).value, date_tuple
+                    )
+
+        wb.save(file_path)
 
     def create_week_report(self):
-        # todo
         weekdays = CheckInForm(self.year_month).get_all_work_date()
         for date_tuple in self.interval.get_all_weekday_interval(weekdays, []):
             from_end_str = self.interval.get_from_end_str(date_tuple)
-            # from_date = self.interval.get_from_date(date_tuple)
-            # end_date = self.interval.get_end_date(date_tuple)
 
-            # 保存时要重命名,先建立临时文件
-            temp_file_name = self.from_file.replace("fromEndStr", "".join(from_end_str,"_temp"))
-            temp_file = os.path.join(self.from_dir, temp_file_name)
+            word_file_name = self.from_file.replace("fromEndStr", from_end_str)
+            word_file = os.path.join(self.from_dir, word_file_name)
             # copy word file
-            self.copy_file(self.from_file,temp_file)
+            self.copy_file(self.from_file, word_file)
             # replace content
-            document = docx.Document(temp_file)
+            document = docx.Document(word_file)
             document = self.check_word_change(document, date_tuple)
-
-            # 保存时文件对象会丢失
-            # TODO 怎么用 python 修改 word 中的对象?
-            document.save(temp_file.replace("_temp",""))
-            print(f"delete temp file")
-            shutil.rmtree(temp_file)
+            document.save(word_file)
 
             excel_file_name = self.from_excel.replace("fromEndStr", from_end_str)
             # copy excel file
-            self.copy_file(self.from_excel,excel_file_name)
+            self.copy_file(self.from_excel, os.path.join(self.from_dir, excel_file_name))
             self.check_excel_change(excel_file_name, date_tuple)
 
 
@@ -117,3 +107,4 @@ if __name__ == "__main__":
         sys.exit(1)
 
     obj = CreateWeekReport(sys.argv[1])
+    obj.create_week_report()
