@@ -28,7 +28,9 @@ class GetNsfwPicture(object):
         """
         获取单个页面中的全部图片地址
         """
-        url = "http://nsfwpicx.com/{}.html#".format(pageNumber)
+        #url = "http://nsfwpicx.com/{}.html#".format(pageNumber)
+        #url = "http://nsfwpicx.com/2020/04/11/{}.html".format(pageNumber)
+        url = "http://nsfwpicx.com/2020/04/14/1333.html"
         picList = []
         title = "_"
         # try:
@@ -141,5 +143,5 @@ if __name__ == "__main__":
     ##end_number = 1200
     #g.download_all_pictures(from_number, end_number)
 
-    index_list = [1289, 1285]
+    index_list = [1333]
     g.download_list_pictures(index_list)
