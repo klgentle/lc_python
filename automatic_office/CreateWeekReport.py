@@ -32,21 +32,25 @@ class CreateWeekReport(object):
             os.path.dirname(os.path.abspath(__file__)) + "/../",
             "automatic_office",
             "doc_file",
-            "董坚",
         )
-        if not os.path.exists(self.__from_dir):
-            os.makedirs(self.__from_dir, exist_ok=True)
+        self.__target_dir = self.get_target_dir()
         self.from_word = "创兴银行香港ODS项目周报_董坚_fromEndStr.docx"
         self.from_excel = "创兴银行香港ODS项目周报_董坚_fromEndStr.xlsx"
 
     def get_from_dir(self):
         return self.__from_dir
 
+    def get_target_dir(self):
+        target_dir = os.path.join(self.__from_dir, "文思周报", "董坚")
+        if not os.path.exists(target_dir):
+            os.makedirs(target_dir, exist_ok=True)
+        return target_dir
+
     def copy_file(self, from_file_name, target_file_name: str):
         logging.info("创建文件:%s" % target_file_name)
         shutil.copy(
             os.path.join(self.__from_dir, from_file_name),
-            os.path.join(self.__from_dir, target_file_name),
+            os.path.join(self.__target_dir, target_file_name),
         )
 
     @staticmethod
@@ -70,7 +74,7 @@ class CreateWeekReport(object):
 
     def check_word_change(self, file_name, date_tuple: tuple):
         logging.info("replace word")
-        word_file = os.path.join(self.__from_dir, file_name)
+        word_file = os.path.join(self.__target_dir, file_name)
         document = docx.Document(word_file)
         for para in document.paragraphs:
             for i, run in enumerate(para.runs):
@@ -79,7 +83,7 @@ class CreateWeekReport(object):
 
     def check_excel_change(self, file_name, date_tuple: tuple):
         logging.info("replace excel")
-        file_path = os.path.join(self.__from_dir, file_name)
+        file_path = os.path.join(self.__target_dir, file_name)
         wb = openpyxl.load_workbook(file_path)
         sheet = wb.active
 
