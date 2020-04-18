@@ -32,7 +32,10 @@ class CreateWeekReport(object):
             os.path.dirname(os.path.abspath(__file__)) + "/../",
             "automatic_office",
             "doc_file",
+            "董坚",
         )
+        if not os.path.exists(self.__from_dir):
+            os.makedirs(self.__from_dir, exist_ok=True)
         self.from_word = "创兴银行香港ODS项目周报_董坚_fromEndStr.docx"
         self.from_excel = "创兴银行香港ODS项目周报_董坚_fromEndStr.xlsx"
 

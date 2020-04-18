@@ -73,9 +73,9 @@ class CheckInForm(object):
             if not holiday_obj.is_holiday(from_date.strftime("%Y%m%d")):
                 all_work_date.append(from_date)
             from_date += datetime.timedelta(1)
-            logging.debug(
-                "----------------{0}------------".format(from_date.strftime("%Y%m%d"))
-            )
+            #logging.debug(
+            #    "debug work date --{0}".format(from_date.strftime("%Y%m%d"))
+            #)
 
         # TODO write work_date
         return all_work_date
