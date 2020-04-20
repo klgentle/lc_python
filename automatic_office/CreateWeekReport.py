@@ -35,7 +35,7 @@ class CreateWeekReport(object):
         )
         self.__target_dir = self.get_target_dir()
         self.from_word = "创兴银行香港ODS项目周报_董坚_fromEndStr.docx"
-        self.from_excel = "创兴银行香港ODS项目周报_董坚_fromEndStr.xlsx"
+        self.from_excel = "工作周报_fromEndStr.xlsx"
 
     def get_from_dir(self):
         return self.__from_dir
