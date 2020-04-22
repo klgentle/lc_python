@@ -1,0 +1,7 @@
+背景：
+公司提交代码的时需要填写登记表，登记表主要填写，程序名称，目录，类别，mantis ID (问题id，类似于Jira)
+当前目录主要写了两个程序，一个是生成登录表的程序commit_register_for_svn.py，另一个是根据登记表取代码的程序copy_svn_modify.py
+
+当时为了发送文件，写了一个发送邮件的程序send_mail_with_attach.py，发送文件要先压缩文件，写了一个压缩文件的程序backupToZip.py
+
+考虑到代码提交svn,跟与登记表可以一起作，将svn的操作整合到了python代码中。起初我是写了一个shell脚本做的，但是因为我的操作系统是wind10，shell写在WSL(win10下的linux子系统)中,导致每在wsl上执行一次svn操作，svn就损坏一次。于是我就修改了代码，将涉及svn操作的代码，直接改为在win10下执行。改完后，Svn再也没有损坏了.
