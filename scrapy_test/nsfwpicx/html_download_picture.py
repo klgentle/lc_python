@@ -2,6 +2,7 @@ import requests
 import os
 import re
 import random
+import sys
 
 import urllib.request
 import time
@@ -54,7 +55,7 @@ class GetNsfwPicture(object):
         #    return (" ", None)
 
         # 精确定位地址集
-        #http://45.147.200.153/images/2020/04/20/PG8T.jpg#vwid=860&vhei=1530
+        # http://45.147.200.153/images/2020/04/20/PG8T.jpg#vwid=860&vhei=1530
         p = re.compile(
             "(https://qpix.com/images/\d{4}/\d{2}/\d{2}/\w*\.jpg|http://\d*.\d*.\d*.\d*/images/\d{4}/\d{2}/\d{2}/\w*\.jpg)"
         )
@@ -66,9 +67,8 @@ class GetNsfwPicture(object):
         else:
             print("保存图片链接失败", pageNumber)
             pprint.pprint(r.text)
-            
-        tempList = []
-        pprint.pprint(list(set(picList)))
+
+        #pprint.pprint(list(set(picList)))
         print("Picture number is:", len(set(picList)))
 
         return (title, pageNumber, list(set(picList)))
@@ -82,7 +82,6 @@ class GetNsfwPicture(object):
             os.mkdir(root2)
         print("保存目录为：", root2)
 
-        print("folder:", root2)
         for i, addr in enumerate(picList):
             # 解决 windows 不区分大小写的问题
             filename = "".join([str(i), "_", addr.split("/")[-1]])
@@ -90,20 +89,8 @@ class GetNsfwPicture(object):
 
             # 多进程下载图片
             subprocess.Popen(["curl", addr, "-o", file_path, "--silent"])
-            print("图片下载中", i)
+            #print("图片下载中", i, sep=" ")
 
-        # if not os.path.exists(file_path):
-        #    pass
-        #    # save file
-        #    #r = requests.get(addr, headers=self.kv)
-        #    #r.raise_for_status()
-        #    #with open(file_path, "wb") as f:
-        #    #    f.write(r.content)
-        #    #urllib.request.urlretrieve(addr,filename=file_path)
-        #    #print("图片已保存")
-
-        # else:
-        #    print("-------------------图片已存在")
 
     def download_one_html(self, url):
         pic_list = self.get_picure_addrs(url)
@@ -131,7 +118,8 @@ class GetNsfwPicture(object):
 
 
 if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print("Please input Url!")
     g = GetNsfwPicture()
-    # g.download_list_pictures(index_list)
-    url = "http://nsfwpicx.com/2020/04/06/1285.html"
-    g.download_one_html(url)
+    # url = "http://nsfwpicx.com/2020/05/01/1435.html"
+    g.download_one_html(sys.argv[1])
