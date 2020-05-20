@@ -8,7 +8,7 @@ class Solution:
                 return False
         return True
 
-    def isValidSudoku(self, board: List[List[str]]) -> bool:
+    def isValidSudoku(self, board]) -> bool:
         # check row
         if not self.isValidSudokuRow(board):
             return False
