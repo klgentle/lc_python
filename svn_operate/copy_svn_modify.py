@@ -14,7 +14,8 @@ from sys import argv
 from openpyxl import Workbook
 from backupToZip import backupToZip
 from datetime import datetime
-from send_mail_with_attach import mail
+
+# from send_mail_with_attach import mail
 from config_default import configs
 from create_date import getBetweenDay
 from SvnOperate import SvnOperate
@@ -144,7 +145,7 @@ class CopyRegister(object):
             return "sql"
         if file_type.upper() == "BO":
             file_type = "rpt"
-        elif file_type.upper() in ("PRO", "FNC"):
+        elif file_type.upper() in ("PRO", "FNC", "PRC"):
             file_type = "sql"
         return file_type.lower()
 
@@ -175,7 +176,6 @@ class CopyRegister(object):
     def register_data_normalize(self):
         """
             TODO 数据标准化
-            complecat method
         """
         file_name_path = map(lambda data_row: data_row[2:5], self.__data_list)
         # print(f"data_list:{self.__data_list}_________________")
@@ -307,12 +307,12 @@ select OBJECT_NAME from ods_job_config where object_type = 'SP';
             for b in bo_name_list:
                 to_file.write(b + "\n")
 
-    def send_mail(self, file_path=""):
-        if not file_path:
-            file_path = os.path.join(
-                os.path.basename(self.__beta_path), self.date_str + "beta.zip"
-            )
-        mail(self.date_str, file_path)
+    # def send_mail(self, file_path=""):
+    #    if not file_path:
+    #        file_path = os.path.join(
+    #            os.path.basename(self.__beta_path), self.date_str + "beta.zip"
+    #        )
+    #    mail(self.date_str, file_path)
 
     def copy_file_from_register(self):
         """main function for call"""
