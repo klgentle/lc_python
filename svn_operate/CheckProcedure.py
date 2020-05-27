@@ -6,6 +6,14 @@ from config_default import configs
 
 class CheckProcedure(object):
     def __init__(self):
+        # 不需要检查的程序清单
+        self.white_list= ['p_rpt_cif089_1.sql',
+                         'P_RPT_CIF089KN.sql',
+                         'P_RPT_CIF089KP.sql',
+                         'p_rpt_cif330d.sql',
+                         'p_rpt_fxd344rp.sql',
+                         'P_RPT_SAV_CUR_FLOAT.sql',
+                         'p_rpt_tu_error_mid.sql']
         if platform.uname().system == "Windows":
             self.procedure_path = configs.get("path").get("win_svn_procedure_path")
         else:
@@ -34,6 +42,8 @@ class CheckProcedure(object):
         procedure_list = self.find_procedure_modify()
         check_pass = True
         for prcedure in procedure_list:
+            if procedure in self.white_list:
+                continue
             if not self.check_procedure(prcedure):
                 check_pass = False
         return check_pass
