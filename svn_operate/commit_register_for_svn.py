@@ -13,6 +13,7 @@ from sys import argv
 from date_add import date_add
 from copy_svn_modify import CopyRegister
 from SvnOperate import SvnOperate
+from CheckProcedure import CheckProcedure
 
 SVN_DIR = "/mnt/e/svn/1300_编码/"
 SVN_LOG = "/mnt/e/svn/commit.log"
@@ -25,12 +26,22 @@ class Solution:
     """ read log to write excel for install """
 
     def __init__(self, date_str, mantis, module_type):
+        # 检查存储过程
+        if not CheckProcedure.check_procedures():
+            sys.exit(1)
+        
+        # 提交SVN
         try:
             self.svn = SvnOperate(SVN_DIR)
             self.svn_add_commit()
         except Exception as e:
             print("Svn Operate Error:", e.__doc__)
 
+        self.create_target_file()
+        self.comit_list = []
+        self.commit_list_end = ["Dongjian", "Gene", self.date_str, mantis, "", ""]
+
+    def create_target_file(self):
         # copy template change excel name
         self.regi_dir = os.path.join(SVN_DIR, "发布登记表", module_type)
 
@@ -47,10 +58,7 @@ class Solution:
         # print(f"self.__source_file:{self.__source_file}")
         if not os.path.exists(self.__source_file):
             shutil.copy(target_file, self.__source_file)
-
-        self.comit_list = []
-        self.commit_list_end = ["Dongjian", "Gene", self.date_str, mantis, "", ""]
-
+        
     def svn_add_commit(self):
         self.svn.svn_add()
         self.svn.svn_delete()
@@ -93,16 +101,13 @@ class Solution:
                     # add 1300
                     path_file = os.path.join("1300_编码", path_file)
                 path_file = CopyRegister.change_path_sep(path_file)
-                # print(f"path_file: {path_file}")
                 path = os.path.join("1000_编辑区", os.path.dirname(path_file))
                 path_list = path_file.split(os.sep)
                 # 跳过建表语句
                 # if path_list[-2] == "1380_建表语句":
                 #    continue
 
-                # print(f"path_list:{path_list}")
                 file_list = path_list[-1].split(".")
-                # print(f"file_list:{file_list}")
                 file_name = file_list[0]
                 # modu = file_name.upper().split("RPT_")
                 modu = re.split("RPT_|ITF_", file_name.upper())
