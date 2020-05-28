@@ -27,7 +27,8 @@ class Solution:
 
     def __init__(self, date_str, mantis, module_type):
         # 检查存储过程
-        if not CheckProcedure.check_procedures():
+        cp = CheckProcedure()
+        if not cp.check_procedures():
             sys.exit(1)
         
         # 提交SVN

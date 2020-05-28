@@ -35,7 +35,7 @@ class CheckProcedure(object):
         #print(svn_list)
         return svn_list
 
-    def check_procedures(self): -> bool
+    def check_procedures(self) -> bool:
         """
         循环检测
         """
@@ -48,7 +48,7 @@ class CheckProcedure(object):
                 check_pass = False
         return check_pass
 
-    def check_procedure(self, procedure: str): -> bool
+    def check_procedure(self, procedure: str) -> bool:
         """
         检测一个存储过程
         """
