@@ -41,10 +41,10 @@ class CheckProcedure(object):
         """
         procedure_list = self.find_procedure_modify()
         check_pass = True
-        for prcedure in procedure_list:
+        for procedure in procedure_list:
             if procedure in self.white_list:
                 continue
-            if not self.check_procedure(prcedure):
+            if not self.check_procedure(procedure):
                 check_pass = False
         return check_pass
 
