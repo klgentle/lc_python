@@ -45,7 +45,6 @@ class CheckProcedure(object):
         return svn_list
 
     def isAllProcedureCorrect(self) -> bool:
-        """ 循环检测 """
         procedure_list = self.findProcedureModifyList()
         check_pass = True
         for prcedure in procedure_list:
@@ -56,9 +55,6 @@ class CheckProcedure(object):
         return check_pass
 
     def isOneProcedureCorrect(self, procedure: str) -> bool:
-        """
-        检测一个存储过程
-        """
         if self.isDateHardCode(procedure):
             print(
                 "Warning: {} date is hard code, please check! __________________".format(
