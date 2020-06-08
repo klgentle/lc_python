@@ -1,38 +1,36 @@
 import os
+import openpyxl
 import platform
+import shutil, os
+import sys
+import re
+
+from PlatformOperation import PlatformOperation
+
+SVN_DIR = "/mnt/e/svn/1300_编码/"
+SVN_LOG = "/mnt/e/svn/commit.log"
+if platform.uname().system == "Windows":
+    SVN_DIR = "E:\\svn\\1300_编码\\"
+    SVN_LOG = "E:\\svn\\commit.log"
 
 class ReleaseRegistrationForm(object):
-
     def __init__(self, date_str, mantis, module_type):
-        self.checkProcedureAndExit()
-        
-        # 提交SVN
-        try:
-            self.svn_add_commit()
-        except Exception as e:
-            print("Svn Operate Error:", e.__doc__)
+        self.__date_str = date_str
+        self.__module_type = module_type
+        self.__create_target_file()
+        self.__comit_list = []
+        self.__commit_list_end = ["Dongjian", "Gene", self.__date_str, mantis, "", ""]
 
-        self.create_target_file()
-        self.comit_list = []
-        self.commit_list_end = ["Dongjian", "Gene", self.date_str, mantis, "", ""]
-
-    def create_target_file(self):
-        # copy template change excel name
-        self.regi_dir = os.path.join(SVN_DIR, "发布登记表", module_type)
-
-        target_file = os.path.join(
-            self.regi_dir, f"ODS程序版本发布登记表({module_type})-template.xlsx"
+    def __createRegistrationFile(self):
+        self.regi_dir = os.path.join(SVN_DIR, "发布登记表", self.__module_type)
+        template_file = os.path.join(
+            self.regi_dir, f"ODS程序版本发布登记表({self.__module_type})-template.xlsx"
         )
-        self.date_str = date_str
-        module_type_name = f"({module_type})"
-        if module_type.upper() == "DEPOSIT":
-            module_type_name = ""
-        self.__source_file = os.path.join(
-            self.regi_dir, f"ODS程序版本发布登记表{module_type_name}-{self.date_str}.xlsx"
+        self.__registration_file = os.path.join(
+            self.regi_dir, f"ODS程序版本发布登记表{self.__module_type}-{self.__date_str}.xlsx"
         )
-        # print(f"self.__source_file:{self.__source_file}")
-        if not os.path.exists(self.__source_file):
-            shutil.copy(target_file, self.__source_file)
+        if not os.path.exists(self.__registration_file):
+            shutil.copy(template_file, self.__registration_file)
 
     # @pysnooper.snoop()
     def logRead(self):
@@ -62,7 +60,7 @@ class ReleaseRegistrationForm(object):
                     path_file = line.split(" ")[-1]
                     # add 1300
                     path_file = os.path.join("1300_编码", path_file)
-                path_file = ReleaseRegistrationForm.change_path_sep(path_file)
+                path_file = PlatformOperation.change_path_sep(path_file)
                 path = os.path.join("1000_编辑区", os.path.dirname(path_file))
                 path_list = path_file.split(os.sep)
                 # 跳过建表语句
@@ -81,14 +79,14 @@ class ReleaseRegistrationForm(object):
                 # 兼容 windows
                 path = path.replace(os.sep, "\\")
                 row = (
-                    [module, "报表"] + [file_name, file_type, path] + self.commit_list_end
+                    [module, "报表"] + [file_name, file_type, path] + self.__commit_list_end
                 )
-                self.comit_list.append(row)
+                self.__comit_list.append(row)
 
         svn_log.close()
-    
+
     def logRegister(self):
-        wb = openpyxl.load_workbook(self.__source_file)
+        wb = openpyxl.load_workbook(self.__registration_file)
         sheet = wb.active
 
         # DELETE BLANK ROW
@@ -105,10 +103,9 @@ class ReleaseRegistrationForm(object):
             sheet.delete_rows(row, sheet.max_row - num)
 
         print("records are as bellow:")
-        for i in self.comit_list:
+        for i in self.__comit_list:
             print(f"{i}")
             sheet.append(i)
 
-        wb.save(filename=self.__source_file)
+        wb.save(filename=self.__registration_file)
         print("excel write down!")
-

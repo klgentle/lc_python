@@ -117,8 +117,8 @@ class CopyRegister(object):
         bo_name_list = []
         for row in self.__data_list:
             name, file_type, path = row[2:5]
-            if file_type.upper() in ("RPT", "BO"):
-                bo_name_list.append(name)
+            if file_type.strip().upper() in ("RPT", "BO"):
+                bo_name_list.append(name.strip())
 
         return sorted(bo_name_list)
 
@@ -174,9 +174,9 @@ class CopyRegister(object):
         # print(f"data_list:{self.__data_list}_________________")
         file_name_path = map(
             lambda data: [
-                self.filename_normlize(data[0]),
-                self.filetype_normlize(data[1]),
-                self.filepath_normlize(data[2]),
+                self.filename_normlize(data[0].strip()),
+                self.filetype_normlize(data[1].strip()),
+                self.filepath_normlize(data[2].strip()),
             ],
             file_name_path,
         )
