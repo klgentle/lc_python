@@ -37,10 +37,11 @@ class CommitRegister(object):
         self.comit_list = []
         self.commit_list_end = ["Dongjian", "Gene", self.date_str, mantis, "", ""]
 
+    @staticmethod
     def checkProcedureAndExit():
         # 检查存储过程
         cp = CheckProcedure()
-        if not cp.isAllprocedureCorrect():
+        if not cp.isAllProcedureCorrect():
             sys.exit(1)
 
     def create_target_file(self):
@@ -188,7 +189,7 @@ if __name__ == "__main__":
     print(f"argv:{argv} ---------- ")
     print(f"date_str:{date_str} ---------- ")
 
-    a = Solution(date_str, mantis, module_type)
+    a = CommitRegister(date_str, mantis, module_type)
     a.logRead()
     a.logRegister()
     a.commit_register()

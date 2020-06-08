@@ -18,14 +18,13 @@ class CheckProcedure(object):
         ]
         self.setProcedurePath()
 
-    @staticmethod
-    def setProcedurePath():
+    def setProcedurePath(self):
         if platform.uname().system == "Windows":
             self.procedure_path = configs.get("path").get("win_svn_procedure_path")
         else:
             self.procedure_path = configs.get("path").get("svn_procedure_path")
 
-    def getSvnStList():
+    def getSvnStList(self):
         os.chdir(self.procedure_path)
         svn_st_list = os.popen("svn st").read().strip("\n").split("\n")
         return svn_st_list
@@ -47,9 +46,9 @@ class CheckProcedure(object):
     def isAllProcedureCorrect(self) -> bool:
         procedure_list = self.findProcedureModifyList()
         check_pass = True
-        for prcedure in procedure_list:
+        for procedure in procedure_list:
             if procedure not in self.white_list and not self.isOneProcedureCorrect(
-                prcedure
+                procedure
             ):
                 check_pass = False
         return check_pass
