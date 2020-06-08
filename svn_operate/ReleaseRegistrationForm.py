@@ -1,28 +1,7 @@
-import datetime
-import openpyxl
+import os
 import platform
 
-# import pysnooper
-import sys
-import shutil, os
-import time
-import re
-
-from sys import argv
-from date_add import date_add
-from PlatformOperation import PlatformOperation
-from SvnOperate import SvnOperate
-from CheckProcedure import CheckProcedure
-
-SVN_DIR = "/mnt/e/svn/1300_编码/"
-SVN_LOG = "/mnt/e/svn/commit.log"
-if platform.uname().system == "Windows":
-    SVN_DIR = "E:\\svn\\1300_编码\\"
-    SVN_LOG = "E:\\svn\\commit.log"
-
-
-class CommitRegister(object):
-    """ read log to write excel for install """
+class ReleaseRegistrationForm(object):
 
     def __init__(self, date_str, mantis, module_type):
         self.checkProcedureAndExit()
@@ -36,12 +15,6 @@ class CommitRegister(object):
         self.create_target_file()
         self.comit_list = []
         self.commit_list_end = ["Dongjian", "Gene", self.date_str, mantis, "", ""]
-
-    def checkProcedureAndExit():
-        # 检查存储过程
-        cp = CheckProcedure()
-        if not cp.isAllprocedureCorrect():
-            sys.exit(1)
 
     def create_target_file(self):
         # copy template change excel name
@@ -60,20 +33,6 @@ class CommitRegister(object):
         # print(f"self.__source_file:{self.__source_file}")
         if not os.path.exists(self.__source_file):
             shutil.copy(target_file, self.__source_file)
-        
-    def svn_add_commit(self):
-        self.svn = SvnOperate(SVN_DIR)
-        self.svn.svn_add()
-        self.svn.svn_delete()
-        self.svn.svn_commit_code()
-        self.svn.update_svn()
-
-    def commit_register(self):
-        try:
-            self.svn.svn_add()
-            self.svn.svn_commit()
-        except Exception as e:
-            print("svn error:", e.__doc__)
 
     # @pysnooper.snoop()
     def logRead(self):
@@ -127,7 +86,7 @@ class CommitRegister(object):
                 self.comit_list.append(row)
 
         svn_log.close()
-
+    
     def logRegister(self):
         wb = openpyxl.load_workbook(self.__source_file)
         sheet = wb.active
@@ -153,43 +112,3 @@ class CommitRegister(object):
         wb.save(filename=self.__source_file)
         print("excel write down!")
 
-
-if __name__ == "__main__":
-    today = time.strftime("%Y%m%d", time.localtime())
-    date_str = time.strftime("%Y%m%d", time.localtime())
-    time_str = time.strftime("%H:%M", time.localtime())
-    if time_str > "16:10":
-        # today add one day
-        date_str = date_add(1)
-    mantis = ""
-    module_type = "cif"
-
-    if len(argv) == 2 and len(argv[1]) == 8:
-        date_str = argv[1]
-    elif len(argv) == 3:
-        date_str, mantis = argv[1], argv[2]
-    elif len(argv) == 4:
-        date_str, mantis, module_type = argv[1], argv[2], argv[3]
-        if not argv[3]:
-            module_type = "cif"
-    elif len(argv) > 4:
-        print("usage: python3 commit_register.py '20190501' mantis_id, module_type")
-        sys.exit(1)
-
-    if len(argv) > 1 and argv[1].find("d+") > -1:
-        # get days from d+days
-        days = int(argv[1][2:])
-        date_str = date_add(days)
-
-    if date_str < today:
-        print(f"date_str:{date_str} is wrong!")
-        sys.exit(1)
-
-    print(f"argv:{argv} ---------- ")
-    print(f"date_str:{date_str} ---------- ")
-
-    a = Solution(date_str, mantis, module_type)
-    a.logRead()
-    a.logRegister()
-    a.commit_register()
-    print(f"time:{time_str}")

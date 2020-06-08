@@ -19,6 +19,7 @@ from datetime import datetime
 from config_default import configs
 from create_date import getBetweenDay
 from SvnOperate import SvnOperate
+from PlatformOperation import PlatformOperation
 
 
 class CopyRegister(object):
@@ -121,17 +122,9 @@ class CopyRegister(object):
 
         return sorted(bo_name_list)
 
-    @staticmethod
-    def change_path_sep(path):
-        if path.find("\\") > -1 and os.sep != "\\":
-            path = path.replace("\\", os.sep)
-        elif path.find("/") > -1 and os.sep != "/":
-            path = path.replace("/", os.sep)
-        return path
 
     @staticmethod
     def filename_normlize(filename):
-        """   > filename 标准化 """
         if filename.find(".") > 0:
             filename = os.path.splitext(filename)[0]
         return filename
@@ -170,7 +163,7 @@ class CopyRegister(object):
         # cut path from 1300
         if filepath.find("1300_编码") > -1:
             filepath = filepath[filepath.find("1300_编码") :]
-        filepath = self.change_path_sep(filepath)
+        filepath = PlatformOperation.change_path_sep(filepath)
         return filepath
 
     def register_data_normalize(self):
