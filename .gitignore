@@ -53,3 +53,4 @@ temp
 *.egg-info
 dist
 build
+/.metadata/

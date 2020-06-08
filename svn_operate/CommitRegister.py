@@ -22,18 +22,14 @@ if platform.uname().system == "Windows":
     SVN_LOG = "E:\\svn\\commit.log"
 
 
-class Solution:
+class CommitRegister(object):
     """ read log to write excel for install """
 
     def __init__(self, date_str, mantis, module_type):
-        # 检查存储过程
-        cp = CheckProcedure()
-        if not cp.check_procedures():
-            sys.exit(1)
+        self.checkProcedureAndExit()
         
         # 提交SVN
         try:
-            self.svn = SvnOperate(SVN_DIR)
             self.svn_add_commit()
         except Exception as e:
             print("Svn Operate Error:", e.__doc__)
@@ -41,6 +37,12 @@ class Solution:
         self.create_target_file()
         self.comit_list = []
         self.commit_list_end = ["Dongjian", "Gene", self.date_str, mantis, "", ""]
+
+    def checkProcedureAndExit():
+        # 检查存储过程
+        cp = CheckProcedure()
+        if not cp.isAllprocedureCorrect():
+            sys.exit(1)
 
     def create_target_file(self):
         # copy template change excel name
@@ -61,6 +63,7 @@ class Solution:
             shutil.copy(target_file, self.__source_file)
         
     def svn_add_commit(self):
+        self.svn = SvnOperate(SVN_DIR)
         self.svn.svn_add()
         self.svn.svn_delete()
         self.svn.svn_commit_code()
@@ -189,5 +192,5 @@ if __name__ == "__main__":
     a = Solution(date_str, mantis, module_type)
     a.logRead()
     a.logRegister()
-    a.commit_register()
+    #a.commit_register()
     print(f"time:{time_str}")

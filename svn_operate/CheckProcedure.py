@@ -7,21 +7,31 @@ from config_default import configs
 class CheckProcedure(object):
     def __init__(self):
         # 不需要检查的程序清单
-        self.white_list= ['p_rpt_cif089_1.sql',
-                         'P_RPT_CIF089KN.sql',
-                         'P_RPT_CIF089KP.sql',
-                         'p_rpt_cif330d.sql',
-                         'p_rpt_fxd344rp.sql',
-                         'P_RPT_SAV_CUR_FLOAT.sql',
-                         'p_rpt_tu_error_mid.sql']
+        self.white_list = [
+            "p_rpt_cif089_1.sql",
+            "P_RPT_CIF089KN.sql",
+            "P_RPT_CIF089KP.sql",
+            "p_rpt_cif330d.sql",
+            "p_rpt_fxd344rp.sql",
+            "P_RPT_SAV_CUR_FLOAT.sql",
+            "p_rpt_tu_error_mid.sql",
+        ]
+        self.setProcedurePath()
+
+    @staticmethod
+    def setProcedurePath():
         if platform.uname().system == "Windows":
             self.procedure_path = configs.get("path").get("win_svn_procedure_path")
         else:
             self.procedure_path = configs.get("path").get("svn_procedure_path")
 
-    def find_procedure_modify(self):
+    def getSvnStList():
         os.chdir(self.procedure_path)
         svn_st_list = os.popen("svn st").read().strip("\n").split("\n")
+        return svn_st_list
+
+    def findProcedureModifyList(self):
+        svn_st_list = self.getSvnStList()
         # 取 add
         svn_add_filter = filter(lambda x: x.startswith("? "), svn_st_list)
         # 取 modify
@@ -32,27 +42,20 @@ class CheckProcedure(object):
                 list(svn_add_filter) + list(svn_modify_filter),
             )
         )
-        #print(svn_list)
         return svn_list
 
-    def check_procedures(self) -> bool:
-        """
-        循环检测
-        """
-        procedure_list = self.find_procedure_modify()
+    def isAllProcedureCorrect(self) -> bool:
+        procedure_list = self.findProcedureModifyList()
         check_pass = True
-        for procedure in procedure_list:
-            if procedure in self.white_list:
-                continue
-            if not self.check_procedure(procedure):
+        for prcedure in procedure_list:
+            if procedure not in self.white_list and not self.isOneProcedureCorrect(
+                prcedure
+            ):
                 check_pass = False
         return check_pass
 
-    def check_procedure(self, procedure: str) -> bool:
-        """
-        检测一个存储过程
-        """
-        if self.is_date_hard_code(procedure):
+    def isOneProcedureCorrect(self, procedure: str) -> bool:
+        if self.isDateHardCode(procedure):
             print(
                 "Warning: {} date is hard code, please check! __________________".format(
                     procedure
@@ -61,11 +64,13 @@ class CheckProcedure(object):
             return False
         return True
 
-    def is_date_hard_code(self, procedure: str) -> bool:
+    def isDateHardCode(self, procedure: str) -> bool:
         """
         检查是否有将日期写死，如将v_deal_date 写date'20...'
         """
-        with open(os.path.join(self.procedure_path, procedure), "r", encoding="utf-8") as f:
+        with open(
+            os.path.join(self.procedure_path, procedure), "r", encoding="utf-8"
+        ) as f:
             proc_cont = f.read()
             if re.search("date'20", proc_cont, flags=re.IGNORECASE):
                 return True
@@ -76,7 +81,7 @@ class CheckProcedure(object):
 if __name__ == "__main__":
     a = CheckProcedure()
     # tests
-    # assert a.is_date_hard_code("p_rpt_lon800_2.sql") is False
-    # a.check_procedure("p_rpt_lon800_2.sql")
-    #a.find_procedure_modify()
-    a.check_procedures()
+    # assert a.isDateHardCode("p_rpt_lon800_2.sql") is False
+    # a.isOneProcedureCorrect("p_rpt_lon800_2.sql")
+    # a.findProcedureModifyList()
+    a.isProcedureCorrects()
