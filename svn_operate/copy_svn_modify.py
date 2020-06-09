@@ -236,7 +236,7 @@ class CopyRegister(object):
         wb = openpyxl.load_workbook(file_path_name)
         sheet = wb.active
 
-        # record rows
+        # TODO remove duplicate, unhashable type: 'list'(error of list(set())) 
         for row in self.__data_list:
             sheet.append(row)
         wb.save(filename=file_path_name)
