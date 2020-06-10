@@ -5,7 +5,9 @@ import pprint
 import shutil, os
 import sys
 import re
+import time
 
+from sys import argv
 from PlatformOperation import PlatformOperation
 
 SVN_DIR = "/mnt/e/svn/1300_编码/"
@@ -29,7 +31,7 @@ class ReleaseRegistrationForm(object):
             self.regi_dir, f"ODS程序版本发布登记表({self.__module_type})-template.xlsx"
         )
         self.__registration_file = os.path.join(
-            self.regi_dir, f"ODS程序版本发布登记表{self.__module_type}-{self.__date_str}.xlsx"
+            self.regi_dir, f"ODS程序版本发布登记表({self.__module_type})-{self.__date_str}.xlsx"
         )
         if not os.path.exists(self.__registration_file):
             shutil.copy(template_file, self.__registration_file)
@@ -67,29 +69,36 @@ class ReleaseRegistrationForm(object):
             module = modu[1][:3]
         return module
 
-    def logReadOneLine(self, line):
+    @staticmethod
+    def __svnLineClean(line):
         print(f"line:{line}")
+        line = line.split(" ")[-1]
+        line = line.replace("\n","")
         if line.find("application/octet-stream") > -1:
             line = line.replace("application/octet-stream", "").strip()
+        return line
 
-        path_file = line
+    def __getPathAndFileFrom(self, line):
+        line = self.__svnLineClean(line)
         if line.find("1300_编码") > -1:
-            path_file = line[line.find("1300_编码") :]
+            pathAndFile = line[line.find("1300_编码") :]
         else:
-            path_file = line.split(" ")[-1]
-            # add 1300
-            path_file = os.path.join("1300_编码", path_file)
-        path_file = PlatformOperation.change_path_sep(path_file)
-        file_path = os.path.join("1000_编辑区", os.path.dirname(path_file))
+            pathAndFile = os.path.join("1300_编码", line)
+        pathAndFile = os.path.join("1000_编辑区", pathAndFile)
+        pathAndFile = PlatformOperation.change_path_sep(pathAndFile)
+        return pathAndFile
 
-        path_list = path_file.split(os.sep)
-        file_list = path_list[-1].split(".")
-        file_name = file_list[0]
-        file_type = file_list[-1].replace("\n", "")
+    def logReadOneLine(self, line):
+        pathAndFile = self.__getPathAndFileFrom(line)
+        filePath = os.path.dirname(pathAndFile)
+        filenameAndType = os.path.basename(pathAndFile) 
+        filename = filenameAndType.split(".")[0]
+        filetype = filenameAndType.split(".")[-1]
+
         # 兼容 windows
-        file_path = file_path.replace(os.sep, "\\")
-        module = self.__getModule(file_name)
-        row = [module, "报表"] + [file_name, file_type, file_path] + self.__commit_list_end
+        filePath = filePath.replace(os.sep, "\\")
+        module = self.__getModule(filename)
+        row = [module, "报表"] + [filename, filetype, filePath] + self.__commit_list_end
         self.__comit_list.append(row)
 
     def logRead(self):
@@ -118,5 +127,10 @@ class ReleaseRegistrationForm(object):
 
 
 if __name__ == "__main__":
-    pass
-    #reg = ReleaseRegistrationForm()
+    date_str = time.strftime("%Y%m%d", time.localtime())
+    if argv[1]:
+        date_str = argv[1]
+    mantis = argv[2]
+    reg = ReleaseRegistrationForm(date_str, mantis, "cif")
+    reg.logRead()
+    reg.logRegister()
