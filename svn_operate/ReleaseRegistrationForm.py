@@ -71,7 +71,6 @@ class ReleaseRegistrationForm(object):
 
     @staticmethod
     def __svnLineClean(line):
-        print(f"line:{line}")
         line = line.split(" ")[-1]
         line = line.replace("\n","")
         if line.find("application/octet-stream") > -1:
