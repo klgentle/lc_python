@@ -18,6 +18,7 @@ class CommitRegister(object):
     """ read log to write excel for install """
 
     def __init__(self, date_str, mantis, module_type):
+        self.__mantis = mantis
         self.__registration = ReleaseRegistrationForm(date_str, mantis, module_type)
 
     @staticmethod
@@ -27,12 +28,18 @@ class CommitRegister(object):
         if not cp.isAllProcedureCorrect():
             sys.exit(1)
 
+    def __getCommitMessage(self):
+        commitMessage = ""
+        if self.__mantis:
+            commitMessage = f"mantis: {self.__mantis}"
+        return commitMessage 
+
     def svn_add_commit(self):
         try:
             self.svn = SvnOperate(SVN_DIR)
             self.svn.svn_add()
             self.svn.svn_delete()
-            self.svn.svn_commit_code()
+            self.svn.svn_commit_code(message=self.__getCommitMessage())
             self.svn.update_svn()
         except Exception as e:
             print("Svn Operate Error:", e.__doc__)

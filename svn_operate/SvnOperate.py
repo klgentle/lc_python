@@ -46,7 +46,7 @@ class SvnOperate(object):
             print("SVN ADD ERROR: ", e.__doc__)
 
     @staticmethod
-    def svn_commit(message="update by DJ", redirect=None):
+    def svn_commit(message="", redirect=None):
         try:
             # TODO 解决重复提交的问题
             if len(os.popen("svn st").read()) < 2:
@@ -62,7 +62,7 @@ class SvnOperate(object):
         except Exception as e:
             print("SVN COMMIT ERROR: ", e.__doc__)
 
-    def svn_commit_code(self, message="update by DJ", redirect="../commit.log"):
+    def svn_commit_code(self, message="", redirect="../commit.log"):
         return self.svn_commit(message, redirect)
 
     @staticmethod
