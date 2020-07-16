@@ -29,8 +29,6 @@ class GetNsfwPicture(object):
         """
         获取单个页面中的全部图片地址
         """
-        # url = "http://nsfwpicx.com/{}.html#".format(pageNumber)
-        # url = "http://nsfwpicx.com/2020/04/11/{}.html".format(pageNumber)
         pageNumber = url.replace(".html", "").split("/")[-1]
         print(f"test pageNumber: {pageNumber}")
 
@@ -44,22 +42,19 @@ class GetNsfwPicture(object):
         soup = BeautifulSoup(r.text, "html.parser")
         title = soup.title.text.replace(" - Nsfwpicx", "")
 
-        # 查找阅读人数
-        # read_num = soup.find_all(attrs={"class": "post-meta"})
-        # read_number = self.get_read_number(str(read_num))
-        # print("read_number", read_number)
-
-        ## 可能有坑，尤其是新页面阅读量少
-        # if read_number < 2000:
-        #    print("Read_number to small", pageNumber)
-        #    return (" ", None)
-
         # 精确定位地址集
-        # http://45.147.200.153/images/2020/04/20/PG8T.jpg#vwid=860&vhei=1530
-        p = re.compile(
-            "(https://qpix.com/images/\d{4}/\d{2}/\d{2}/\w*\.jpg|http://\d*.\d*.\d*.\d*/images/\d{4}/\d{2}/\d{2}/\w*\.jpg)"
-        )
-        tempList = re.findall(p, r.text)
+        imgs = soup.select('img[data-src]')
+
+        try:
+            tempList = []
+            for img in imgs:
+                #p = re.compile("http.*#vwid")
+                imgAddrs = str(img).split('data-src="')[1]
+                tempList.append(imgAddrs.split("#vwid")[0])
+            
+        except Exception as e:
+            print(e.__doc__)
+
         for addr in tempList:
             picList.append(addr)
         if len(picList) > 0:
@@ -67,11 +62,12 @@ class GetNsfwPicture(object):
         else:
             print("保存图片链接失败", pageNumber)
             pprint.pprint(r.text)
+        
+        uniqueList = list(set(picList))
+        pprint.pprint(uniqueList)
+        print("Picture number is:", len(uniqueList))
 
-        #pprint.pprint(list(set(picList)))
-        print("Picture number is:", len(set(picList)))
-
-        return (title, pageNumber, list(set(picList)))
+        return (title, pageNumber, uniqueList)
 
     def download_picture(self, title_picList):
         # root 保存目录
@@ -84,13 +80,12 @@ class GetNsfwPicture(object):
 
         for i, addr in enumerate(picList):
             # 解决 windows 不区分大小写的问题
-            filename = "".join([str(i), "_", addr.split("/")[-1]])
+            filename = "".join([pageNumber, "_", str(i), "_", addr.split("/")[-1]])
             file_path = os.path.join(root2, filename)
 
             # 多进程下载图片
             subprocess.Popen(["curl", addr, "-o", file_path, "--silent"])
-            #print("图片下载中", i, sep=" ")
-
+            # print("图片下载中", i, sep=" ")
 
     def download_one_html(self, url):
         pic_list = self.get_picure_addrs(url)
