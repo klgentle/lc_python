@@ -84,7 +84,9 @@ class GetNsfwPicture(object):
             file_path = os.path.join(root2, filename)
 
             # 多进程下载图片
-            subprocess.Popen(["curl", addr, "-o", file_path, "--silent"])
+            # -C 断点续传，-C, --continue-at OFFSET
+            # -S显示错误
+            subprocess.Popen(["curl", addr, "-o", file_path, "-C", '-'])
             # print("图片下载中", i, sep=" ")
 
     def download_one_html(self, url):
