@@ -43,15 +43,15 @@ class GetNsfwPicture(object):
         title = soup.title.text.replace(" - Nsfwpicx", "")
 
         # 精确定位地址集
-        imgs = soup.select('img[data-src]')
+        imgs = soup.select("img[data-src]")
 
         try:
             tempList = []
             for img in imgs:
-                #p = re.compile("http.*#vwid")
+                # p = re.compile("http.*#vwid")
                 imgAddrs = str(img).split('data-src="')[1]
                 tempList.append(imgAddrs.split("#vwid")[0])
-            
+
         except Exception as e:
             print(e.__doc__)
 
@@ -62,32 +62,62 @@ class GetNsfwPicture(object):
         else:
             print("保存图片链接失败", pageNumber)
             pprint.pprint(r.text)
-        
-        uniqueList = list(set(picList))
-        pprint.pprint(uniqueList)
+
+        uniqueList = sorted(list(set(picList)))
+        for i, v in enumerate(uniqueList):
+            print(i, v)
+        #pprint.pprint(uniqueList)
         print("Picture number is:", len(uniqueList))
 
         return (title, pageNumber, uniqueList)
 
-    def download_picture(self, title_picList):
+    def GetFolderRoot(self, title, pageNumber):
         # root 保存目录
-        start = time.time()
-        title, pageNumber, picList = title_picList
         root2 = os.path.join(self.root, str(pageNumber) + "_" + title.replace(" ", "_"))
+        return root2
+
+    def download_picture(self, title_picList):
+        title, pageNumber, picList = title_picList
+        root2 = self.GetFolderRoot(title, pageNumber)
         if not os.path.exists(root2):
             os.mkdir(root2)
         print("保存目录为：", root2)
 
         for i, addr in enumerate(picList):
-            # 解决 windows 不区分大小写的问题
-            filename = "".join([pageNumber, "_", str(i), "_", addr.split("/")[-1]])
+            filename = self.createFilename(pageNumber, i, addr)
             file_path = os.path.join(root2, filename)
 
             # 多进程下载图片
-            # -C 断点续传，-C, --continue-at OFFSET
-            # -S显示错误
-            subprocess.Popen(["curl", addr, "-o", file_path, "-C", '-'])
-            # print("图片下载中", i, sep=" ")
+            process = self.callCurlThroughSubprocess(file_path, addr)
+        time.sleep(15)
+        self.checkAndRedownload(root2, pageNumber, picList)
+
+    @staticmethod
+    def createFilename(pageNumber, index, addr):
+        # 解决 windows 不区分大小写的问题
+        return "".join([pageNumber, "_", str(index), "_", addr.split("/")[-1]])
+
+    @staticmethod
+    def callCurlThroughSubprocess(file_path: str, addr: str):
+        process = subprocess.Popen(
+            ["curl", "-C", "-", "-S", "-s", "-o", file_path, addr]
+        )
+        return process
+
+    def checkAndRedownload(self, root2, pageNumber, picList):
+        for i, addr in enumerate(picList):
+            filename = self.createFilename(pageNumber, i, addr)
+            file_path = os.path.join(root2, filename)
+
+            # 如果下载不成功，需要换方法
+            if not os.path.exists(file_path):
+                print("file to check:", filename)
+                self.SaveOnePictureFrom(addr, file_path)
+
+    def SaveOnePictureFrom(self, url:str, file_path:str):
+        response = requests.get(url,headers=self.kv)
+        with open(file_path,"wb") as f:
+            f.write(response.content)
 
     def download_one_html(self, url):
         pic_list = self.get_picure_addrs(url)
