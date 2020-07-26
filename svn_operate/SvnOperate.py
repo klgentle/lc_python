@@ -1,6 +1,7 @@
 import os
 import platform
 import sys
+import requests
 
 
 class SvnOperate(object):
@@ -8,6 +9,22 @@ class SvnOperate(object):
         os.chdir(path)
         if not self.is_system_windows():
             raise TypeError("not windows OS svn operate is not safe")
+        #self.checkSvnConnect()
+
+    @staticmethod
+    def checkSvnConnect():
+        # try:
+        # SSLError(SSLCertVerif
+        svn_url = "https://100.11.94.168/svn/HK_ODS"
+        response = requests.get(
+            svn_url,
+            headers={
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36"
+            },
+        )
+        # except Exception as e:
+        #    print("请检查 svn 连接: ", e.__doc__)
+        #    sys.exit(-1)
 
     @staticmethod
     def update_svn():
@@ -50,7 +67,7 @@ class SvnOperate(object):
         try:
             # TODO 解决重复提交的问题
             if len(os.popen("svn st").read()) < 2:
-                #print("no need to commit")
+                # print("no need to commit")
                 return
             if redirect:
                 print(f'call svn commit -m "{message}" * >{redirect}')
@@ -79,4 +96,3 @@ class SvnOperate(object):
                     os.system("svn delete {}".format(filename))
         except Exception as e:
             print("SVN DELETE ERROR: ", e.__doc__)
-

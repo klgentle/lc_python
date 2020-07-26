@@ -88,8 +88,9 @@ class GetNsfwPicture(object):
             file_path = os.path.join(root2, filename)
 
             # 多进程下载图片
-            process = self.callCurlThroughSubprocess(file_path, addr)
-        time.sleep(15)
+            self.callCurlThroughSubprocess(file_path, addr)
+
+        time.sleep(10)
         self.checkAndRedownload(root2, pageNumber, picList)
 
     @staticmethod
@@ -99,8 +100,16 @@ class GetNsfwPicture(object):
 
     @staticmethod
     def callCurlThroughSubprocess(file_path: str, addr: str):
+        # 感觉curl,比wget快一点
         process = subprocess.Popen(
             ["curl", "-C", "-", "-S", "-s", "-o", file_path, addr]
+        )
+        return process
+
+    @staticmethod
+    def callWgetThroughSubprocess(file_path: str, addr: str):
+        process = subprocess.Popen(
+            ["wget", "-O", file_path, "-q", "-o", "/tmp/wget-log",  addr]
         )
         return process
 
@@ -112,6 +121,7 @@ class GetNsfwPicture(object):
             # 如果下载不成功，需要换方法
             if not os.path.exists(file_path):
                 print("file to check:", filename)
+                #self.callWgetThroughSubprocess(file_path, addr)
                 self.SaveOnePictureFrom(addr, file_path)
 
     def SaveOnePictureFrom(self, url:str, file_path:str):

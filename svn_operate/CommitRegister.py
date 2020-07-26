@@ -36,14 +36,14 @@ class CommitRegister(object):
         return commitMessage 
 
     def svn_add_commit(self):
-        try:
-            self.svn = SvnOperate(SVN_DIR)
-            self.svn.svn_add()
-            self.svn.svn_delete()
-            self.svn.svn_commit_code(message=self.__getCommitMessage())
-            self.svn.update_svn()
-        except Exception as e:
-            print("Svn Operate Error:", e.__doc__)
+        self.svn = SvnOperate(SVN_DIR)
+        self.svn.svn_add()
+        self.svn.svn_delete()
+        self.svn.svn_commit_code(message=self.__getCommitMessage())
+        self.svn.update_svn()
+        #try:
+        #except Exception as e:
+        #    print("Svn Operate Error:", e.__doc__)
 
     def commit_register(self):
         try:
