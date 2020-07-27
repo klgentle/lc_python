@@ -9,19 +9,13 @@ class SvnOperate(object):
         os.chdir(path)
         if not self.is_system_windows():
             raise TypeError("not windows OS svn operate is not safe")
-        #self.checkSvnConnect()
+        self.checkSvnConnect()
 
     @staticmethod
     def checkSvnConnect():
-        # try:
         # SSLError(SSLCertVerif
-        svn_url = "https://100.11.94.168/svn/HK_ODS"
-        response = requests.get(
-            svn_url,
-            headers={
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36"
-            },
-        )
+        r = requests.get('https://100.11.94.168/svn/HK_ODS', auth=('dong.jian', '123456'), verify=False)
+        # try:
         # except Exception as e:
         #    print("请检查 svn 连接: ", e.__doc__)
         #    sys.exit(-1)
