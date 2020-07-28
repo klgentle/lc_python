@@ -56,11 +56,17 @@ class CommitRegister(object):
         self.__registration.logRead()
         self.__registration.logRegister()
     
-    def SvnLogRegistAndCommit(self):
+    def CreateSvnLog(self):
         self.checkProcedureAndExit()
         self.svn_add_commit()
+
+    def readLogAndCommit(self):
         self.SvnLogRegist()
         self.commit_register()
+
+    def SvnLogRegistAndCommit(self):
+        self.CreateSvnLog()
+        self.readLogAndCommit()
 
 
 if __name__ == "__main__":
