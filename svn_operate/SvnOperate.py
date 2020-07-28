@@ -14,7 +14,8 @@ class SvnOperate(object):
     @staticmethod
     def checkSvnConnect():
         # SSLError(SSLCertVerif
-        r = requests.get('https://100.11.94.168/svn/HK_ODS', auth=('dong.jian', '123456'), verify=False)
+        svn_url = "https://10.120.107.200/svn/HK-ODS"
+        r = requests.get(svn_url, verify=False)
         # try:
         # except Exception as e:
         #    print("请检查 svn 连接: ", e.__doc__)
