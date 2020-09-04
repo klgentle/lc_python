@@ -28,7 +28,7 @@ class RenameFileAndContent(object):
             oldFileNameAndPath = os.path.join(self.__file_path, filename)
             self.renameFile(oldFileNameAndPath)
             newFilename = self.getNewFilename(oldFileNameAndPath)
-            self.renameContent(newFilename)
+            #self.renameContent(newFilename)
 
 
 if __name__ == "__main__":
