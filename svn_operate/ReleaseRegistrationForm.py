@@ -56,6 +56,13 @@ class ReleaseRegistrationForm(object):
         return False
 
     @staticmethod
+    def __isFolderLine(line):
+        # 如果为目录则返回true
+        if line.startswith("Adding") and line.split('/')[-1].find(".") == -1:
+            return True
+        return False
+
+    @staticmethod
     def __isRegistrationLine(line):
         if line.find("ODS程序版本发布登记表") > -1:
             return True
@@ -104,7 +111,7 @@ class ReleaseRegistrationForm(object):
         with open(SVN_LOG, encoding=self.__getEncoding()) as svn_log:
             for line in svn_log.readlines():
                 line = line.strip()
-                if self.__isCodeLine(line) and not self.__isRegistrationLine(line):
+                if self.__isCodeLine(line) and not self.__isRegistrationLine(line) and not self.__isFolderLine(line):
                     self.logReadOneLine(line)
 
         self.printComitList(self.__comit_list)
