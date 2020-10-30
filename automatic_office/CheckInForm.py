@@ -44,7 +44,7 @@ class CheckInForm(object):
         year = self.__input_year
         month = self.__input_month + 1
         if month == 13:
-            month = 12
+            month = 1
             year += 1
         return datetime.date(year, month, 4)
 
