@@ -21,12 +21,13 @@ Output: -1
 
 """
 
+
 class Solution:
-    def coinChange(self, coins, amount:int) -> int:
-        #coins:List[int]
+    def coinChange(self, coins, amount: int) -> int:
+        # coins:List[int]
         res = {}
         res[0] = 0
-        
+
         def dp(n):
             # dp(n) = min(dp(n-coin)+1, dp(n))
             if n in res.keys():
@@ -35,10 +36,10 @@ class Solution:
                 return -1
             res[n] = float("INF")
             for coin in coins:
-                if dp(n-coin) == -1:
-                    continue             
-                res[n] = min(dp(n-coin) + 1, res[n])
-                
+                if dp(n - coin) == -1:
+                    continue
+                res[n] = min(dp(n - coin) + 1, res[n])
+
             return res[n] if res[n] != float("INF") else -1
 
         return dp(amount)
