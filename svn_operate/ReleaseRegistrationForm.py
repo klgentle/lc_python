@@ -7,8 +7,10 @@ import sys
 import re
 import time
 
+
 from sys import argv
 from PlatformOperation import PlatformOperation
+from skip_table_structure_change import skip_table_structure_change
 
 SVN_DIR = "/mnt/e/svn/1300_编码/"
 SVN_LOG = "/mnt/e/svn/commit.log"
@@ -125,7 +127,8 @@ class ReleaseRegistrationForm(object):
     def logRegister(self):
         wb = openpyxl.load_workbook(self.__registration_file)
         sheet = wb.active
-        for i in self.__comit_list:
+        #for i in self.__comit_list:
+        for i in skip_table_structure_change(self.__comit_list):
             sheet.append(i)
 
         wb.save(filename=self.__registration_file)
