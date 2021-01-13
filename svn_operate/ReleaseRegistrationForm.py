@@ -116,7 +116,6 @@ class ReleaseRegistrationForm(object):
                 if self.__isCodeLine(line) and not self.__isRegistrationLine(line) and not self.__isFolderLine(line):
                     self.logReadOneLine(line)
 
-        self.printComitList(self.__comit_list)
 
     @staticmethod
     def printComitList(comit_list):
@@ -127,8 +126,9 @@ class ReleaseRegistrationForm(object):
     def logRegister(self):
         wb = openpyxl.load_workbook(self.__registration_file)
         sheet = wb.active
-        #for i in self.__comit_list:
-        for i in skip_table_structure_change(self.__comit_list):
+        regist_list = skip_table_structure_change(self.__comit_list)
+        self.printComitList(regist_list)
+        for i in regist_list:
             sheet.append(i)
 
         wb.save(filename=self.__registration_file)

@@ -4,24 +4,21 @@ def skip_table_structure_change(commit_list):
     """
     folder_index = 4
     has_modify = False
-    has_tables = False
+    modify_tables = []
 
     for row in commit_list:
         if row[folder_index].endswith("01Tables\\modify"):
             has_modify = True
         elif row[folder_index].endswith("01Tables"):
-            has_tables = True
+            modify_tables.append(row)
 
-    commit_delete_tables_list = []
-    if has_modify and has_tables:
-        # delete row in commit_list, delete的时候不能使用for row in, 会少数据
-        for row in commit_list:
-            if row[folder_index].endswith("01Tables"):
-                print("Warning, skip row !!!!!!!!!!!!!!!: \n", row)
-            else:
-                commit_delete_tables_list.append(row)
+    if has_modify and len(modify_tables) > 0:
+        # delete row in commit_list
+        for row in modify_tables:
+            print("Warning, skip row !!!!!!!!!!!!!!!: \n", row)
+            commit_list.remove(row)
 
-    return commit_delete_tables_list
+    return commit_list
 
 
 if __name__ == "__main__":
