@@ -15,12 +15,7 @@ class SvnOperate(object):
     def checkSvnConnect():
         # SSLError(SSLCertVerif
         svn_url = "https://10.120.107.200/svn/HK-ODS"
-        #svn_url = "https://100.11.94.168/svn/hk_ods"
         r = requests.get(svn_url, verify=False)
-        # try:
-        # except Exception as e:
-        #    print("请检查 svn 连接: ", e.__doc__)
-        #    sys.exit(-1)
 
     @staticmethod
     def update_svn():
@@ -45,7 +40,7 @@ class SvnOperate(object):
     @staticmethod
     def svn_add():
         try:
-            # 检查是否需要add
+            # 检查是否是新增的文件
             # TODO svn how to add file with blank?
             if os.popen("svn st").read().find("?") > -1:
                 svn_st_list = os.popen("svn st").read().strip("\n").split("\n")
@@ -81,7 +76,6 @@ class SvnOperate(object):
     @staticmethod
     def svn_delete():
         try:
-            # TODO svn how to add file with blank?
             if os.popen("svn st").read().find("!") > -1:
                 svn_st_list = os.popen("svn st").read().strip("\n").split("\n")
                 svn_st_filter = filter(lambda x: x.startswith("! "), svn_st_list)
