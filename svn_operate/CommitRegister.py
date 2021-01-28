@@ -55,6 +55,7 @@ class CommitRegister(object):
     def SvnLogRegist(self):
         self.__registration.logRead()
         self.__registration.logRegister()
+        self.__registration.logClean()
     
     def CreateSvnLog(self):
         self.checkProcedureAndExit()

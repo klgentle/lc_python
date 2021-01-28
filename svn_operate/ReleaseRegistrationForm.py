@@ -135,11 +135,19 @@ class ReleaseRegistrationForm(object):
         print("excel write down!")
 
 
+    def logClean(self):
+        with open(SVN_LOG, "w") as svn_log:
+            pass
+        
+
 if __name__ == "__main__":
     date_str = time.strftime("%Y%m%d", time.localtime())
     if argv[1]:
         date_str = argv[1]
-    mantis = argv[2]
+    mantis = ""
+    if len(argv) >2:
+        mantis = argv[2]
     reg = ReleaseRegistrationForm(date_str, mantis, "cif")
-    reg.logRead()
-    reg.logRegister()
+    #reg.logRead()
+    #reg.logRegister()
+    reg.logClean()
