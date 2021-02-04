@@ -41,7 +41,11 @@ class CreateWeekReport(object):
         return self.__from_dir
 
     def get_target_dir(self):
-        target_dir = os.path.join(self.__from_dir, f"文思周报【20{self.year_month[4:]}-20】", "董坚")
+        short_year = self.year_month[2:4]
+        month = self.year_month[4:]
+        next_month = str(int(month) +1).zfill(2)
+        print("next_month:", next_month)
+        target_dir = os.path.join(self.__from_dir, f"文思周报【{short_year}{month}-{short_year}{next_month}】", "董坚")
         if not os.path.exists(target_dir):
             os.makedirs(target_dir, exist_ok=True)
         return target_dir
