@@ -21,17 +21,18 @@ Output: [40,20,60,10,30,50,70,null,null,25]
 
 """
 
+
 class Solution:
     def insertIntoBST(self, root: TreeNode, val: int) -> TreeNode:
-        #if root:
+        # if root:
         #    print(f"root.val: {root.val}")
         if not root:
             return TreeNode(val)
-        
+
         # All the values Node.val are unique.
         if val < root.val:
             root.left = self.insertIntoBST(root.left, val)
         elif val > root.val:
             root.right = self.insertIntoBST(root.right, val)
-        
+
         return root

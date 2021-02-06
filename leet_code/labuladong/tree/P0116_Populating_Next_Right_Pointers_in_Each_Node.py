@@ -24,13 +24,13 @@ from typing import List, Node
 
 
 class Solution:
-    def connect(self, root: 'Node') -> 'Node':
+    def connect(self, root: "Node") -> "Node":
         if root is None:
             return root
         self.connectTwoNode(root.left, root.right)
         return root
 
-    def connectTwoNode(self, node1: 'None', node2: 'None'):
+    def connectTwoNode(self, node1: "None", node2: "None"):
         if node1 is None or node2 is None:
             return None
 
@@ -44,6 +44,5 @@ class Solution:
 
 if __name__ == "__main__":
     a = Solution()
-    root = [1,2,3,4,5,6,7] 
+    root = [1, 2, 3, 4, 5, 6, 7]
     print(a.connect(root))
-

@@ -12,6 +12,7 @@ Given the root of a binary tree, flatten the tree into a "linked list":
 #         self.left = left
 #         self.right = right
 
+
 class Solution:
     def flatten(self, root: TreeNode) -> None:
         if root is None:

@@ -33,7 +33,7 @@ class Solution:
         while q:
             level = []
 
-            for _  in range(len(q)):
+            for _ in range(len(q)):
                 node = q.popleft()
                 level.append(node.val)
 
@@ -43,7 +43,7 @@ class Solution:
                 if node.right:
                     q.append(node.right)
 
-            #print(f"redirect:{redirect}, level:{level}")
+            # print(f"redirect:{redirect}, level:{level}")
             # 调整加入顺序
             if redirect:
                 level.reverse()

@@ -10,19 +10,20 @@ Output: 1
 
 """
 
+
 class Solution:
     def __init__(self):
         self.treeList = []
 
     def kthSmallest(self, root: TreeNode, k: int) -> int:
         self.constructList(root, k)
-        return self.treeList[k-1]
+        return self.treeList[k - 1]
 
     def constructList(self, root, k):
         if not root:
             return
 
-        #print(self.treeList)
+        # print(self.treeList)
         # 跳过不需要的部分
         if len(self.treeList) >= k:
             return self.treeList

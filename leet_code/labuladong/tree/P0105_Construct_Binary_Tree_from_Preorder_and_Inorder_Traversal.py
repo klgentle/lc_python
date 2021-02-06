@@ -21,15 +21,15 @@ Return the following binary tree:
 
 class Solution:
     def buildTree(self, preorder: List[int], inorder: List[int]) -> TreeNode:
-        
+
         if not inorder:
             return
-        
+
         root_value = preorder.pop(0)
         root = TreeNode(root_value)
         root_index = inorder.index(root_value)
 
         root.left = self.buildTree(preorder, inorder[:root_index])
-        root.right = self.buildTree(preorder, inorder[root_index+1:])
-        
+        root.right = self.buildTree(preorder, inorder[root_index + 1 :])
+
         return root

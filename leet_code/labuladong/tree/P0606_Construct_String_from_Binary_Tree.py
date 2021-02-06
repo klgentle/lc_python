@@ -34,21 +34,22 @@ except we can't omit the first parenthesis pair to break the one-to-one mapping 
 
 """
 
+
 class Solution:
     def tree2str(self, t: TreeNode) -> str:
         if not t:
             return ""
-        
+
         if t.left:
             left = self.tree2str(t.left)
         if t.right:
             right = self.tree2str(t.right)
-        
+
         if t.left and not t.right:
             return f"{t.val}({left})"
         if t.right and not t.left:
             return f"{t.val}()({right})"
         if not t.left and not t.right:
             return f"{t.val}"
-        
+
         return f"{t.val}({left})({right})"

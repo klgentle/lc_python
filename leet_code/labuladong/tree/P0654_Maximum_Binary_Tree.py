@@ -25,6 +25,6 @@ class Solution:
         root = TreeNode(max_value)
         root.left = self.constructMaximumBinaryTree(nums[:max_index])
         # be careful max_index is in the root node
-        root.right = self.constructMaximumBinaryTree(nums[max_index+1:])
+        root.right = self.constructMaximumBinaryTree(nums[max_index + 1 :])
 
         return root

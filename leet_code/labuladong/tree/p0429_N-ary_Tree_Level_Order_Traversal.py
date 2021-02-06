@@ -20,8 +20,9 @@ class Node:
         self.children = children
 """
 
+
 class Solution:
-    def levelOrder(self, root: 'Node') -> List[List[int]]:
+    def levelOrder(self, root: "Node") -> List[List[int]]:
         q, result = deque(), []
 
         if root:

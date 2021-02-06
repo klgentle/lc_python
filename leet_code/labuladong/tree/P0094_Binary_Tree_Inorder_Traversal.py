@@ -23,7 +23,7 @@ Output: [1]
 #         self.right = right
 class Solution:
     def inorderTraversal(self, root: TreeNode) -> List[int]:
-        #根据..序，返回正序
+        # 根据..序，返回正序
         if root is None:
             return []
 

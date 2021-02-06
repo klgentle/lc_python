@@ -16,7 +16,7 @@ For this problem, a path is defined as any node sequence from some starting node
 class Solution:
     def __init__(self):
         self.ans = -99999999999999999
-    
+
     def onePathSum(self, root):
         # root.left == None 无效
         if root is None:
@@ -24,8 +24,8 @@ class Solution:
         left = max(0, self.onePathSum(root.left))
         right = max(0, self.onePathSum(root.right))
         self.ans = max(self.ans, left + right + root.val)
-        return max(left, right) + root.val # 为什么是max(left, right) 因为是求max,不是求和
-        
+        return max(left, right) + root.val  # 为什么是max(left, right) 因为是求max,不是求和
+
     def maxPathSum(self, root: TreeNode) -> int:
         self.onePathSum(root)
         return self.ans

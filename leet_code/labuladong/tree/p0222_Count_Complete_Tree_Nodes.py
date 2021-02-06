@@ -30,15 +30,15 @@ class Solution:
         if not root:
             return 0
 
-        return 1+ self.countNodes(root.left) + self.countNodes(root.right)
+        return 1 + self.countNodes(root.left) + self.countNodes(root.right)
 
     def countNodes(self, root: TreeNode) -> int:
         if not root:
             return 0
-        
+
         l = root.left
         r = root.right
-        
+
         hl, hr = 0, 0
         while l:
             l = l.left
@@ -46,8 +46,8 @@ class Solution:
         while r:
             r = r.right
             hr += 1
-        
+
         if hl == hr:
-            return 2 ** (hl+1) -1
-        
-        return 1+ self.countNodes(root.left) + self.countNodes(root.right)
+            return 2 ** (hl + 1) - 1
+
+        return 1 + self.countNodes(root.left) + self.countNodes(root.right)

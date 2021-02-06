@@ -44,7 +44,7 @@ class Solution:
                 return root.left
             if root.left and root.right:
                 root.val = self.minVal(root.right)
-                #print(f"root.val:{root.val}")
+                # print(f"root.val:{root.val}")
                 root.right = self.deleteNode(root.right, root.val)
 
         elif key < root.val:

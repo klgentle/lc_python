@@ -7,8 +7,8 @@ Clarification: The input/output format is the same as how LeetCode serializes a 
 
 """
 
+
 class Codec:
-    
     def serialize(self, root):
         """Encodes a tree to a single string.
         
@@ -17,13 +17,12 @@ class Codec:
         """
         if not root:
             return "#"
-        
+
         left = self.serialize(root.left)
         right = self.serialize(root.right)
-        
+
         return f"{root.val},{left},{right}"
-        
-        
+
     def deserialize(self, data):
         """Decodes your encoded data to tree.
         
@@ -32,23 +31,24 @@ class Codec:
         """
         nodes = data.split(",")
         return self.deserializeIteration(nodes)
-    
+
     def deserializeIteration(self, nodes):
         if not nodes:
             return None
-        
-        #print(f"nodes:{nodes}")
+
+        # print(f"nodes:{nodes}")
         root_val = nodes.pop(0)
         if root_val == "#":
             return None
-        
+
         root = TreeNode(root_val)
         # 无法区分左右，直接交给递归. 递归会不断减少数据，left全部减少之后就只剩right
         root.left = self.deserializeIteration(nodes)
         root.right = self.deserializeIteration(nodes)
-        
+
         return root
-        
+
+
 # Your Codec object will be instantiated and called as such:
 # ser = Codec()
 # deser = Codec()

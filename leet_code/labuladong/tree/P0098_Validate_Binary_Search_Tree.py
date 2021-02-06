@@ -31,4 +31,6 @@ class Solution:
         if root.val <= minVal or root.val >= maxVal:
             return False
 
-        return self.isValidBSTSub(root.left, minVal, root.val) and self.isValidBSTSub(root.right, root.val, maxVal)
+        return self.isValidBSTSub(root.left, minVal, root.val) and self.isValidBSTSub(
+            root.right, root.val, maxVal
+        )
