@@ -76,7 +76,7 @@ class ReleaseRegistrationForm(object):
         module = ""
         if len(modu) > 1:
             module = modu[1][:3]
-        return module
+        return module or "CIF"
 
     @staticmethod
     def __svnLineClean(line):
