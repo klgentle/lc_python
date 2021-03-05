@@ -64,7 +64,7 @@ class CreateWeekReport(object):
             content = content.replace(date_name, date_str)
         return content
 
-    def replace_all_str(self, text: str, date_tuple: tuple) -> str:
+    def replace_all_str(self, text: str, date_tuple: tuple, date_tuple2=()) -> str:
         text = self.replace_date_str(
             text, "fromEndStr", self.interval.get_from_end_str(date_tuple)
         )
@@ -74,6 +74,14 @@ class CreateWeekReport(object):
         text = self.replace_date_str(
             text, "endDate", self.interval.get_end_date(date_tuple)
         )
+        if date_tuple2:
+            text = self.replace_date_str(
+                text, "nextFD", self.interval.get_from_date(date_tuple2)
+            )
+            text = self.replace_date_str(
+                text, "nextND", self.interval.get_end_date(date_tuple2)
+            )
+
         return text
 
     def check_word_change(self, file_name, date_tuple: tuple):
@@ -85,7 +93,7 @@ class CreateWeekReport(object):
                 run.text = self.replace_all_str(run.text, date_tuple)
         document.save(word_file)
 
-    def check_excel_change(self, file_name, date_tuple: tuple):
+    def check_excel_change(self, file_name, date_tuple: tuple, date_tuple2):
         logging.info("replace excel")
         file_path = os.path.join(self.__target_dir, file_name)
         wb = openpyxl.load_workbook(file_path)
@@ -93,11 +101,11 @@ class CreateWeekReport(object):
 
         for row in range(1, sheet.max_row + 1):
             for col in range(1, sheet.max_column + 1):
-                if sheet.cell(row, col).value in ("fromEndStr", "fromDate", "endDate"):
+                if sheet.cell(row, col).value in ("fromEndStr", "fromDate", "endDate", "nextFD", "nextND"):
                     logging.debug("excel value:[%s]" % sheet.cell(row, col).value)
                     # 替换单元格的值
                     sheet.cell(row, col).value = self.replace_all_str(
-                        sheet.cell(row, col).value, date_tuple
+                        sheet.cell(row, col).value, date_tuple, date_tuple2
                     )
 
         wb.save(file_path)
@@ -105,7 +113,8 @@ class CreateWeekReport(object):
     def create_week_report(self):
         weekdays = CheckInForm(self.year_month).get_all_work_date()
         logging.info("开始生成周报...")
-        for date_tuple in self.interval.get_all_weekday_interval(weekdays, []):
+        date_tuples = self.interval.get_all_weekday_interval(weekdays, [])
+        for i, date_tuple in enumerate(date_tuples):
             from_end_str = self.interval.get_from_end_str(date_tuple)
 
             word_file_name = self.from_word.replace("fromEndStr", from_end_str)
@@ -117,7 +126,13 @@ class CreateWeekReport(object):
             excel_file_name = self.from_excel.replace("fromEndStr", from_end_str)
             # copy excel file
             self.copy_file(self.from_excel, excel_file_name)
-            self.check_excel_change(excel_file_name, date_tuple)
+
+            date_tuple2 = ()
+            if i+1 < len(date_tuples):
+                date_tuple2 = date_tuples[i+1] 
+            else:
+                date_tuple2 = (date_tuple[0] + datetime.timedelta(7), date_tuple[1] + datetime.timedelta(7))
+            self.check_excel_change(excel_file_name, date_tuple, date_tuple2)
         logging.info("周报已生成!")
 
 
