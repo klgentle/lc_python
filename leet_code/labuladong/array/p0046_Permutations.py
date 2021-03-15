@@ -25,11 +25,12 @@ Output: [[1]]
 
 class Solution:
     def permute(self, nums: List[int]) -> List[List[int]]:
-        #result = []
 
         def backtrace(nums, trace=[], result=[]):
             if not nums:
-                result.append(trace[::]) # 为什么不写[::]就为空？
+                # reason why we are copying here is because at "lists are passed by reference" and since we are maintaining only one path
+                #result.append(trace[::])
+                result.append(trace.copy()) # 需要复制trace, list.copy() 等价于 [::]
 
             for i in range(len(nums)):
                 newNums = nums[:i] + nums[i+1:]
