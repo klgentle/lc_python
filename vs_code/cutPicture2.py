@@ -4,6 +4,9 @@ import os
 #import cv2
 
 class SplitPicture(object):
+    """
+    剪切手机图片，主要是剪掉图片头部跟图片下方的答案
+    """
 
     def __init__(self):
         self.path = "/mnt/f/for_wife"
@@ -25,9 +28,9 @@ class SplitPicture(object):
                 file_whole_name = os.path.join(self.path,folderName,filename)
                 img = Image.open(file_whole_name)
                 w,h = img.size
-                h = 660
+                h = 850
                 print(f"w,h:{w},{h}")
-                box1 = (0,60,w,660)
+                box1 = (0,120,w,h)
                 image1 = img.crop(box1)
                 percent = 2.2
                 image1 = image1.resize((int(w/percent), int((h-60)/percent)))
