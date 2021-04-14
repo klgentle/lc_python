@@ -5,7 +5,7 @@ import cv2
 
 class SplitPicture(object):
     def __init__(self):
-        self.path = "/mnt/c/Users/klgentle/Desktop/老婆专用"
+        self.path = "/mnt/f/for_wife" #"/mnt/c/Users/klgentle/Desktop/老婆专用"
 
     def splitPicture(self):
         # for filename in os.listdir(self.path):

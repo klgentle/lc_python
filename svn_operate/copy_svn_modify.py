@@ -27,12 +27,12 @@ class CopyRegister(object):
        "usage python[3] copy_upload_ubuntu.py '20190501'"
     """
 
-    def __init__(self, date_str: str):
+    def __init__(self, date_str: str, place: str):
         self.__date_str_list = [0]
         self.create_date_str_list(date_str)
         print(f"self.__date_str_list:{self.__date_str_list}")
 
-        self.init_path()
+        self.init_path(place)
         self.svn = SvnOperate(self.__svnup_dir)
         self.svn.update_windows_svn()
         self.make_or_clean_folder()
@@ -41,7 +41,7 @@ class CopyRegister(object):
         self.__error_file_type = set()
         print("init complete")
 
-    def init_path(self):
+    def init_path(self, place):
         home_path = configs.get("path").get("svn_home_path")
         # if self.svn.is_system_windows():
         if platform.uname().system == "Windows":
@@ -53,11 +53,15 @@ class CopyRegister(object):
         print(f"home_path:{home_path}")
 
         self.code_home = os.path.join(home_path, "svn")
-        self.__register_folder = os.path.join(self.code_home, "1300_编码", "发布登记表")
+        from_folder = "发布登记表_UAT"
+        if place.upper() == 'PRD':
+            from_folder = "发布登记表_PRD"
+        #self.__register_folder = os.path.join(self.code_home, "1300_编码", "发布登记表")
+        self.__register_folder = os.path.join(self.code_home, "1300_编码", from_folder)
         self.__svnup_dir = os.path.join(self.code_home, "1300_编码")
 
         code_beta_path = os.path.join(home_path, "yx_walk", "beta")
-        self.__beta_path = os.path.join(code_beta_path, self.date_str + "beta")
+        self.__beta_path = os.path.join(code_beta_path, self.date_str + "beta_" + place)
 
     def create_date_str_list(self, date_str):
         if date_str.find(",") > -1:
@@ -330,18 +334,20 @@ select OBJECT_NAME from ods_job_config where object_type = 'SP';
 
 
 if __name__ == "__main__":
-    # print("usage python[3] copy_upload_ubuntu.py '20190501'")
-    # print("usage python[3] copy_upload_ubuntu.py 20181201,20200114")
+    # print("usage python[3] copy_upload_ubuntu.py '20190501', UAT")
     date_str = time.strftime("%Y%m%d", time.localtime())
-    if len(argv) > 1 and len(argv[1]) == 8:
-        if int(date_str) - int(argv[1]) > 10:
-            print(f"argv[1] {argv[1]} is too small")
-            sys.exit(1)
-        date_str = argv[1]
-    elif len(argv) > 1:
-        date_str = argv[1]
+    place = argv[2]
+    #if len(argv) > 1 and len(argv[1]) == 8:
+    #    if int(date_str) - int(argv[1]) > 10:
+    #        print(f"argv[1] {argv[1]} is too small")
+    #        sys.exit(1)
+    #    date_str = argv[1]
+    #elif len(argv) > 1:
+    #    date_str = argv[1]
 
-    a = CopyRegister(date_str)
+   
+
+    a = CopyRegister(date_str, place)
     a.copy_file_from_register()
 
     print("Done!")
