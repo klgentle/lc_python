@@ -56,7 +56,6 @@ class CopyRegister(object):
         from_folder = "发布登记表_UAT"
         if place.upper() == 'PRD':
             from_folder = "发布登记表_PRD"
-        #self.__register_folder = os.path.join(self.code_home, "1300_编码", "发布登记表")
         self.__register_folder = os.path.join(self.code_home, "1300_编码", from_folder)
         self.__svnup_dir = os.path.join(self.code_home, "1300_编码")
 
@@ -84,10 +83,12 @@ class CopyRegister(object):
             for filename in filenames:
                 # find right date register excel
                 # filename[-13:-5] is datadate of register
+                #print(f"filename:{filename} test !!!!!!!!!")
                 if filename[-13:-5] not in self.__date_str_list:
                     continue
 
                 whole_filename = os.path.join(folderName, filename)
+                print(f"whole_filename:{whole_filename}")
                 self.readOneRegister(whole_filename)
 
         print(f"data_list count:{len(self.__data_list)}")
@@ -232,7 +233,7 @@ class CopyRegister(object):
     def saveRegisterExcel(self):
         "save excel records to one excel"
         file1 = os.path.join(
-            self.__svnup_dir, "发布登记表", "cif", "ODS程序版本发布登记表(cif)-template.xlsx"
+            self.__svnup_dir, "发布登记表_UAT", "cif", "ODS程序版本发布登记表(cif)-template.xlsx"
         )
         file_path_name = self.__beta_path + "/登记表" + self.date_str + ".xlsx"
         shutil.copy(file1, file_path_name)
@@ -336,15 +337,14 @@ select OBJECT_NAME from ods_job_config where object_type = 'SP';
 if __name__ == "__main__":
     # print("usage python[3] copy_upload_ubuntu.py '20190501', UAT")
     date_str = time.strftime("%Y%m%d", time.localtime())
+    if len(argv) > 1 and len(argv[1]) == 8:
+        if int(date_str) - int(argv[1]) > 10:
+            print(f"argv[1] {argv[1]} is too small")
+            sys.exit(1)
+        date_str = argv[1]
+    elif len(argv) > 1:
+        date_str = argv[1]
     place = argv[2]
-    #if len(argv) > 1 and len(argv[1]) == 8:
-    #    if int(date_str) - int(argv[1]) > 10:
-    #        print(f"argv[1] {argv[1]} is too small")
-    #        sys.exit(1)
-    #    date_str = argv[1]
-    #elif len(argv) > 1:
-    #    date_str = argv[1]
-
    
 
     a = CopyRegister(date_str, place)
