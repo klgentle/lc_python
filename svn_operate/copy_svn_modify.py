@@ -1,7 +1,7 @@
 import shutil, os
 import openpyxl
 import pprint
-import codecs
+#import codecs
 import csv
 import os
 import time
@@ -322,8 +322,8 @@ select OBJECT_NAME from ods_job_config where object_type = 'SP';
         self.__error_file_type = self.copyfiles(self.register_data_deal(register_data))
         self.listSqlFile()
         print("list file complete")
-        self.createConfigCheckSql()
-        print("create config done")
+        #self.createConfigCheckSql()
+        #print("create config done")
         self.write_bo_list()
         print("write bo done")
         self.createZipfile()
