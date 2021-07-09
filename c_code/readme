@@ -1,2 +1,4 @@
 cc charminus.c
 ./a.out
+
+gcc -o atof atof.c -lm
