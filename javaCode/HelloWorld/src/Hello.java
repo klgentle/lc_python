@@ -7,10 +7,17 @@ import java.math.*;
 import java.time.LocalDate;
 
 public class Hello {
+    public static void main(String[] args) {
+        Random r = new Random(12345);  // ä¼ªéšæœºæ•°
+        for (int i = 0; i < 10; i++) { 
+            System.out.println(r.nextInt(100));  
+        }
+        // 51, 80, 41, 28, 55...
+    }
 
-	public static void main(String[] args)
+	public static void main5(String[] args)
 	{
-        // 5Î»Í¬Ñ§µÄ³É¼¨:
+        // 5Î»Í¬Ñ§ï¿½Ä³É¼ï¿½:
         int[] ns = new int[5];
         ns[0] = 68;
         ns[1] = 79;
@@ -48,7 +55,7 @@ public class Hello {
 		
         double x = 1.0 / 10;
         double y = 1 - 9.0 / 10;
-        // ¹Û²ìxºÍyÊÇ·ñÏàµÈ:
+        // ï¿½Û²ï¿½xï¿½ï¿½yï¿½Ç·ï¿½ï¿½ï¿½ï¿½:
         System.out.println(x);
         System.out.println(y);
         System.out.println("x is equal to y? " +isEqual(x,y));
@@ -57,7 +64,7 @@ public class Hello {
         System.out.println(d);
         
         int n3= (int) (2.6 + 0.5);
-        int n4= (int) (2.4 + 0.5); // Èç¹ûÒª½øĞĞËÄÉáÎåÈë£¬¿ÉÒÔ¶Ô¸¡µãÊı¼ÓÉÏ0.5ÔÙÇ¿ÖÆ×ªĞÍ£º
+        int n4= (int) (2.4 + 0.5); // ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ë£¬ï¿½ï¿½ï¿½Ô¶Ô¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½0.5ï¿½ï¿½Ç¿ï¿½ï¿½×ªï¿½Í£ï¿½
         System.out.println(n3);
         System.out.println(n4);
 	}
@@ -74,7 +81,7 @@ public class Hello {
         double a = 1.0;
         double b = 3.0;
         double c = -4.0;
-        // ÇóÆ½·½¸ù¿ÉÓÃ Math.sqrt():
+        // ï¿½ï¿½Æ½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Math.sqrt():
         // System.out.println(Math.sqrt(2)); ==> 1.414
         // TODO:
         double d = Math.sqrt(b*b-4*a*c);
@@ -83,7 +90,7 @@ public class Hello {
         
         System.out.println(r1);
         System.out.println(r2);
-        System.out.println(r1 == 1 && r2 == -4 ? "²âÊÔÍ¨¹ı" : "²âÊÔÊ§°Ü");
+        System.out.println(r1 == 1 && r2 == -4 ? "ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½" : "ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½");
     }
     
 	public static void main2(String[] args) {
@@ -91,8 +98,8 @@ public class Hello {
 		System.out.println("Hello, World!");
 		int n = 100;
 		System.out.println("n = " + n);
-		int i3 = 2_000_000_000; // ¼ÓÏÂ»®Ïß¸üÈİÒ×Ê¶±ğ
-		System.out.printf("i3 = %d\n", i3); // + ¸ú£¬(ĞèÒª¸ñÊ½»¯)¶¼¿ÉÒÔ
+		int i3 = 2_000_000_000; // ï¿½ï¿½ï¿½Â»ï¿½ï¿½ß¸ï¿½ï¿½ï¿½ï¿½ï¿½Ê¶ï¿½ï¿½
+		System.out.printf("i3 = %d\n", i3); // + ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½Òªï¿½ï¿½Ê½ï¿½ï¿½)ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		boolean b1 = true;
 		System.out.println("b1 = " + b1);
 	}

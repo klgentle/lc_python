@@ -1,0 +1,2 @@
+JAVA_VERSION="16.0.1"
+MODULES="java.base java.xml hello.world"

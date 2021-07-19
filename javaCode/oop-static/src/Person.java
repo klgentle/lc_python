@@ -1,17 +1,17 @@
 
 public class Person {
 
-	private int count;
+	private static int count;
 
 	String name;
 
 	public Person(String name) {
 		this.name = name;
-		this.count = count + 1;
+		count = count + 1;
 	}
 	
-	public int getCount() {
-		return this.count;
+	public static int getCount() {
+		return count;
 	}
 
 }
