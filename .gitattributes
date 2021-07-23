@@ -17,6 +17,8 @@
 *.sql text eol=crlf
 *.php text eol=crlf
 *.py text eol=crlf
+*.java text eol=lf
+*.class text eol=lf
 
 # Denote all files that are truly binary and should not be modified.
 *.png binary
