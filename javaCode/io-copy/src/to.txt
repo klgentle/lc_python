@@ -1,0 +1,9 @@
+-- 1	4010	4008	SCD06 420000101 其他支付结算手续费（转账缴存）	手续费转账支出
+select * from ods.sym_rb_tran_def where TRAN_type in ('4010','4008')
+AND edate = '99991231';  -- 420000101
+
+--SELECT * FROM fsd.gl_balances;
+--GL_CODE
+
+select * from  TPS.ODS_ALL_REPORT_RULE where RESO_ID = 'INT002';  -- todo insert 
+select * from  TPS.INT009_ITEM ;  -- todo insert 
