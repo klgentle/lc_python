@@ -7,7 +7,12 @@ import java.math.*;
 import java.time.LocalDate;
 
 public class Hello {
-    public static void main(String[] args) {
+	public static void main(String[] args) {
+		System.out.println(System.currentTimeMillis());
+		
+	}
+	
+    public static void main6(String[] args) {
         Random r = new Random(12345);  // 伪随机数
         for (int i = 0; i < 10; i++) { 
             System.out.println(r.nextInt(100));  

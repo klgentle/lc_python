@@ -1,3 +1,5 @@
+package set;
+
 import java.util.*;
 
 public class Tests{

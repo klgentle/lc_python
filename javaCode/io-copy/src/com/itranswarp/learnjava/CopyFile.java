@@ -3,6 +3,7 @@ package com.itranswarp.learnjava;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 
@@ -21,7 +22,7 @@ public class CopyFile {
 		copy(args[0], args[1]);
 	}
 
-	static void copy(String source, String target) throws IOException {
+	static void copy1(String source, String target) throws IOException {
 		// 友情提示：测试时请使用无关紧要的文件
 		try (InputStreamReader input = new InputStreamReader(new FileInputStream(source), "UTF-8");  // 使用InputStreamReader 指定编码
 			 OutputStream out = new FileOutputStream(target))
@@ -38,5 +39,17 @@ public class CopyFile {
 			out.flush(); // 清空缓存
 		}
 		System.out.println("Copy success!");
+	}
+	
+	static void copy(String source, String target) throws IOException {
+		// 友情提示：测试时请使用无关紧要的文件
+		try (InputStream input = new FileInputStream(source);
+			     OutputStream output = new FileOutputStream(target))
+			{
+				
+			    input.transferTo(output);  // 真简洁啊
+			    output.flush(); // 清空缓存
+			    System.out.println("复制成功");
+			}
 	}
 }
