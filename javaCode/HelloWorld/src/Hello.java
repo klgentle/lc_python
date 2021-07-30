@@ -60,7 +60,6 @@ public class Hello {
 		
         double x = 1.0 / 10;
         double y = 1 - 9.0 / 10;
-        // �۲�x��y�Ƿ����:
         System.out.println(x);
         System.out.println(y);
         System.out.println("x is equal to y? " +isEqual(x,y));
@@ -69,7 +68,7 @@ public class Hello {
         System.out.println(d);
         
         int n3= (int) (2.6 + 0.5);
-        int n4= (int) (2.4 + 0.5); // ���Ҫ�����������룬���ԶԸ���������0.5��ǿ��ת�ͣ�
+        int n4= (int) (2.4 + 0.5); 
         System.out.println(n3);
         System.out.println(n4);
 	}
@@ -86,7 +85,6 @@ public class Hello {
         double a = 1.0;
         double b = 3.0;
         double c = -4.0;
-        // ��ƽ�������� Math.sqrt():
         // System.out.println(Math.sqrt(2)); ==> 1.414
         // TODO:
         double d = Math.sqrt(b*b-4*a*c);
@@ -95,7 +93,7 @@ public class Hello {
         
         System.out.println(r1);
         System.out.println(r2);
-        System.out.println(r1 == 1 && r2 == -4 ? "����ͨ��" : "����ʧ��");
+        System.out.println(r1 == 1 && r2 == -4 ? "OK" : "not");
     }
     
 	public static void main2(String[] args) {
@@ -103,8 +101,8 @@ public class Hello {
 		System.out.println("Hello, World!");
 		int n = 100;
 		System.out.println("n = " + n);
-		int i3 = 2_000_000_000; // ���»��߸�����ʶ��
-		System.out.printf("i3 = %d\n", i3); // + ����(��Ҫ��ʽ��)������
+		int i3 = 2_000_000_000; 
+		System.out.printf("i3 = %d\n", i3); 
 		boolean b1 = true;
 		System.out.println("b1 = " + b1);
 	}
