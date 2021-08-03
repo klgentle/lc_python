@@ -40,6 +40,14 @@ class ExtractTheReferencedFile(object):
 
         return True
 
+    def referencedLineFormat(self, line):
+        line = line.strip('\n')
+        line = line.strip()
+        line = line.strip(';')
+        return line.replace('@..\\..\\', '')
+        
+
+
     def getListFiles(self):
         for folderName, subfolders, filenames in os.walk(self.inputDir):
             for filename in filenames:
@@ -49,10 +57,7 @@ class ExtractTheReferencedFile(object):
                 with open(os.path.join(self.inputDir,filename), "r", encoding='gbk', errors='ignore') as f:
                     for line in f.readlines(): 
                         if line[0] == "@":
-                            line = line.strip('\n')
-                            line = line.strip()
-                            line = line.strip(';')
-                            self.fileList.append(line.replace('@..\\..\\', ''))
+                            self.fileList.append(self.referencedLineFormat(line))
         logging.debug(self.fileList)
 
     def copyFile(self, fromDir, toDir):
