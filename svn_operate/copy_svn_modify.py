@@ -339,8 +339,9 @@ if __name__ == "__main__":
     date_str = time.strftime("%Y%m%d", time.localtime())
     if len(argv) > 1 and len(argv[1]) == 8:
         if int(date_str) - int(argv[1]) > 10:
-            print(f"argv[1] {argv[1]} is too small")
-            sys.exit(1)
+            pass
+            #print(f"argv[1] {argv[1]} is too small")
+            #sys.exit(1)
         date_str = argv[1]
     elif len(argv) > 1:
         date_str = argv[1]
