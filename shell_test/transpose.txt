@@ -1,3 +1,4 @@
-name age
-alice 21
-ryan 30
+job salary age
+c++ 13 20
+java 14 21
+php 12 22
