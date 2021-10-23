@@ -1,7 +1,8 @@
 import sqlite3
+from flask import Flask, request
 
 
-def demo(site_name):
+def save_data(site_name):
     # 若不存在则创建
     con = sqlite3.connect("ifrs9.db")
     # 游标对象
@@ -29,4 +30,4 @@ def demo(site_name):
 
 
 if __name__ == "__main__":
-    demo("HASE")
+    save_data("HASE")
