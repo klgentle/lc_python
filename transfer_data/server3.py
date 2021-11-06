@@ -2,7 +2,11 @@ import sqlite3
 from flask import Flask, Response, jsonify, json, request
 from exchangelib import Credentials, Configuration, Account, DELEGATE, Mailbox, UTC, Message
 from exchangelib.protocol import BaseProtocol, NoVerifyHTTPAdapter, FaultTolerance
+from exchangelib.util import PrettyXmlHandler
+import logging
 import urllib3
+
+logging.basicConfig(level=logging.DEBUG, handlers=[PrettyXmlHandler()])
 
 
 app = Flask(__name__)
@@ -87,7 +91,7 @@ def send_mail_ex(site_name):
     config = Configuration(server="outlook.office365.com", credentials=credentials)
 
     my_account = Account(
-        primary_smtp_address="myusername@example.com",
+        primary_smtp_address="klgentle4@outlook.com",
         credentials=credentials,
         config=config,
         access_type=DELEGATE,
@@ -97,9 +101,10 @@ def send_mail_ex(site_name):
         account=my_account,
         subject="Daily motivation",
         body="All bodies are beautiful",
-        to_recipients=[Mailbox(email_address="klgentle@sina.com")],
+        to_recipients=[Mailbox(email_address="klgentle4@outlook.com")],
     )
     m.send()
+    return "Success"
 
 
 if __name__ == "__main__":
