@@ -1,6 +1,6 @@
 import sqlite3
 from flask import Flask, Response, jsonify, json, request
-from exchangelib import Credentials, Configuration, Account, DELEGATE, Mailbox, UTC, Message
+from exchangelib import Credentials, Configuration, Account, DELEGATE, Mailbox, UTC, Message, OAUTH2
 from exchangelib.protocol import BaseProtocol, NoVerifyHTTPAdapter, FaultTolerance
 from exchangelib.util import PrettyXmlHandler
 import logging
@@ -89,6 +89,7 @@ def send_mail_ex(site_name):
 
     credentials = Credentials(username="klgentle4@outlook.com", password="ol654321")
     config = Configuration(server="outlook.office365.com", credentials=credentials)
+    #config = Configuration(server="outlook.office365.com", credentials=credentials, auth_type=OAUTH2)
 
     my_account = Account(
         primary_smtp_address="klgentle4@outlook.com",
