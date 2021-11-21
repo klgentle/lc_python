@@ -54,3 +54,4 @@ temp
 dist
 build
 /.metadata/
+transfer_data/venv
