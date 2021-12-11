@@ -1,7 +1,0 @@
-flask
-cryptography==3.3.2
-exchangelib==3.3.0
-pyOpenSSL
-ndg-httpsclient
-pyasn1
-wheel
