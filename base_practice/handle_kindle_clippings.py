@@ -14,10 +14,11 @@ file sample:
 
 import os.path
 import re
+
 # from pprint import pprint
 
 # my_clippings_file = r"D:\文本\kindle电子书\My Clippings-test.txt"
-my_clippings_file = r"D:\文本\kindle电子书\My Clippings-22-02-27.txt"
+my_clippings_file = r"D:\文本\kindle电子书\My Clippings.txt"
 target_note_path = r"D:\文本\kindle电子书\notes"
 
 
@@ -35,7 +36,7 @@ def move_notes_according_to_book_name():
     book_note_dict = {}
     for note in all_notes_list:
         note_line_list = note.split("\n")
-        book_name = note_line_list[0].replace("\ufeff", "").replace("/", "_")
+        book_name = note_line_list[0].replace("\ufeff", "")
         book_name = re.sub(r'[,. -!?:/]', '_', book_name)
         page_info = note_line_list[1].split(" | ")[0].replace("- 您在位置 ", "").replace("的标注", "")
         note_content_with_page = " ".join([page_info, note_line_list[3]])
@@ -52,10 +53,9 @@ def write_note_to_files():
     for book_name, content in move_notes_according_to_book_name().items():
         if not os.path.exists(target_note_path):
             os.makedirs(target_note_path)
-        # repr(变量) 来实现不进行转义, str 进行转义
         # print(f"Book name:{book_name}")
         try:
-            with open(os.path.join(target_note_path, book_name[0:30] + '.txt'), "a", encoding="utf-8") as note_file:
+            with open(os.path.join(target_note_path, book_name[0:60] + '.txt'), "a", encoding="utf-8") as note_file:
                 note_file.write("\n".join(content))
         except OSError:
             print(f"Error found with content:", '\n'.join(content))
