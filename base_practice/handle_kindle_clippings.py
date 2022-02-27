@@ -55,7 +55,7 @@ def write_note_to_files():
         # repr(变量) 来实现不进行转义, str 进行转义
         # print(f"Book name:{book_name}")
         try:
-            with open(os.path.join(target_note_path, book_name + '.txt'), "a", encoding="utf-8") as note_file:
+            with open(os.path.join(target_note_path, book_name[0:30] + '.txt'), "a", encoding="utf-8") as note_file:
                 note_file.write("\n".join(content))
         except OSError:
             print(f"Error found with content:", '\n'.join(content))
