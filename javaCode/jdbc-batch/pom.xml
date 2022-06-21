@@ -18,7 +18,7 @@
 		<java.version>11</java.version>
 
 		<!-- <mysql.version>5.1.47</mysql.version> -->
-		<mysql.version>8.0.21</mysql.version>
+		<mysql.version>8.0.28</mysql.version>
 
 	</properties>
 
