@@ -17,9 +17,9 @@ import re
 
 # from pprint import pprint
 
-# my_clippings_file = r"D:\文本\kindle电子书\My Clippings-test.txt"
-my_clippings_file = r"D:\文本\kindle电子书\My Clippings.txt"
-target_note_path = r"D:\文本\kindle电子书\notes"
+# my_clippings_file = r"C:\文本\kindle电子书\My Clippings-test.txt"
+my_clippings_file = r"C:\文本\kindle电子书\My Clippings.txt"
+target_note_path = r"C:\文本\kindle电子书\notes"
 
 
 def read_and_split_notes():
