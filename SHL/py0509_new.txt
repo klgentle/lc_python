@@ -1,0 +1,68 @@
+import sys
+from math import gcd
+
+def solve():
+    input_data = sys.stdin.read().split()
+    if not input_data:
+        return
+    
+    N = int(input_data[0])
+    if N == 0:
+        print(0)
+        return
+    
+    points = []
+    idx = 1
+    for _ in range(N):
+        x = int(input_data[idx])
+        y = int(input_data[idx+1])
+        points.append((x, y))
+        idx += 2
+        
+    lines = 0
+    
+    while len(points) > 0:
+        if len(points) == 1:
+            lines += 1
+            break
+        
+        p0 = points[0]
+        
+        slopes = {}
+        
+        for i in range(1, len(points)):
+            p1 = points[i]
+            dx = p1[0] - p0[0]
+            dy = p1[1] - p0[1]
+            
+            if dx == 0 and dy == 0:
+                slope = (0, 0)
+            else:
+                common = gcd(dx, dy)
+                slope = (dy // common, dx // common)
+                if slope[1] < 0 or (slope[1] == 0 and slope[0] < 0):
+                    slope = (-slope[0], -slope[1])
+            
+            if slope not in slopes:
+                slopes[slope] = []
+            slopes[slope].append(i)
+            
+        
+        if slopes:
+            best_slope = max(slopes, key=lambda k: len(slopes[k]))
+            max_covered_indices = slopes[best_slope]
+        
+        indices_to_remove = {0} | set(max_covered_indices)
+        
+        new_points = []
+        for i in range(len(points)):
+            if i not in indices_to_remove:
+                new_points.append(points[i])
+        
+        points = new_points
+        lines += 1
+        
+    print(lines)
+
+if __name__ == '__main__':
+    solve()

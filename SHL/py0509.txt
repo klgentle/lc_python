@@ -1,0 +1,89 @@
+import sys
+from math import gcd
+
+def solve():
+    # 使用 sys.stdin 读取输入，速度更快
+    input_data = sys.stdin.read().split()
+    if not input_data:
+        return
+    
+    N = int(input_data[0])
+    if N == 0:
+        print(0)
+        return
+    
+    # 将坐标读入列表
+    points = []
+    idx = 1
+    for _ in range(N):
+        x = int(input_data[idx])
+        y = int(input_data[idx+1])
+        points.append((x, y))
+        idx += 2
+        
+    lines = 0
+    
+    # 当还有点未覆盖时
+    while len(points) > 0:
+        # 如果只剩下一个点，必然需要一条直线
+        if len(points) == 1:
+            lines += 1
+            break
+        
+        # 贪心：选取第一个点作为基准点 P0
+        p0 = points[0]
+        
+        # 统计经过 p0 的所有直线的覆盖情况
+        # key 为斜率 (dy, dx)，value 为点在 points 中的索引列表
+        slopes = {}
+        
+        # 遍历剩余所有点，计算斜率
+        for i in range(1, len(points)):
+            p1 = points[i]
+            dx = p1[0] - p0[0]
+            dy = p1[1] - p0[1]
+            
+            # 约分斜率，使用 gcd 处理 (0, 0) 等特殊情况
+            if dx == 0 and dy == 0:
+                # 重合点，归类为特殊斜率，或者直接处理
+                # 这里为了简化，将重合点视为属于任何通过 p0 的直线
+                # 这里暂且视为 (0, 0)
+                slope = (0, 0)
+            else:
+                common = gcd(dx, dy)
+                slope = (dy // common, dx // common)
+                # 标准化斜率方向，确保斜率唯一 (例如 1/-1 和 -1/1 视为同一种)
+                if slope[1] < 0 or (slope[1] == 0 and slope[0] < 0):
+                    slope = (-slope[0], -slope[1])
+            
+            if slope not in slopes:
+                slopes[slope] = []
+            slopes[slope].append(i)
+            
+        # 找出覆盖点最多的斜率
+        # 默认覆盖点数就是只包含 p0 本身 (len == 0)
+        max_covered_indices = [] # 存储要删除的索引
+        
+        # 如果存在斜率，则选择覆盖最多的
+        if slopes:
+            best_slope = max(slopes, key=lambda k: len(slopes[k]))
+            max_covered_indices = slopes[best_slope]
+        
+        # 移除这些点
+        # 注意：要倒序删除以保证索引正确，或者使用列表推导式
+        # p0 也是要移除的，它是索引 0
+        indices_to_remove = {0} | set(max_covered_indices)
+        
+        # 构建新点集
+        new_points = []
+        for i in range(len(points)):
+            if i not in indices_to_remove:
+                new_points.append(points[i])
+        
+        points = new_points
+        lines += 1
+        
+    print(lines)
+
+if __name__ == '__main__':
+    solve()
